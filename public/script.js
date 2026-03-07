@@ -1,3 +1,13 @@
+const API = 'https://uncrowned1-production.up.railway.app';
+async function apiFetch(path, opts = {}) {
+  const token = localStorage.getItem('uc_token');
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': token } : {}) },
+    ...opts
+  });
+  return res.json();
+}
+
 const SIZE_SURCHARGE = { 'S': 0, 'M': 0, 'L': 0, 'XL': 50, '2XL': 100 };
 const ALL_SIZES = ['S', 'M', 'L', 'XL', '2XL'];
 
@@ -33,6 +43,15 @@ let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   renderProducts(allProducts);
+  const savedToken = localStorage.getItem('uc_token');
+  if (savedToken) {
+    apiFetch('/api/orders/my').then(data => {
+      if (!data.error) {
+        const tokenParts = savedToken.split('');
+      }
+    }).catch(() => { });
+  }
+  loadProductsFromAPI();
   updateAuthUI();
 });
 
@@ -440,6 +459,19 @@ function placeOrder(gcashMeta) {
     gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
     createdAt: new Date().toISOString()
   };
+  apiFetch('/api/checkout', {
+    method: 'POST', body: JSON.stringify({
+      cart: cart.map(i => ({ id: i.id, name: i.name, category: i.category, size: i.size, qty: i.qty || 1, finalPrice: i.finalPrice, price: i.finalPrice, image: i.image })),
+      subtotal, shipping, total,
+      address: order.address,
+      paymentMethod: selectedPayMethod,
+      gcashProof: gcashMeta ? gcashMeta.gcashProof : null,
+      gcashRef: gcashMeta ? gcashMeta.gcashRef : null,
+      gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
+    })
+  }).then(data => {
+    if (data.orderNum) order.orderNum = data.orderNum;
+  }).catch(() => { });
   allOrders.unshift(order);
 
   const isGCashOrder = selectedPayMethod === 'gcash';
@@ -533,20 +565,20 @@ function signup() {
   if (pwStrength.score < 4) return showError('signup-error', '⚠ ' + pwStrength.tip);
   if (!agreedTerms) return showError('signup-error', 'Please agree to the Terms & Conditions.');
   if (!agreedPrivacy) return showError('signup-error', 'Please agree to the Privacy Policy.');
-  if (registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase()))
-    return showError('signup-error', 'This email is already registered.');
-  if (registeredUsers.find(u => u.username.toLowerCase() === username.toLowerCase()))
-    return showError('signup-error', 'This username is already taken. Please choose another.');
-
-  const newUser = { id: registeredUsers.length + 1, username, email, password, age, role: 'customer', createdAt: new Date() };
-  registeredUsers.push(newUser);
-  ['signup-username', 'signup-email', 'signup-age', 'signup-password'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('agree-terms').checked = false;
-  document.getElementById('agree-privacy').checked = false;
-  document.getElementById('signup-strength-bar').style.width = '0%';
-  document.getElementById('signup-strength-label').innerText = '';
-  switchModal('signup-modal', 'login-modal');
-  showToast('Account created! Please log in.');
+  apiFetch('/api/signup', { method: 'POST', body: JSON.stringify({ username, email, password, age, agreedToTerms: agreedTerms, agreedToPrivacy: agreedPrivacy }) })
+    .then(data => {
+      if (data.error) return showError('signup-error', data.error);
+      localStorage.setItem('uc_token', data.token);
+      currentUser = { username: data.username, role: data.role };
+      ['signup-username', 'signup-email', 'signup-age', 'signup-password'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('agree-terms').checked = false;
+      document.getElementById('agree-privacy').checked = false;
+      document.getElementById('signup-strength-bar').style.width = '0%';
+      document.getElementById('signup-strength-label').innerText = '';
+      closeModal('signup-modal');
+      updateAuthUI();
+      showToast('Account created! Welcome, ' + data.username + '!');
+    }).catch(() => showError('signup-error', 'Network error. Please try again.'));
 }
 
 function login() {
@@ -556,26 +588,21 @@ function login() {
   if (!emailOrUser) return showError('login-error', 'Please enter your email or username.');
   if (!password) return showError('login-error', 'Please enter your password.');
 
-  if ((emailOrUser === ADMIN_CREDENTIALS.username || emailOrUser === 'admin') && password === ADMIN_CREDENTIALS.password) {
-    currentUser = { username: 'Admin', role: 'admin' };
-    updateAuthUI(); closeModal('login-modal');
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-password').value = '';
-    showToast('Welcome back, Admin!'); return;
-  }
-  const user = registeredUsers.find(u =>
-    (u.email.toLowerCase() === emailOrUser.toLowerCase() || u.username.toLowerCase() === emailOrUser.toLowerCase())
-    && u.password === password
-  );
-  if (!user) return showError('login-error', 'Invalid email/username or password.');
-  currentUser = { username: user.username, role: user.role };
-  updateAuthUI(); closeModal('login-modal');
-  document.getElementById('login-email').value = '';
-  document.getElementById('login-password').value = '';
-  showToast(`Welcome back, ${user.username}!`);
+  apiFetch('/api/login', { method: 'POST', body: JSON.stringify({ email: emailOrUser, password }) })
+    .then(data => {
+      if (data.error) return showError('login-error', data.error);
+      localStorage.setItem('uc_token', data.token);
+      currentUser = { username: data.username, role: data.role };
+      updateAuthUI(); closeModal('login-modal');
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+      showToast('Welcome back, ' + data.username + '!');
+    }).catch(() => showError('login-error', 'Network error. Please try again.'));
 }
 
 function logout() {
+  apiFetch('/api/logout', { method: 'POST' }).catch(() => { });
+  localStorage.removeItem('uc_token');
   currentUser = null;
   updateAuthUI();
   showToast('Logged out successfully.');
@@ -650,25 +677,32 @@ function loadAdminProducts() {
   });
 }
 
+function loadProductsFromAPI() {
+  apiFetch('/api/products').then(data => {
+    if (Array.isArray(data) && data.length > 0) {
+      allProducts = data;
+      renderProducts(allProducts);
+    }
+  }).catch(() => { });
+}
+
 function loadAdminUsers() {
   const list = document.getElementById('admin-user-list');
-  list.innerHTML = '';
-  if (registeredUsers.length === 0) {
-    list.innerHTML = '<p style="color:#888;padding:20px 0;">No registered customers yet.</p>';
-    return;
-  }
-  registeredUsers.forEach(u => {
-    const row = document.createElement('div');
-    row.className = 'admin-row';
-    row.innerHTML = `
-      <div style="flex:1;">
+  list.innerHTML = '<p style="color:#888;padding:20px 0;">Loading...</p>';
+  apiFetch('/api/admin/users').then(users => {
+    list.innerHTML = '';
+    if (!users.length) { list.innerHTML = '<p style="color:#888;padding:20px 0;">No registered customers yet.</p>'; return; }
+    users.forEach(u => {
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      row.innerHTML = `<div style="flex:1;">
         <strong>${u.username}</strong>
         <small style="display:block;color:#888;">${u.email} · Age: ${u.age}</small>
-        <small style="display:block;color:#aaa;">Joined: ${new Date(u.createdAt).toLocaleDateString()}</small>
-      </div>
-    `;
-    list.appendChild(row);
-  });
+        <small style="display:block;color:#aaa;">Joined: ${new Date(u.created_at).toLocaleDateString()}</small>
+      </div>`;
+      list.appendChild(row);
+    });
+  }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load users.</p>'; });
 }
 
 function loadAdminOrders() {

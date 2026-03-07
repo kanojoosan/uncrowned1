@@ -42,17 +42,26 @@ let productToDelete = null;
 let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderProducts(allProducts);
-  const savedToken = localStorage.getItem('uc_token');
-  if (savedToken) {
-    apiFetch('/api/orders/my').then(data => {
-      if (!data.error) {
-        const tokenParts = savedToken.split('');
-      }
-    }).catch(() => { });
+  // Restore session from localStorage
+  const savedUser = localStorage.getItem('uc_user');
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+    } catch (e) {
+      localStorage.removeItem('uc_user');
+      localStorage.removeItem('uc_token');
+    }
   }
-  loadProductsFromAPI();
   updateAuthUI();
+
+  // Load products from DB (falls back to hardcoded if API fails)
+  loadProductsFromAPI();
+
+  // Restore cart from localStorage
+  const savedCart = localStorage.getItem('uc_cart');
+  if (savedCart) {
+    try { cart = JSON.parse(savedCart); updateCartUI(); } catch (e) { }
+  }
 });
 
 function getSurcharge(size) {
@@ -235,6 +244,7 @@ function removeFromCart(index) {
 }
 
 function updateCartUI() {
+  localStorage.setItem('uc_cart', JSON.stringify(cart));
   const totalItems = cart.reduce((s, i) => s + (i.qty || 1), 0);
   document.getElementById('cart-count').innerText = totalItems;
   const container = document.getElementById('cart-items');
@@ -570,6 +580,7 @@ function signup() {
       if (data.error) return showError('signup-error', data.error);
       localStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
+      localStorage.setItem('uc_user', JSON.stringify(currentUser));
       ['signup-username', 'signup-email', 'signup-age', 'signup-password'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('agree-terms').checked = false;
       document.getElementById('agree-privacy').checked = false;
@@ -593,6 +604,7 @@ function login() {
       if (data.error) return showError('login-error', data.error);
       localStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
+      localStorage.setItem('uc_user', JSON.stringify(currentUser));
       updateAuthUI(); closeModal('login-modal');
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
@@ -603,7 +615,11 @@ function login() {
 function logout() {
   apiFetch('/api/logout', { method: 'POST' }).catch(() => { });
   localStorage.removeItem('uc_token');
+  localStorage.removeItem('uc_user');
+  localStorage.removeItem('uc_cart');
   currentUser = null;
+  cart = [];
+  updateCartUI();
   updateAuthUI();
   showToast('Logged out successfully.');
 }
@@ -708,31 +724,31 @@ function loadAdminUsers() {
 function loadAdminOrders() {
   const list = document.getElementById('admin-order-list');
   const countEl = document.getElementById('order-count');
-  list.innerHTML = '';
-  if (countEl) countEl.innerText = allOrders.length;
-  if (allOrders.length === 0) {
-    list.innerHTML = '<p style="color:#888;padding:20px 0;">No orders yet.</p>';
-    return;
-  }
-  allOrders.forEach((order, idx) => {
-    const statusColors = { pending: '#e67e22', out_for_delivery: '#2980b9', completed: '#27ae60', cancelled: '#c0392b' };
-    const statusLabels = { pending: '⏳ Pending', out_for_delivery: '🚚 Out for Delivery', completed: '✅ Completed', cancelled: '❌ Cancelled' };
-    const color = statusColors[order.status] || '#888';
-    const label = statusLabels[order.status] || order.status;
-    const date = new Date(order.createdAt).toLocaleString();
-    const itemsSummary = order.items.map(i => `${i.name} (${i.size})`).join(', ');
+  list.innerHTML = '<p style="color:#888;padding:20px 0;">Loading orders...</p>';
+  apiFetch('/api/admin/orders').then(orders => {
+    allOrders = orders;
+    list.innerHTML = '';
+    if (countEl) countEl.innerText = orders.length;
+    if (!orders.length) { list.innerHTML = '<p style="color:#888;padding:20px 0;">No orders yet.</p>'; return; }
+    orders.forEach((order, idx) => {
+      const statusColors = { pending: '#e67e22', out_for_delivery: '#2980b9', completed: '#27ae60', cancelled: '#c0392b' };
+      const statusLabels = { pending: '⏳ Pending', out_for_delivery: '🚚 Out for Delivery', completed: '✅ Completed', cancelled: '❌ Cancelled' };
+      const color = statusColors[order.status] || '#888';
+      const label = statusLabels[order.status] || order.status;
+      const date = new Date(order.created_at).toLocaleString();
+      const itemsSummary = order.items.map(i => `${i.name} (${i.size})`).join(', ');
 
-    const isGCash = order.payment === 'gcash';
-    const gcashPending = isGCash && order.gcashStatus === 'pending_confirmation';
-    const gcashConfirmed = isGCash && order.gcashStatus === 'confirmed';
-    const gcashRejected = isGCash && order.gcashStatus === 'rejected';
+      const isGCash = order.payment_method === 'gcash';
+      const gcashPending = isGCash && order.gcash_status === 'pending_confirmation';
+      const gcashConfirmed = isGCash && order.gcash_status === 'confirmed';
+      const gcashRejected = isGCash && order.gcash_status === 'rejected';
 
-    const row = document.createElement('div');
-    row.className = 'admin-order-row';
-    row.innerHTML = `
+      const row = document.createElement('div');
+      row.className = 'admin-order-row';
+      row.innerHTML = `
       <div class="order-row-top">
         <div>
-          <strong class="order-num">#${order.orderNum}</strong>
+          <strong class="order-num">#${order.order_num}</strong>
           <span class="order-customer">by ${order.customer}</span>
           <span class="order-date">${date}</span>
         </div>
@@ -745,21 +761,21 @@ function loadAdminOrders() {
       </div>
       <div class="order-row-items">${itemsSummary}</div>
       <div class="order-row-address">📍 ${order.address.street}, ${order.address.city}, ${order.address.province} ${order.address.zip} · ${order.address.phone}</div>
-      ${isGCash && order.gcashRef ? `
+      ${isGCash && order.gcash_ref ? `
         <div class="gcash-proof-row">
-          <div class="gcash-ref-display">📋 Ref #: <strong>${order.gcashRef}</strong></div>
-          ${order.gcashProof ? `<img src="${order.gcashProof}" class="gcash-proof-thumb" onclick="viewGCashProof(${idx})" title="Click to enlarge">` : ''}
+          <div class="gcash-ref-display">📋 Ref #: <strong>${order.gcash_ref}</strong></div>
+          ${order.gcash_proof ? `<img src="${order.gcash_proof}" class="gcash-proof-thumb" onclick="viewGCashProof(${idx})" title="Click to enlarge">` : ''}
           ${gcashPending ? `
             <div style="display:flex;gap:8px;flex-shrink:0;">
               <button class="order-btn gcash-confirm-btn" onclick="confirmGCashPaymentAdmin(${idx})">✅ CONFIRM</button>
               <button class="order-btn gcash-reject-btn"  onclick="rejectGCashPaymentAdmin(${idx})">❌ REJECT</button>
             </div>
           ` : ''}
-          ${gcashRejected ? `<span style="font-size:0.75rem;color:#c0392b;font-weight:700;">Reason: ${order.gcashRejectReason || 'Invalid payment proof'}</span>` : ''}
+          ${gcashRejected ? `<span style="font-size:0.75rem;color:#c0392b;font-weight:700;">Reason: ${order.gcash_reject_reason || 'Invalid payment proof'}</span>` : ''}
         </div>
       ` : ''}
       <div class="order-row-bottom">
-        <span class="order-total">Total: <strong>₱${order.total.toLocaleString()}</strong> · ${order.payment.toUpperCase()}</span>
+        <span class="order-total">Total: <strong>₱${order.total.toLocaleString()}</strong> · ${order.payment_method.toUpperCase()}</span>
         <div class="order-actions">
           ${(order.status === 'pending' && (!isGCash || gcashConfirmed)) ? `<button class="order-btn deliver" onclick="updateOrderStatus(${idx},'out_for_delivery')">🚚 Mark Out for Delivery</button>` : ''}
           ${order.status === 'out_for_delivery' ? `<button class="order-btn complete" onclick="updateOrderStatus(${idx},'completed')">✅ Mark Completed</button>` : ''}
@@ -768,21 +784,26 @@ function loadAdminOrders() {
         </div>
       </div>
     `;
-    list.appendChild(row);
-  });
+      list.appendChild(row);
+    });
+  }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load orders.</p>'; });
 }
 
 function updateOrderStatus(idx, newStatus) {
-  allOrders[idx].status = newStatus;
-  loadAdminOrders();
-  const labels = { out_for_delivery: 'Out for Delivery', completed: 'Completed', cancelled: 'Cancelled' };
-  showToast(`Order #${allOrders[idx].orderNum} → ${labels[newStatus]}`);
+  const order = allOrders[idx];
+  apiFetch('/api/admin/orders/' + order.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status: newStatus }) })
+    .then(() => {
+      const labels = { out_for_delivery: 'Out for Delivery', completed: 'Completed', cancelled: 'Cancelled' };
+      showToast('Order #' + order.order_num + ' → ' + (labels[newStatus] || newStatus));
+      loadAdminOrders();
+    }).catch(() => showToast('Failed to update order.'));
 }
 
 function confirmGCashPaymentAdmin(idx) {
-  allOrders[idx].gcashStatus = 'confirmed';
-  loadAdminOrders();
-  showToast(`💙 GCash payment confirmed for Order #${allOrders[idx].orderNum}`);
+  const order = allOrders[idx];
+  apiFetch('/api/admin/orders/' + order.order_num + '/gcash', { method: 'PUT', body: JSON.stringify({ gcash_status: 'confirmed' }) })
+    .then(() => { showToast('💙 GCash confirmed for Order #' + order.order_num); loadAdminOrders(); })
+    .catch(() => showToast('Failed to confirm GCash.'));
 }
 
 let gcashRejectTargetIdx = null;
@@ -803,20 +824,20 @@ function selectRejectReason(chip, text) {
 function confirmGCashReject() {
   const reason = document.getElementById('gcash-reject-reason').value.trim();
   if (!reason) { showToast('Please select or type a reason.'); return; }
-  const idx = gcashRejectTargetIdx;
-  allOrders[idx].gcashStatus = 'rejected';
-  allOrders[idx].gcashRejectReason = reason;
-  allOrders[idx].status = 'cancelled';
-  closeModal('gcash-reject-modal');
-  loadAdminOrders();
-  showToast(`❌ GCash payment rejected for Order #${allOrders[idx].orderNum}`);
+  const order = allOrders[gcashRejectTargetIdx];
+  apiFetch('/api/admin/orders/' + order.order_num + '/gcash', { method: 'PUT', body: JSON.stringify({ gcash_status: 'rejected', gcash_reject_reason: reason }) })
+    .then(() => {
+      closeModal('gcash-reject-modal');
+      showToast('❌ GCash rejected for Order #' + order.order_num);
+      loadAdminOrders();
+    }).catch(() => showToast('Failed to reject GCash.'));
 }
 
 function viewGCashProof(idx) {
   const order = allOrders[idx];
-  if (!order || !order.gcashProof) return;
+  if (!order || !order.gcash_proof) return;
   const win = window.open('');
-  win.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${order.gcashProof}" style="max-width:100%;max-height:100vh;object-fit:contain;"></body></html>`);
+  win.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${order.gcash_proof}" style="max-width:100%;max-height:100vh;object-fit:contain;"></body></html>`);
 }
 
 function promptDelete(id, name) {
@@ -826,12 +847,15 @@ function promptDelete(id, name) {
 }
 function confirmDelete() {
   if (productToDelete === null) return;
-  allProducts = allProducts.filter(p => p.id !== productToDelete);
-  productToDelete = null;
-  closeModal('delete-modal');
-  renderProducts(allProducts);
-  loadAdminProducts();
-  showToast('Product deleted successfully.');
+  apiFetch('/api/products/' + productToDelete, { method: 'DELETE' })
+    .then(() => {
+      allProducts = allProducts.filter(p => p.id !== productToDelete);
+      productToDelete = null;
+      closeModal('delete-modal');
+      renderProducts(allProducts);
+      loadAdminProducts();
+      showToast('Product deleted successfully.');
+    }).catch(() => showToast('Failed to delete product.'));
 }
 
 let editingProductId = null;
@@ -904,27 +928,32 @@ function saveProduct() {
   const stock = stockVal !== '' ? parseInt(stockVal) : null;
   const details = document.getElementById('new-product-details').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('new-product-specs').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
-  if (editingProductId !== null) {
-    const idx = allProducts.findIndex(p => p.id === editingProductId);
-    if (idx > -1) allProducts[idx] = { ...allProducts[idx], image, name, category, price, sizes, stock, details, specs };
-    showToast(`"${name}" updated successfully.`);
-  } else {
-    const newId = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.id)) + 1 : 1;
-    allProducts.push({ id: newId, name, category, price, image, sizes, stock, details, specs });
-    showToast(`"${name}" added to the store!`);
-  }
-  closeModal('add-product-modal');
-  renderProducts(allProducts);
-  loadAdminProducts();
+  const method = editingProductId !== null ? 'PUT' : 'POST';
+  const url = editingProductId !== null ? '/api/products/' + editingProductId : '/api/products';
+  apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, details, specs }) })
+    .then(data => {
+      if (data.error) return showToast('Error: ' + data.error);
+      if (editingProductId !== null) {
+        const idx = allProducts.findIndex(p => p.id === editingProductId);
+        if (idx > -1) allProducts[idx] = data.product;
+        showToast('"' + name + '" updated successfully.');
+      } else {
+        allProducts.unshift(data.product);
+        showToast('"' + name + '" added to the store!');
+      }
+      closeModal('add-product-modal');
+      renderProducts(allProducts);
+      loadAdminProducts();
+    }).catch(() => showToast('Failed to save product.'));
 }
 
 function getCustomerTab(order) {
   if (order.status === 'cancelled') return null;
   if (order.status === 'pending') {
-    return order.payment === 'cod' ? 'to_ship' : 'to_pay';
+    return order.payment_method === 'cod' ? 'to_ship' : 'to_pay';
   }
   if (order.status === 'out_for_delivery') return 'to_receive';
-  if (order.status === 'completed') return order.rated ? null : 'to_rate';
+  if (order.status === 'completed') return order.rated && order.rating ? null : 'to_rate';
   return null;
 }
 
@@ -939,19 +968,19 @@ function openMyOrders() {
 }
 
 function refreshMyOrdersBadges() {
-  const tabs = ['to_pay', 'to_ship', 'to_receive', 'to_rate'];
-  const counts = { to_pay: 0, to_ship: 0, to_receive: 0, to_rate: 0 };
-  const myOrders = allOrders.filter(o => o.customer === currentUser?.username);
-  myOrders.forEach(o => {
-    const tab = getCustomerTab(o);
-    if (tab) counts[tab]++;
-  });
-  tabs.forEach(tab => {
-    const el = document.getElementById('badge-' + tab);
-    if (!el) return;
-    el.innerText = counts[tab];
-    el.classList.toggle('visible', counts[tab] > 0);
-  });
+  apiFetch('/api/orders/my').then(orders => {
+    if (!Array.isArray(orders)) return;
+    allOrders = orders;
+    const tabs = ['to_pay', 'to_ship', 'to_receive', 'to_rate'];
+    const counts = { to_pay: 0, to_ship: 0, to_receive: 0, to_rate: 0 };
+    orders.forEach(o => { const tab = getCustomerTab(o); if (tab) counts[tab]++; });
+    tabs.forEach(tab => {
+      const el = document.getElementById('badge-' + tab);
+      if (!el) return;
+      el.innerText = counts[tab];
+      el.classList.toggle('visible', counts[tab] > 0);
+    });
+  }).catch(() => { });
 }
 
 function switchMyOrdersTab(tab) {
@@ -965,41 +994,44 @@ function switchMyOrdersTab(tab) {
 
 function renderMyOrders(tab) {
   const list = document.getElementById('my-orders-list');
-  list.innerHTML = '';
-  const myOrders = allOrders.filter(o => o.customer === currentUser?.username && getCustomerTab(o) === tab);
+  list.innerHTML = '<p style="color:#888;padding:20px 0;text-align:center;">Loading...</p>';
+  apiFetch('/api/orders/my').then(orders => {
+    allOrders = Array.isArray(orders) ? orders : [];
+    list.innerHTML = '';
+    const myOrders = allOrders.filter(o => getCustomerTab(o) === tab);
 
-  if (myOrders.length === 0) {
-    const emptyIcons = { to_pay: '💳', to_ship: '📦', to_receive: '🚚', to_rate: '⭐' };
-    const emptyMsgs = {
-      to_pay: 'No orders waiting for payment.',
-      to_ship: 'No orders being prepared.',
-      to_receive: 'No orders out for delivery.',
-      to_rate: 'No completed orders to rate yet.'
-    };
-    list.innerHTML = `
+    if (myOrders.length === 0) {
+      const emptyIcons = { to_pay: '💳', to_ship: '📦', to_receive: '🚚', to_rate: '⭐' };
+      const emptyMsgs = {
+        to_pay: 'No orders waiting for payment.',
+        to_ship: 'No orders being prepared.',
+        to_receive: 'No orders out for delivery.',
+        to_rate: 'No completed orders to rate yet.'
+      };
+      list.innerHTML = `
       <div class="my-order-empty">
         <div class="empty-icon">${emptyIcons[tab]}</div>
         <p>${emptyMsgs[tab]}</p>
       </div>`;
-    return;
-  }
+      return;
+    }
 
-  myOrders.forEach(order => {
-    const statusColors = {
-      pending: '#e67e22',
-      out_for_delivery: '#2980b9',
-      completed: '#27ae60',
-    };
-    const statusLabels = {
-      pending: order.payment === 'cod' ? '📦 Preparing' : (order.payment === 'gcash' ? '💙 GCash - Verifying Payment' : '💳 Awaiting Payment'),
-      out_for_delivery: '🚚 Out for Delivery',
-      completed: '✅ Delivered',
-    };
-    const color = statusColors[order.status] || '#888';
-    const label = statusLabels[order.status] || order.status;
-    const date = new Date(order.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+    myOrders.forEach(order => {
+      const statusColors = {
+        pending: '#e67e22',
+        out_for_delivery: '#2980b9',
+        completed: '#27ae60',
+      };
+      const statusLabels = {
+        pending: order.payment_method === 'cod' ? '📦 Preparing' : (order.payment_method === 'gcash' ? '💙 GCash - Verifying Payment' : '💳 Awaiting Payment'),
+        out_for_delivery: '🚚 Out for Delivery',
+        completed: '✅ Delivered',
+      };
+      const color = statusColors[order.status] || '#888';
+      const label = statusLabels[order.status] || order.status;
+      const date = new Date(order.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 
-    const itemsHTML = order.items.map(item => `
+      const itemsHTML = order.items.map(item => `
       <div class="my-order-item">
         <img src="${item.image}" alt="${item.name}">
         <div class="my-order-item-info">
@@ -1011,39 +1043,39 @@ function renderMyOrders(tab) {
     `).join('');
 
 
-    let actionBtn = '';
-    if (tab === 'to_pay') {
-      if (order.payment === 'gcash') {
-        if (order.gcashStatus === 'pending_confirmation') {
-          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify payment</span>`;
-        } else if (order.gcashStatus === 'confirmed') {
-          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">💙 GCash Confirmed</span>`;
-        } else if (order.gcashStatus === 'rejected') {
-          actionBtn = `<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#c0392b;background:#fdecea;border:1px solid #f5c6c6;padding:6px 12px;border-radius:4px;display:inline-block;">❌ Payment Rejected</span>${order.gcashRejectReason ? `<div style="font-size:0.72rem;color:#c0392b;margin-top:4px;">Reason: ${order.gcashRejectReason}</div>` : ''}</div>`;
+      let actionBtn = '';
+      if (tab === 'to_pay') {
+        if (order.payment_method === 'gcash') {
+          if (order.gcash_status === 'pending_confirmation') {
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify payment</span>`;
+          } else if (order.gcash_status === 'confirmed') {
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">💙 GCash Confirmed</span>`;
+          } else if (order.gcash_status === 'rejected') {
+            actionBtn = `<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#c0392b;background:#fdecea;border:1px solid #f5c6c6;padding:6px 12px;border-radius:4px;display:inline-block;">❌ Payment Rejected</span>${order.gcash_reject_reason ? `<div style="font-size:0.72rem;color:#c0392b;margin-top:4px;">Reason: ${order.gcash_reject_reason}</div>` : ''}</div>`;
+          } else {
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;padding:6px 12px;">Pending</span>`;
+          }
         } else {
-          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;padding:6px 12px;">Pending</span>`;
+          actionBtn = `<button class="my-order-action-btn primary" onclick="showToast('Redirecting to payment...')">PAY NOW</button>`;
         }
-      } else {
-        actionBtn = `<button class="my-order-action-btn primary" onclick="showToast('Redirecting to payment...')">PAY NOW</button>`;
+      } else if (tab === 'to_ship') {
+        actionBtn = '';
+      } else if (tab === 'to_receive') {
+        actionBtn = `<button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>`;
+      } else if (tab === 'to_rate') {
+        actionBtn = `<button class="my-order-action-btn primary" onclick="openRateModal('${order.order_num}')">RATE NOW</button>`;
       }
-    } else if (tab === 'to_ship') {
-      actionBtn = '';
-    } else if (tab === 'to_receive') {
-      actionBtn = `<button class="my-order-action-btn primary" onclick="confirmReceived('${order.orderNum}')">ORDER RECEIVED</button>`;
-    } else if (tab === 'to_rate') {
-      actionBtn = `<button class="my-order-action-btn primary" onclick="openRateModal('${order.orderNum}')">RATE NOW</button>`;
-    }
 
-    const ratedHTML = order.rated
-      ? `<div class="rated-stars">${'★'.repeat(order.rating)}${'☆'.repeat(5 - order.rating)}</div>${order.ratingComment ? `<div class="rated-comment">"${order.ratingComment}"</div>` : ''}`
-      : '';
+      const ratedHTML = order.rated
+        ? `<div class="rated-stars">${'★'.repeat(order.rating)}${'☆'.repeat(5 - order.rating)}</div>${order.rating_comment ? `<div class="rated-comment">"${order.rating_comment}"</div>` : ''}`
+        : '';
 
-    const card = document.createElement('div');
-    card.className = 'my-order-card';
-    card.innerHTML = `
+      const card = document.createElement('div');
+      card.className = 'my-order-card';
+      card.innerHTML = `
       <div class="my-order-card-top">
         <div>
-          <span class="my-order-num">#${order.orderNum}</span>
+          <span class="my-order-num">#${order.order_num}</span>
           <span style="color:#aaa;font-size:0.75rem;margin-left:8px;">${date}</span>
         </div>
         <span class="my-order-status" style="background:${color};color:#fff;">${label}</span>
@@ -1055,19 +1087,18 @@ function renderMyOrders(tab) {
         ${actionBtn}
       </div>
     `;
-    list.appendChild(card);
-  });
+      list.appendChild(card);
+    });
+  }).catch(() => { list.innerHTML = '<p style="color:#c00;padding:20px 0;text-align:center;">Failed to load orders.</p>'; });
 }
 
 function confirmReceived(orderNum) {
-  const order = allOrders.find(o => o.orderNum === orderNum);
-  if (!order) return;
-  order.status = 'completed';
-  refreshMyOrdersBadges();
-  renderMyOrders('to_receive');
-  showToast('Order marked as received! Please rate your purchase.');
-
-  setTimeout(() => switchMyOrdersTab('to_rate'), 800);
+  apiFetch('/api/orders/' + orderNum + '/received', { method: 'PUT' })
+    .then(() => {
+      showToast('Order marked as received! Please rate your purchase.');
+      refreshMyOrdersBadges();
+      setTimeout(() => switchMyOrdersTab('to_rate'), 800);
+    }).catch(() => showToast('Failed to update order.'));
 }
 
 function openRateModal(orderNum) {
@@ -1089,15 +1120,14 @@ function setRating(rating) {
 
 function submitRating() {
   if (currentRating === 0) return showToast('Please select a star rating.');
-  const order = allOrders.find(o => o.orderNum === ratingTargetOrderNum);
-  if (!order) return;
-  order.rated = true;
-  order.rating = currentRating;
-  order.ratingComment = document.getElementById('rate-comment').value.trim();
-  closeModal('rate-modal');
-  refreshMyOrdersBadges();
-  switchMyOrdersTab('to_rate');
-  showToast('Thank you for your rating! ⭐'.repeat(Math.min(currentRating, 3)));
+  const comment = document.getElementById('rate-comment').value.trim();
+  apiFetch('/api/orders/' + ratingTargetOrderNum + '/rate', { method: 'PUT', body: JSON.stringify({ rating: currentRating, comment }) })
+    .then(() => {
+      closeModal('rate-modal');
+      refreshMyOrdersBadges();
+      switchMyOrdersTab('to_rate');
+      showToast('Thank you for your rating! ' + '⭐'.repeat(Math.min(currentRating, 3)));
+    }).catch(() => showToast('Failed to submit rating.'));
 }
 
 function checkPasswordStrength(pw) {

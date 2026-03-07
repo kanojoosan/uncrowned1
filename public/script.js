@@ -696,11 +696,65 @@ function loadAdminProducts() {
 }
 
 function loadProductsFromAPI() {
+  // Show hardcoded products immediately so page is never blank
+  renderProducts(allProducts);
+  // Then fetch from DB and replace if available
   apiFetch('/api/products').then(data => {
     if (Array.isArray(data) && data.length > 0) {
       allProducts = data;
       renderProducts(allProducts);
+    } else if (Array.isArray(data) && data.length === 0) {
+      // DB is empty - seed products then reload
+      seedProductsToDB();
     }
+  }).catch(() => {
+    // API unreachable - keep showing hardcoded products
+    renderProducts(allProducts);
+  });
+}
+
+function seedProductsToDB() {
+  const toSeed = [
+    { name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 2800, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Aonga Y2k Sweatpants", category: "jackets", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+  ];
+  // Need admin token to seed - store original token, use admin
+  const originalToken = localStorage.getItem('uc_token');
+  // Login as admin temporarily to seed
+  fetch(API + '/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin', password: 'admin123' })
+  }).then(r => r.json()).then(data => {
+    if (!data.token) return;
+    const adminToken = data.token;
+    let seeded = 0;
+    toSeed.forEach(p => {
+      fetch(API + '/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': adminToken },
+        body: JSON.stringify(p)
+      }).then(r => r.json()).then(res => {
+        seeded++;
+        if (seeded === toSeed.length) {
+          // Restore original token and reload products
+          if (originalToken) localStorage.setItem('uc_token', originalToken);
+          else localStorage.removeItem('uc_token');
+          loadProductsFromAPI();
+        }
+      });
+    });
   }).catch(() => { });
 }
 

@@ -469,6 +469,7 @@ function placeOrder(gcashMeta) {
     gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
     createdAt: new Date().toISOString()
   };
+  const isGCashOrder = selectedPayMethod === 'gcash';
   apiFetch('/api/checkout', {
     method: 'POST', body: JSON.stringify({
       cart: cart.map(i => ({ id: i.id, name: i.name, category: i.category, size: i.size, qty: i.qty || 1, finalPrice: i.finalPrice, price: i.finalPrice, image: i.image })),
@@ -480,20 +481,21 @@ function placeOrder(gcashMeta) {
       gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
     })
   }).then(data => {
-    if (data.orderNum) order.orderNum = data.orderNum;
-  }).catch(() => { });
-  allOrders.unshift(order);
-
-  const isGCashOrder = selectedPayMethod === 'gcash';
-  document.getElementById('success-screen-confirmed').style.display = isGCashOrder ? 'none' : 'block';
-  document.getElementById('success-screen-gcash').style.display = isGCashOrder ? 'block' : 'none';
-  document.getElementById('success-order-num').innerText = 'ORDER #' + orderNum;
-  document.getElementById('success-order-num-gcash').innerText = 'ORDER #' + orderNum;
-  document.querySelectorAll('.checkout-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('checkout-success').classList.add('active');
-  cart = [];
-  updateCartUI();
-  updateStepIndicator(4);
+    const realOrderNum = (data && data.orderNum) ? data.orderNum : orderNum;
+    document.getElementById('success-screen-confirmed').style.display = isGCashOrder ? 'none' : 'block';
+    document.getElementById('success-screen-gcash').style.display = isGCashOrder ? 'block' : 'none';
+    document.getElementById('success-order-num').innerText = 'ORDER #' + realOrderNum;
+    document.getElementById('success-order-num-gcash').innerText = 'ORDER #' + realOrderNum;
+    document.querySelectorAll('.checkout-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('checkout-success').classList.add('active');
+    cart = [];
+    updateCartUI();
+    updateStepIndicator(4);
+    refreshMyOrdersBadges();
+  }).catch(err => {
+    showToast('Order failed. Please try again.');
+    console.error(err);
+  });
 }
 
 function selectPayMethod(method) {
@@ -726,7 +728,8 @@ function loadAdminOrders() {
   const countEl = document.getElementById('order-count');
   list.innerHTML = '<p style="color:#888;padding:20px 0;">Loading orders...</p>';
   apiFetch('/api/admin/orders').then(orders => {
-    allOrders = orders;
+    console.log('ADMIN ORDERS API:', orders);
+    allOrders = Array.isArray(orders) ? orders : [];
     list.innerHTML = '';
     if (countEl) countEl.innerText = orders.length;
     if (!orders.length) { list.innerHTML = '<p style="color:#888;padding:20px 0;">No orders yet.</p>'; return; }
@@ -996,6 +999,11 @@ function renderMyOrders(tab) {
   const list = document.getElementById('my-orders-list');
   list.innerHTML = '<p style="color:#888;padding:20px 0;text-align:center;">Loading...</p>';
   apiFetch('/api/orders/my').then(orders => {
+    console.log('MY ORDERS API:', orders);
+    if (orders && orders.error) {
+      list.innerHTML = '<p style="color:#c00;padding:20px 0;text-align:center;">Please log in to view orders.</p>';
+      return;
+    }
     allOrders = Array.isArray(orders) ? orders : [];
     list.innerHTML = '';
     const myOrders = allOrders.filter(o => getCustomerTab(o) === tab);

@@ -1,6 +1,6 @@
 const API = 'https://uncrowned1-production.up.railway.app';
 async function apiFetch(path, opts = {}) {
-  const token = localStorage.getItem('uc_token');
+  const token = sessionStorage.getItem('uc_token');
   const res = await fetch(API + path, {
     headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': token } : {}) },
     ...opts
@@ -46,13 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
   populateBirthdaySelects();
 
 
-  const savedUser = localStorage.getItem('uc_user');
+  const savedUser = sessionStorage.getItem('uc_user');
   if (savedUser) {
     try {
       currentUser = JSON.parse(savedUser);
     } catch (e) {
-      localStorage.removeItem('uc_user');
-      localStorage.removeItem('uc_token');
+      sessionStorage.removeItem('uc_user');
+      sessionStorage.removeItem('uc_token');
     }
   }
   updateAuthUI();
@@ -580,9 +580,9 @@ function signup() {
   apiFetch('/api/signup', { method: 'POST', body: JSON.stringify({ username, email, password, age, birthday, gender, agreedToTerms: agreedTerms, agreedToPrivacy: agreedPrivacy }) })
     .then(data => {
       if (data.error) return showError('signup-error', data.error);
-      localStorage.setItem('uc_token', data.token);
+      sessionStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
-      localStorage.setItem('uc_user', JSON.stringify(currentUser));
+      sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
       ['signup-username', 'signup-email', 'signup-age', 'signup-password', 'signup-birthday'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('agree-terms').checked = false;
       document.getElementById('agree-privacy').checked = false;
@@ -611,9 +611,9 @@ function login() {
   apiFetch('/api/login', { method: 'POST', body: JSON.stringify({ email: emailOrUser, password }) })
     .then(data => {
       if (data.error) return showError('login-error', data.error);
-      localStorage.setItem('uc_token', data.token);
+      sessionStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
-      localStorage.setItem('uc_user', JSON.stringify(currentUser));
+      sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
       updateAuthUI(); closeModal('login-modal');
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
@@ -655,8 +655,8 @@ function updateBirthday() {
 
 function logout() {
   apiFetch('/api/logout', { method: 'POST' }).catch(() => { });
-  localStorage.removeItem('uc_token');
-  localStorage.removeItem('uc_user');
+  sessionStorage.removeItem('uc_token');
+  sessionStorage.removeItem('uc_user');
   localStorage.removeItem('uc_cart');
   currentUser = null;
   cart = [];
@@ -769,7 +769,7 @@ function seedProductsToDB() {
     { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder', 'Boxy Cropped Fit', 'Front and back logo print', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
   ];
 
-  const originalToken = localStorage.getItem('uc_token');
+  const originalToken = sessionStorage.getItem('uc_token');
 
   fetch(API + '/api/login', {
     method: 'POST',
@@ -788,8 +788,8 @@ function seedProductsToDB() {
         seeded++;
         if (seeded === toSeed.length) {
 
-          if (originalToken) localStorage.setItem('uc_token', originalToken);
-          else localStorage.removeItem('uc_token');
+          if (originalToken) sessionStorage.setItem('uc_token', originalToken);
+          else sessionStorage.removeItem('uc_token');
           loadProductsFromAPI();
         }
       });

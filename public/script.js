@@ -124,7 +124,8 @@ function openProductDetail(id) {
   document.getElementById('detail-name').innerText = product.name;
   document.getElementById('detail-cat').innerText = product.category.toUpperCase();
   document.getElementById('detail-price').innerHTML = `₱${product.price.toLocaleString()}`;
-  document.getElementById('detail-stock-badge').innerHTML = stockBadge;
+  const unisexBadge = `<span class="stock-badge unisex">UNISEX</span>`;
+  document.getElementById('detail-stock-badge').innerHTML = stockBadge + unisexBadge;
   document.getElementById('detail-sizes').innerHTML = sizeButtons;
   document.getElementById('detail-size-error').style.display = 'none';
   document.getElementById('detail-add-btn').onclick = () => addToCartFromDetail(product.id);

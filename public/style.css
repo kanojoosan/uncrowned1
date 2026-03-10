@@ -1970,6 +1970,11 @@ footer {
   color: #c0392b;
 }
 
+.stock-badge.unisex {
+  background: #f0f0ff;
+  color: #6c5ce7;
+}
+
 .qty-control {
   display: flex;
   align-items: center;

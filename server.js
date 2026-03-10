@@ -1,9 +1,9 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2/promise');
-const path = require('path');
+const mysql   = require('mysql2/promise');
+const path    = require('path');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
@@ -16,15 +16,15 @@ let sessions = {};
 
 async function initDB() {
   db = await mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'railway',
+    host:               process.env.DB_HOST     || 'localhost',
+    port:               parseInt(process.env.DB_PORT) || 3306,
+    user:               process.env.DB_USER     || 'root',
+    password:           process.env.DB_PASSWORD || '',
+    database:           process.env.DB_NAME     || 'railway',
     waitForConnections: true,
-    connectionLimit: 10,
-    connectTimeout: 30000,
-    ssl: { rejectUnauthorized: false },
+    connectionLimit:    10,
+    connectTimeout:     30000,
+    ssl:                { rejectUnauthorized: false },
   });
 
   await db.query(`CREATE TABLE IF NOT EXISTS users (
@@ -101,9 +101,9 @@ async function initDB() {
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
 
   // Add new columns if upgrading existing DB
-  try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch (_) { }
-  try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch (_) { }
-  try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
+  try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch(_) {}
+  try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch(_) {}
+  try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch(_) {}
   console.log('Database tables ready.');
 }
 
@@ -130,24 +130,26 @@ app.get('/api/products', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM products ORDER BY created_at DESC');
     rows.forEach(r => {
-      if (typeof r.sizes === 'string') try { r.sizes = JSON.parse(r.sizes); } catch (_) { }
-      if (typeof r.details === 'string') try { r.details = JSON.parse(r.details); } catch (_) { }
-      if (typeof r.specs === 'string') try { r.specs = JSON.parse(r.specs); } catch (_) { }
+      if (typeof r.sizes      === 'string') try { r.sizes      = JSON.parse(r.sizes);      } catch(_) {}
+      if (typeof r.details    === 'string') try { r.details    = JSON.parse(r.details);    } catch(_) {}
+      if (typeof r.specs      === 'string') try { r.specs      = JSON.parse(r.specs);      } catch(_) {}
+      if (typeof r.size_stock === 'string') try { r.size_stock = JSON.parse(r.size_stock); } catch(_) { r.size_stock = {}; }
+      if (!r.size_stock) r.size_stock = {};
     });
     res.json(rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/products', requireAdmin, async (req, res) => {
-  const { name, category, price, image, sizes, stock, details, specs } = req.body;
+  const { name, category, price, image, sizes, stock, size_stock, details, specs } = req.body;
   if (!name || !category || !price || !image)
     return res.status(400).json({ error: 'All fields are required.' });
   try {
     const [result] = await db.query(
-      'INSERT INTO products (name,category,price,sizes,image,stock,details,specs) VALUES (?,?,?,?,?,?,?,?)',
-      [name, category, parseInt(price), JSON.stringify(sizes || []), image,
-        stock != null ? parseInt(stock) : null,
-        JSON.stringify(details || []), JSON.stringify(specs || [])]
+      'INSERT INTO products (name,category,price,sizes,image,stock,details,specs,size_stock) VALUES (?,?,?,?,?,?,?,?,?)',
+      [name, category, parseInt(price), JSON.stringify(sizes||[]), image,
+       stock != null ? parseInt(stock) : null,
+       JSON.stringify(details||[]), JSON.stringify(specs||[]), JSON.stringify(size_stock||{})]
     );
     const [rows] = await db.query('SELECT * FROM products WHERE id=?', [result.insertId]);
     res.json({ status: 'success', product: rows[0] });
@@ -155,13 +157,13 @@ app.post('/api/products', requireAdmin, async (req, res) => {
 });
 
 app.put('/api/products/:id', requireAdmin, async (req, res) => {
-  const { name, category, price, image, sizes, stock, details, specs } = req.body;
+  const { name, category, price, image, sizes, stock, size_stock, details, specs } = req.body;
   try {
     await db.query(
-      'UPDATE products SET name=?,category=?,price=?,sizes=?,image=?,stock=?,details=?,specs=? WHERE id=?',
-      [name, category, parseInt(price), JSON.stringify(sizes || []), image,
-        stock != null ? parseInt(stock) : null,
-        JSON.stringify(details || []), JSON.stringify(specs || []), req.params.id]
+      'UPDATE products SET name=?,category=?,price=?,sizes=?,image=?,stock=?,details=?,specs=?,size_stock=? WHERE id=?',
+      [name, category, parseInt(price), JSON.stringify(sizes||[]), image,
+       stock != null ? parseInt(stock) : null,
+       JSON.stringify(details||[]), JSON.stringify(specs||[]), JSON.stringify(size_stock||{}), req.params.id]
     );
     const [rows] = await db.query('SELECT * FROM products WHERE id=?', [req.params.id]);
     if (!rows.length) return res.status(404).json({ error: 'Product not found.' });
@@ -188,11 +190,11 @@ app.post('/api/signup', async (req, res) => {
   try {
     const [emailCheck] = await db.query('SELECT id FROM users WHERE email=?', [email.toLowerCase()]);
     if (emailCheck.length) return res.status(409).json({ error: 'Email already registered.' });
-    const [userCheck] = await db.query('SELECT id FROM users WHERE LOWER(username)=?', [username.toLowerCase()]);
-    if (userCheck.length) return res.status(409).json({ error: 'Username already taken.' });
+    const [userCheck]  = await db.query('SELECT id FROM users WHERE LOWER(username)=?', [username.toLowerCase()]);
+    if (userCheck.length)  return res.status(409).json({ error: 'Username already taken.' });
     const [result] = await db.query(
       'INSERT INTO users (username,email,password,age,birthday,gender,role) VALUES (?,?,?,?,?,?,?)',
-      [username, email.toLowerCase(), password, parseInt(age), birthday || null, gender || null, 'customer']
+      [username, email.toLowerCase(), password, parseInt(age), birthday||null, gender||null, 'customer']
     );
     const token = genToken();
     sessions[token] = { userId: result.insertId, username, role: 'customer' };
@@ -214,7 +216,7 @@ app.post('/api/login', async (req, res) => {
       [email.toLowerCase(), email.toLowerCase(), password]
     );
     if (!rows.length) return res.status(401).json({ error: 'Invalid credentials.' });
-    const user = rows[0];
+    const user  = rows[0];
     const token = genToken();
     sessions[token] = { userId: user.id, username: user.username, role: user.role };
     res.json({ status: 'success', token, username: user.username, role: user.role });
@@ -238,7 +240,7 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
     await db.query('DELETE FROM saved_addresses WHERE username=?', [username]);
     await db.query('DELETE FROM users WHERE id=?', [id]);
     res.json({ success: true });
-  } catch (e) { console.error('Delete user error:', e); res.status(500).json({ error: e.message }); }
+  } catch(e) { console.error('Delete user error:', e); res.status(500).json({ error: e.message }); }
 });
 
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
@@ -257,7 +259,7 @@ app.get('/api/admin/orders', requireAdmin, async (req, res) => {
     );
     for (const o of orders) {
       const [items] = await db.query('SELECT * FROM order_items WHERE order_id=?', [o.id]);
-      o.items = items;
+      o.items   = items;
       o.address = typeof o.address === 'string' ? JSON.parse(o.address) : o.address;
     }
     res.json(orders);
@@ -266,7 +268,7 @@ app.get('/api/admin/orders', requireAdmin, async (req, res) => {
 
 app.put('/api/admin/orders/:orderNum/status', requireAdmin, async (req, res) => {
   const { status } = req.body;
-  if (!['pending', 'out_for_delivery', 'completed', 'cancelled'].includes(status))
+  if (!['pending','out_for_delivery','completed','cancelled'].includes(status))
     return res.status(400).json({ error: 'Invalid status.' });
   try {
     await db.query('UPDATE orders SET status=? WHERE order_num=?', [status, req.params.orderNum]);
@@ -279,7 +281,7 @@ app.put('/api/admin/orders/:orderNum/gcash', requireAdmin, async (req, res) => {
   try {
     await db.query(
       'UPDATE orders SET gcash_status=?,gcash_reject_reason=? WHERE order_num=?',
-      [gcash_status, gcash_reject_reason || null, req.params.orderNum]
+      [gcash_status, gcash_reject_reason||null, req.params.orderNum]
     );
     if (gcash_status === 'rejected')
       await db.query('UPDATE orders SET status="cancelled" WHERE order_num=?', [req.params.orderNum]);
@@ -294,7 +296,7 @@ app.get('/api/orders/my', requireAuth, async (req, res) => {
     );
     for (const o of orders) {
       const [items] = await db.query('SELECT * FROM order_items WHERE order_id=?', [o.id]);
-      o.items = items;
+      o.items   = items;
       o.address = typeof o.address === 'string' ? JSON.parse(o.address) : o.address;
     }
     res.json(orders);
@@ -318,7 +320,7 @@ app.put('/api/orders/:orderNum/rate', requireAuth, async (req, res) => {
   try {
     await db.query(
       'UPDATE orders SET rated=1,rating=?,rating_comment=? WHERE order_num=? AND user_id=?',
-      [rating, comment || '', req.params.orderNum, req.session.userId]
+      [rating, comment||'', req.params.orderNum, req.session.userId]
     );
     res.json({ status: 'success' });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -327,21 +329,21 @@ app.put('/api/orders/:orderNum/rate', requireAuth, async (req, res) => {
 app.post('/api/checkout', requireAuth, async (req, res) => {
   const { cart, subtotal, shipping, total, address, paymentMethod, gcashProof, gcashRef, gcashStatus } = req.body;
   if (!cart || !cart.length) return res.status(400).json({ error: 'Cart is empty.' });
-  const orderNum = 'UC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-  const conn = await db.getConnection();
+  const orderNum = 'UC-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  const conn     = await db.getConnection();
   try {
     await conn.beginTransaction();
     const [orderResult] = await conn.query(
       `INSERT INTO orders (order_num,user_id,subtotal,shipping,total,payment_method,status,address,gcash_proof,gcash_ref,gcash_status)
        VALUES (?,?,?,?,?,?,'pending',?,?,?,?)`,
-      [orderNum, req.session.userId, subtotal || total, shipping || 150, total,
-        paymentMethod, JSON.stringify(address), gcashProof || null, gcashRef || null, gcashStatus || null]
+      [orderNum, req.session.userId, subtotal||total, shipping||150, total,
+       paymentMethod, JSON.stringify(address), gcashProof||null, gcashRef||null, gcashStatus||null]
     );
     const orderId = orderResult.insertId;
     for (const item of cart) {
       await conn.query(
         'INSERT INTO order_items (order_id,product_id,name,category,size,qty,price,image) VALUES (?,?,?,?,?,?,?,?)',
-        [orderId, item.id || null, item.name, item.category, item.size, item.qty || 1, item.finalPrice || item.price, item.image]
+        [orderId, item.id||null, item.name, item.category, item.size, item.qty||1, item.finalPrice||item.price, item.image]
       );
     }
     await conn.commit();

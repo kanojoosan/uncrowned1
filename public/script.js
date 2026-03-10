@@ -565,6 +565,12 @@ function signup() {
   if (isNaN(age) || age < 18 || age > 60) return showError('signup-error', '⚠️ Age must be between 18 and 60.');
   if (age < 18) return showError('signup-error', '⚠️ You must be 18 or older to register.');
   if (!birthday) return showError('signup-error', 'Please enter your birthday.');
+  const bdYear = parseInt(birthday.split('-')[0]);
+  const today = new Date();
+  const calculatedAge = today.getFullYear() - bdYear - (
+    new Date(today.getFullYear(), parseInt(birthday.split('-')[1]) - 1, parseInt(birthday.split('-')[2])) > today ? 1 : 0
+  );
+  if (calculatedAge !== age) return showError('signup-error', '⚠️ Age does not match your birthday. Based on your birthday, your age should be ' + calculatedAge + '.');
   if (!gender) return showError('signup-error', 'Please select your gender.');
   if (!password) return showError('signup-error', 'Password is required.');
   const pwStrength = checkPasswordStrength(password);

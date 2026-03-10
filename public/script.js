@@ -558,7 +558,8 @@ function signup() {
 
   if (!username) return showError('signup-error', 'Username is required.');
   if (!email) return showError('signup-error', 'Email is required.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('signup-error', 'Please enter a valid email address (e.g. juan@gmail.com).');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('signup-error', 'Please enter a valid email address (e.g. juan0606@gmail.com).');
+  if (!/\d/.test(email.split('@')[0])) return showError('signup-error', '⚠️ Email must contain a number (e.g. juan0606@gmail.com).');
   if (!ageVal) return showError('signup-error', 'Age is required.');
   const age = parseInt(ageVal);
   if (isNaN(age) || age < 18 || age > 60) return showError('signup-error', '⚠️ Age must be between 18 and 60.');

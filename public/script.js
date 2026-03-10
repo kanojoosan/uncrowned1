@@ -43,8 +43,7 @@ let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   
-  const bdEl = document.getElementById('signup-birthday');
-  if (bdEl) bdEl.max = new Date().toISOString().split('T')[0];
+  populateBirthdaySelects();
 
   
   const savedUser = localStorage.getItem('uc_user');
@@ -580,6 +579,10 @@ function signup() {
       document.getElementById('agree-privacy').checked = false;
       document.getElementById('signup-strength-bar').style.width = '0%';
       document.getElementById('signup-strength-label').innerText = '';
+      document.getElementById('bday-month').value = '';
+      document.getElementById('bday-day').value = '';
+      document.getElementById('bday-year').value = '';
+      document.getElementById('signup-birthday').value = '';
       document.querySelectorAll('.gender-option').forEach(el => el.classList.remove('selected'));
       const gc = document.querySelector('input[name="signup-gender"]:checked');
       if (gc) gc.checked = false;
@@ -614,6 +617,31 @@ function selectGender(val) {
     const el = document.getElementById('gender-' + g);
     if (el) el.classList.toggle('selected', g === val);
   });
+}
+
+function populateBirthdaySelects() {
+  const yearSel = document.getElementById('bday-year');
+  const daySel  = document.getElementById('bday-day');
+  if (!yearSel || !daySel) return;
+  const curYear = new Date().getFullYear();
+  for (let y = curYear; y >= 1920; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.text = y;
+    yearSel.appendChild(o);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option');
+    o.value = String(d).padStart(2,'0'); o.text = d;
+    daySel.appendChild(o);
+  }
+}
+
+function updateBirthday() {
+  const m = document.getElementById('bday-month').value;
+  const d = document.getElementById('bday-day').value;
+  const y = document.getElementById('bday-year').value;
+  const hidden = document.getElementById('signup-birthday');
+  if (hidden) hidden.value = (m && d && y) ? `${y}-${m}-${d}` : '';
 }
 
 function logout() {
@@ -1516,4 +1544,4 @@ function saveAddressBook() {
   saveAddressToStorage({ fname, lname, phone, street, city, province, zip, region });
   showToast('✅ Address saved!');
   openAddressBook();
-} 
+}

@@ -517,6 +517,39 @@ footer {
   display: none;
 }
 
+.birthday-selects {
+  display: flex;
+  gap: 8px;
+}
+
+.birthday-selects select {
+  flex: 1;
+  padding: 10px 8px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #111;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.2s;
+}
+
+.birthday-selects select:focus {
+  border-color: #000;
+}
+
+.birthday-selects select:first-child {
+  flex: 1.6;
+}
+
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;

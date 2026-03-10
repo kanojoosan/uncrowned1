@@ -33,6 +33,8 @@ async function initDB() {
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     age INT NOT NULL,
+    birthday DATE,
+    gender VARCHAR(20),
     role VARCHAR(20) DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
@@ -97,6 +99,9 @@ async function initDB() {
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
 
+  // Add new columns if upgrading existing DB
+  try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch (_) { }
+  try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
   console.log('Database tables ready.');
 }
 
@@ -171,7 +176,7 @@ app.delete('/api/products/:id', requireAdmin, async (req, res) => {
 });
 
 app.post('/api/signup', async (req, res) => {
-  const { username, email, password, age, agreedToTerms, agreedToPrivacy } = req.body;
+  const { username, email, password, age, birthday, gender, agreedToTerms, agreedToPrivacy } = req.body;
   if (!username || !email || !password || !age)
     return res.status(400).json({ error: 'All fields are required.' });
   if (parseInt(age) < 18)
@@ -184,8 +189,8 @@ app.post('/api/signup', async (req, res) => {
     const [userCheck] = await db.query('SELECT id FROM users WHERE LOWER(username)=?', [username.toLowerCase()]);
     if (userCheck.length) return res.status(409).json({ error: 'Username already taken.' });
     const [result] = await db.query(
-      'INSERT INTO users (username,email,password,age,role) VALUES (?,?,?,?,?)',
-      [username, email.toLowerCase(), password, parseInt(age), 'customer']
+      'INSERT INTO users (username,email,password,age,birthday,gender,role) VALUES (?,?,?,?,?,?,?)',
+      [username, email.toLowerCase(), password, parseInt(age), birthday || null, gender || null, 'customer']
     );
     const token = genToken();
     sessions[token] = { userId: result.insertId, username, role: 'customer' };

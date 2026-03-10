@@ -42,6 +42,10 @@ let productToDelete = null;
 let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Set birthday max date to today
+  const bdEl = document.getElementById('signup-birthday');
+  if (bdEl) bdEl.max = new Date().toISOString().split('T')[0];
+
   // Restore session from localStorage
   const savedUser = localStorage.getItem('uc_user');
   if (savedUser) {
@@ -564,6 +568,9 @@ function signup() {
   const password = document.getElementById('signup-password').value;
   const agreedTerms = document.getElementById('agree-terms').checked;
   const agreedPrivacy = document.getElementById('agree-privacy').checked;
+  const birthday = document.getElementById('signup-birthday').value;
+  const genderEl = document.querySelector('input[name="signup-gender"]:checked');
+  const gender = genderEl ? genderEl.value : '';
 
   if (!username) return showError('signup-error', 'Username is required.');
   if (!email) return showError('signup-error', 'Email is required.');
@@ -572,22 +579,27 @@ function signup() {
   const age = parseInt(ageVal);
   if (isNaN(age) || age < 1 || age > 120) return showError('signup-error', 'Please enter a valid age.');
   if (age < 18) return showError('signup-error', '⚠️ You must be 18 or older to register.');
+  if (!birthday) return showError('signup-error', 'Please enter your birthday.');
+  if (!gender) return showError('signup-error', 'Please select your gender.');
   if (!password) return showError('signup-error', 'Password is required.');
   const pwStrength = checkPasswordStrength(password);
   if (pwStrength.score < 4) return showError('signup-error', '⚠ ' + pwStrength.tip);
   if (!agreedTerms) return showError('signup-error', 'Please agree to the Terms & Conditions.');
   if (!agreedPrivacy) return showError('signup-error', 'Please agree to the Privacy Policy.');
-  apiFetch('/api/signup', { method: 'POST', body: JSON.stringify({ username, email, password, age, agreedToTerms: agreedTerms, agreedToPrivacy: agreedPrivacy }) })
+  apiFetch('/api/signup', { method: 'POST', body: JSON.stringify({ username, email, password, age, birthday, gender, agreedToTerms: agreedTerms, agreedToPrivacy: agreedPrivacy }) })
     .then(data => {
       if (data.error) return showError('signup-error', data.error);
       localStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
       localStorage.setItem('uc_user', JSON.stringify(currentUser));
-      ['signup-username', 'signup-email', 'signup-age', 'signup-password'].forEach(id => document.getElementById(id).value = '');
+      ['signup-username', 'signup-email', 'signup-age', 'signup-password', 'signup-birthday'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('agree-terms').checked = false;
       document.getElementById('agree-privacy').checked = false;
       document.getElementById('signup-strength-bar').style.width = '0%';
       document.getElementById('signup-strength-label').innerText = '';
+      document.querySelectorAll('.gender-option').forEach(el => el.classList.remove('selected'));
+      const gc = document.querySelector('input[name="signup-gender"]:checked');
+      if (gc) gc.checked = false;
       closeModal('signup-modal');
       updateAuthUI();
       showToast('Account created! Welcome, ' + data.username + '!');
@@ -612,6 +624,13 @@ function login() {
       document.getElementById('login-password').value = '';
       showToast('Welcome back, ' + data.username + '!');
     }).catch(() => showError('login-error', 'Network error. Please try again.'));
+}
+
+function selectGender(val) {
+  ['male', 'female', 'other'].forEach(g => {
+    const el = document.getElementById('gender-' + g);
+    if (el) el.classList.toggle('selected', g === val);
+  });
 }
 
 function logout() {
@@ -1005,7 +1024,11 @@ function saveProduct() {
 }
 
 function getCustomerTab(order) {
-  if (order.status === 'cancelled') return null;
+  // Cancelled orders: only show in to_pay if gcash rejected, so customer knows
+  if (order.status === 'cancelled') {
+    if (order.payment_method === 'gcash' && order.gcash_status === 'rejected') return 'to_pay';
+    return null;
+  }
   if (order.status === 'pending') {
     return order.payment_method === 'cod' ? 'to_ship' : 'to_pay';
   }
@@ -1402,13 +1425,15 @@ function confirmGCashPayment() {
   errEl.style.display = 'none';
   const overlay = document.getElementById('gcash-overlay');
   if (overlay) overlay.remove();
+  const proofToSend = gcashProofDataUrl;  // save before clearing
+  gcashProofDataUrl = null;
   placeOrder({
-    gcashProof: gcashProofDataUrl,
+    gcashProof: proofToSend,
     gcashRef: ref,
     gcashStatus: 'pending_confirmation',
     address: gcashSavedAddress
   });
-  openModal('checkout-modal');
+  // Do NOT reopen checkout modal — placeOrder handles showing success screen
 }
 
 function cancelGCashPayment() {

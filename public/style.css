@@ -490,6 +490,33 @@ footer {
   cursor: pointer;
 }
 
+.gender-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.gender-option:hover {
+  border-color: #999;
+}
+
+.gender-option.selected {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
+.gender-option input[type="radio"] {
+  display: none;
+}
+
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;

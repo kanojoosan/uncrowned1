@@ -550,6 +550,57 @@ footer {
   flex: 1.6;
 }
 
+.size-stock-grid {
+  display: flex;
+  gap: 8px;
+}
+
+.size-stock-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.size-stock-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #111;
+}
+
+.size-stock-input {
+  width: 100%;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.size-stock-input:focus {
+  border-color: #000;
+}
+
+.size-stock-input[value="0"] {
+  background: #fff0f0;
+  border-color: #f5c6cb;
+  color: #c0392b;
+}
+
+.size-btn.size-out {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #ddd;
+  color: #aaa;
+  background: #f8f8f8;
+}
+
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;

@@ -49,6 +49,7 @@ async function initDB() {
     stock INT,
     details TEXT,
     specs TEXT,
+    size_stock TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
 
@@ -101,6 +102,7 @@ async function initDB() {
 
   // Add new columns if upgrading existing DB
   try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch (_) { }
+  try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch (_) { }
   try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
   console.log('Database tables ready.');
 }

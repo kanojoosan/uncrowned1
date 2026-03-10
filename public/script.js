@@ -959,7 +959,7 @@ let editingProductId = null;
 function openAddProduct(id) {
   editingProductId = id || null;
   hideError('add-product-error');
-  document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = false);
+  ALL_SIZES.forEach(s => { const el = document.getElementById('stock-'+s); if(el) el.value = ''; });
   if (id) {
     const p = allProducts.find(p => p.id === id);
     document.getElementById('add-product-title').innerText = 'EDIT PRODUCT';
@@ -967,13 +967,12 @@ function openAddProduct(id) {
     document.getElementById('new-product-name').value     = p.name;
     document.getElementById('new-product-category').value = p.category;
     document.getElementById('new-product-price').value    = p.price;
-    document.getElementById('new-product-stock').value    = p.stock != null ? p.stock : '';
     document.getElementById('new-product-details').value  = p.details ? p.details.join('\n') : '';
     document.getElementById('new-product-specs').value    = p.specs   ? p.specs.join('\n')   : '';
-    const sizes = p.sizes && p.sizes.length > 0 ? p.sizes : ALL_SIZES;
-    sizes.forEach(s => {
-      const cb = document.querySelector(`.size-checkbox[data-size="${s}"]`);
-      if (cb) cb.checked = true;
+    const sizeStock = p.size_stock || {};
+    ALL_SIZES.forEach(s => {
+      const el = document.getElementById('stock-' + s);
+      if (el) el.value = sizeStock[s] != null ? sizeStock[s] : '';
     });
     previewImage();
   } else {
@@ -982,13 +981,11 @@ function openAddProduct(id) {
     document.getElementById('new-product-name').value     = '';
     document.getElementById('new-product-category').value = '';
     document.getElementById('new-product-price').value    = '';
-    document.getElementById('new-product-stock').value    = '';
     document.getElementById('new-product-details').value  = '';
     document.getElementById('new-product-specs').value    = '';
     document.getElementById('img-preview-img').style.display = 'none';
     document.getElementById('img-placeholder').style.display = 'block';
     document.getElementById('img-placeholder').innerText     = 'IMAGE PREVIEW';
-    document.querySelectorAll('.size-checkbox').forEach(cb => cb.checked = true);
   }
   openModal('add-product-modal');
 }
@@ -1011,23 +1008,27 @@ function saveProduct() {
   const name     = document.getElementById('new-product-name').value.trim();
   const category = document.getElementById('new-product-category').value;
   const priceVal = document.getElementById('new-product-price').value;
-  const stockVal = document.getElementById('new-product-stock').value;
-  const sizes    = [...document.querySelectorAll('.size-checkbox:checked')].map(cb => cb.dataset.size);
+
+  const size_stock = {};
+  ALL_SIZES.forEach(s => {
+    const el = document.getElementById('stock-' + s);
+    if (el && el.value !== '') size_stock[s] = parseInt(el.value) || 0;
+  });
+  const sizes = ALL_SIZES.filter(s => size_stock[s] == null || size_stock[s] > 0);
 
   if (!image)    return showError('add-product-error', 'Please enter an image URL.');
   if (!name)     return showError('add-product-error', 'Please enter a product name.');
   if (!category) return showError('add-product-error', 'Please select a category.');
   if (!priceVal || parseInt(priceVal) < 1) return showError('add-product-error', 'Please enter a valid price.');
-  if (sizes.length === 0) return showError('add-product-error', 'Please select at least one available size.');
   document.getElementById('add-product-error').style.display = 'none';
 
   const price   = parseInt(priceVal);
-  const stock   = stockVal !== '' ? parseInt(stockVal) : null;
+  const stock   = Object.values(size_stock).reduce((a,b) => a+b, 0) || null;
   const details = document.getElementById('new-product-details').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
   const specs   = document.getElementById('new-product-specs').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
   const method = editingProductId !== null ? 'PUT' : 'POST';
   const url    = editingProductId !== null ? '/api/products/' + editingProductId : '/api/products';
-  apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, details, specs }) })
+  apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock, details, specs }) })
     .then(data => {
       if (data.error) return showToast('Error: ' + data.error);
       if (editingProductId !== null) {

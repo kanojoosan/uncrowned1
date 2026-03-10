@@ -144,6 +144,7 @@
           </div>
           <span class="pw-strength-label" id="signup-strength-label"></span>
         </div>
+        <div id="pw-tip" style="font-size:0.75rem;margin-top:4px;min-height:16px;"></div>
       </div>
       <div class="form-group checkbox-group">
         <label class="checkbox-label">
@@ -403,9 +404,9 @@
         <div id="addr-form-wrap">
           <div class="form-row">
             <div class="form-group"><label>FIRST NAME</label><input type="text" id="addr-fname" placeholder="Juan"
-                oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+                maxlength="30" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
             <div class="form-group"><label>LAST NAME</label><input type="text" id="addr-lname" placeholder="dela Cruz"
-                oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+                maxlength="30" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
           </div>
           <div class="form-group"><label>PHONE NUMBER</label><input type="text" id="addr-phone"
               placeholder="09XXXXXXXXX" maxlength="11"
@@ -506,7 +507,8 @@
               </select>
             </div>
             <div class="form-group"><label>PROVINCE</label><input type="text" id="addr-province"
-                placeholder="Metro Manila" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+                placeholder="Metro Manila" maxlength="50"
+                oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>ZIP CODE</label><input type="text" id="addr-zip" placeholder="1000"
@@ -556,37 +558,11 @@
       <div class="checkout-panel" id="checkout-step-2">
         <div id="payment-error" class="error-msg" style="display:none;"></div>
         <div class="payment-methods">
-          <div class="pay-method selected" id="pm-card" onclick="selectPayMethod('card')">
-            <div class="pay-method-icon">&#128179;</div>CARD
-          </div>
-          <div class="pay-method" id="pm-gcash" onclick="selectPayMethod('gcash')">
+          <div class="pay-method selected" id="pm-gcash" onclick="selectPayMethod('gcash')">
             <div class="pay-method-icon">&#128241;</div>GCASH
           </div>
           <div class="pay-method" id="pm-cod" onclick="selectPayMethod('cod')">
             <div class="pay-method-icon">&#128181;</div>CASH ON DELIVERY
-          </div>
-        </div>
-        <div class="pay-panel active" id="pay-panel-card">
-          <div class="card-preview">
-            <div class="card-chip"></div>
-            <div class="card-number-display" id="card-num-display">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;
-              &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;</div>
-            <div class="card-bottom">
-              <div><span>CARD HOLDER</span><strong id="card-name-display">YOUR NAME</strong></div>
-              <div style="text-align:right;"><span>EXPIRES</span><strong id="card-exp-display">MM/YY</strong></div>
-            </div>
-          </div>
-          <div class="form-group"><label>CARD NUMBER</label><input type="text" id="card-number"
-              placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCardNumber(this);updateCardPreview()">
-          </div>
-          <div class="form-group"><label>CARDHOLDER NAME</label><input type="text" id="card-name"
-              placeholder="JUAN DELA CRUZ" maxlength="26"
-              oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-\.]/g,'');updateCardPreview()"></div>
-          <div class="form-row">
-            <div class="form-group"><label>EXPIRY DATE</label><input type="text" id="card-expiry" placeholder="MM/YY"
-                maxlength="5" oninput="formatExpiry(this);updateCardPreview()"></div>
-            <div class="form-group"><label>CVV</label><input type="text" id="card-cvv" placeholder="&bull;&bull;&bull;"
-                maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')"></div>
           </div>
         </div>
         <div class="pay-panel" id="pay-panel-gcash">
@@ -751,9 +727,9 @@
       <div id="address-book-form" style="display:none;">
         <div class="form-row">
           <div class="form-group"><label>FIRST NAME</label><input type="text" id="ab-fname" placeholder="Juan"
-              oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+              maxlength="30" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
           <div class="form-group"><label>LAST NAME</label><input type="text" id="ab-lname" placeholder="dela Cruz"
-              oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+              maxlength="30" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
         </div>
         <div class="form-group"><label>PHONE NUMBER</label><input type="text" id="ab-phone" placeholder="09XXXXXXXXX"
             maxlength="11" oninput="this.value=this.value.replace(/\D/g,'').substring(0,11)"></div>
@@ -832,7 +808,7 @@
             </select>
           </div>
           <div class="form-group"><label>PROVINCE</label><input type="text" id="ab-province" placeholder="Metro Manila"
-              oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+              maxlength="50" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label>ZIP CODE</label><input type="text" id="ab-zip" placeholder="1000" maxlength="4"

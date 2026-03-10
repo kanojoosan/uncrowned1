@@ -42,11 +42,11 @@ let productToDelete = null;
 let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Set birthday max date to today
+  
   const bdEl = document.getElementById('signup-birthday');
   if (bdEl) bdEl.max = new Date().toISOString().split('T')[0];
 
-  // Restore session from localStorage
+  
   const savedUser = localStorage.getItem('uc_user');
   if (savedUser) {
     try {
@@ -58,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   updateAuthUI();
 
-  // Load products from DB (falls back to hardcoded if API fails)
+  
   loadProductsFromAPI();
 
-  // Restore cart from localStorage
+  
   const savedCart = localStorage.getItem('uc_cart');
   if (savedCart) {
     try { cart = JSON.parse(savedCart); updateCartUI(); } catch(e) {}
@@ -309,7 +309,7 @@ let currentStep = 1;
 
 function openCheckout() {
   goToStep(1, true);
-  selectedPayMethod = 'card';
+  selectedPayMethod = 'gcash';
   selectPayMethod('card');
   prefillSavedAddress();
   openModal('checkout-modal');
@@ -714,19 +714,19 @@ function loadAdminProducts() {
 }
 
 function loadProductsFromAPI() {
-  // Show hardcoded products immediately so page is never blank
+  
   renderProducts(allProducts);
-  // Then fetch from DB and replace if available
+  
   apiFetch('/api/products').then(data => {
     if (Array.isArray(data) && data.length > 0) {
       allProducts = data;
       renderProducts(allProducts);
     } else if (Array.isArray(data) && data.length === 0) {
-      // DB is empty - seed products then reload
+      
       seedProductsToDB();
     }
   }).catch(() => {
-    // API unreachable - keep showing hardcoded products
+    
     renderProducts(allProducts);
   });
 }
@@ -747,9 +747,9 @@ function seedProductsToDB() {
     { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop shoulder','Boxy Cropped Fit','Front and back logo print','Custom Fit','FREE Stickers in every purchase'], specs: ['100% COTTON','260 GSM','FRENCH TERRY FABRIC'] },
     { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop shoulder','Boxy Cropped Fit','Front and back logo print','Custom Fit','FREE Stickers in every purchase'], specs: ['100% COTTON','260 GSM','FRENCH TERRY FABRIC'] },
   ];
-  // Need admin token to seed - store original token, use admin
+  
   const originalToken = localStorage.getItem('uc_token');
-  // Login as admin temporarily to seed
+  
   fetch(API + '/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -766,7 +766,7 @@ function seedProductsToDB() {
       }).then(r => r.json()).then(res => {
         seeded++;
         if (seeded === toSeed.length) {
-          // Restore original token and reload products
+          
           if (originalToken) localStorage.setItem('uc_token', originalToken);
           else localStorage.removeItem('uc_token');
           loadProductsFromAPI();
@@ -789,10 +789,20 @@ function loadAdminUsers() {
         <strong>${u.username}</strong>
         <small style="display:block;color:#888;">${u.email} · Age: ${u.age}</small>
         <small style="display:block;color:#aaa;">Joined: ${new Date(u.created_at).toLocaleDateString()}</small>
-      </div>`;
+      </div>
+      <button onclick="deleteCustomer(${u.id},'${u.username}')" style="background:#fde8e8;color:#c0392b;border:none;padding:6px 14px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🗑 DELETE</button>`;
       list.appendChild(row);
     });
   }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load users.</p>'; });
+}
+
+function deleteCustomer(userId, username) {
+  if (!confirm('Delete account of ' + username + '? This cannot be undone.')) return;
+  apiFetch('/api/admin/users/' + userId, { method: 'DELETE' })
+    .then(data => {
+      if (data.success) { showToast('🗑 ' + username + ' deleted.'); loadAdminUsers(); }
+      else showToast('Failed to delete user.');
+    }).catch(() => showToast('Failed to delete user.'));
 }
 
 function loadAdminOrders() {
@@ -1023,7 +1033,7 @@ function saveProduct() {
 }
 
 function getCustomerTab(order) {
-  // Cancelled orders: only show in to_pay if gcash rejected, so customer knows
+  
   if (order.status === 'cancelled') {
     if (order.payment_method === 'gcash' && order.gcash_status === 'rejected') return 'to_pay';
     return null;
@@ -1237,8 +1247,9 @@ function onPasswordInput() {
   const pw  = document.getElementById('signup-password').value;
   const bar = document.getElementById('signup-strength-bar');
   const lbl = document.getElementById('signup-strength-label');
+  const tip = document.getElementById('pw-tip');
   if (!bar || !lbl) return;
-  const { score, tip } = checkPasswordStrength(pw);
+  const { score, checks } = checkPasswordStrength(pw);
   const pct    = ['0%','20%','40%','60%','80%','100%'][score];
   const colors = ['#ccc','#e74c3c','#e67e22','#f1c40f','#2ecc71','#27ae60'];
   const labels = ['','Weak','Fair','Good','Strong','Very Strong'];
@@ -1247,6 +1258,16 @@ function onPasswordInput() {
   lbl.innerText        = score > 0 ? labels[score] : '';
   lbl.style.color      = colors[score];
   if (score === 5) lbl.innerText = '✓ ' + labels[score];
+  if (tip) {
+    const missing = [];
+    if (!checks.length)  missing.push('8+ characters');
+    if (!checks.upper)   missing.push('uppercase letter (A-Z)');
+    if (!checks.lower)   missing.push('lowercase letter (a-z)');
+    if (!checks.number)  missing.push('number (0-9)');
+    if (!checks.special) missing.push('special character (!@#$...)');
+    tip.innerText = pw.length > 0 && missing.length ? '⚠ Needs: ' + missing.join(', ') : '';
+    tip.style.color = '#e67e22';
+  }
 }
 
 function addrKey() { return 'uc_addr_' + (currentUser?.username || 'guest'); }
@@ -1424,7 +1445,7 @@ function confirmGCashPayment() {
   errEl.style.display = 'none';
   const overlay = document.getElementById('gcash-overlay');
   if (overlay) overlay.remove();
-  const proofToSend = gcashProofDataUrl;  // save before clearing
+  const proofToSend = gcashProofDataUrl;  
   gcashProofDataUrl = null;
   placeOrder({
     gcashProof:  proofToSend,
@@ -1432,7 +1453,7 @@ function confirmGCashPayment() {
     gcashStatus: 'pending_confirmation',
     address:     gcashSavedAddress
   });
-  // Do NOT reopen checkout modal — placeOrder handles showing success screen
+  
 }
 
 function cancelGCashPayment() {

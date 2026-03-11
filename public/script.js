@@ -4,9 +4,9 @@ function onCityChange(select, prefix) {
   const parts = val.split('|');
   const city = parts[0], province = parts[1], region = parts[2], zip = parts[3];
   const el = id => document.getElementById(prefix + '-' + id);
-  if (el('province')) el('province').value = province || '';
-  if (el('region')) el('region').value = region || '';
-  if (el('zip')) el('zip').value = zip || '';
+  if (el('province')) { el('province').value = province || ''; el('province').style.color = '#111'; el('province').style.fontWeight = '500'; }
+  if (el('region')) { el('region').value = region || ''; el('region').style.color = '#111'; el('region').style.fontWeight = '500'; }
+  if (el('zip')) { el('zip').value = zip || ''; el('zip').style.color = '#111'; el('zip').style.fontWeight = '500'; }
   if (prefix === 'addr') updateShippingDisplay();
 }
 

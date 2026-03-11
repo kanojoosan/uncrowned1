@@ -31,6 +31,12 @@
           ORDERS</button>
         <button class="nav-auth-btn" id="my-address-btn" style="display:none;" onclick="openAddressBook()">MY
           ADDRESS</button>
+        <div id="notif-bell" style="display:none;position:relative;cursor:pointer;margin-right:4px;"
+          onclick="openNotifications()">
+          <span style="font-size:1.2rem;">🔔</span>
+          <span id="notif-badge"
+            style="display:none;position:absolute;top:-4px;right:-4px;background:#e74c3c;color:#fff;font-size:0.6rem;font-weight:700;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;"></span>
+        </div>
         <button class="nav-auth-btn" onclick="logout()">LOG OUT</button>
       </div>
       <div class="cart-icon" onclick="toggleCart()">BAG (<span id="cart-count">0</span>)</div>
@@ -677,18 +683,34 @@
         </div>
         <div class="success-screen" id="success-screen-gcash" style="display:none;">
           <div class="success-icon">⏳</div>
-          <h3 style="font-size:1.3rem;">WAITING FOR<br>ADMIN APPROVAL</h3>
+          <h3 style="font-size:1.3rem;">PAYMENT SUBMITTED!</h3>
           <div class="order-number" id="success-order-num-gcash">ORDER #000000</div>
-          <p
-            style="font-size:0.82rem;color:#888;margin-top:14px;line-height:1.6;max-width:260px;margin-left:auto;margin-right:auto;">
-            Your GCash payment is being reviewed. We will process your order once payment is confirmed.</p>
-          <button class="submit-btn" style="margin-top:24px;width:auto;padding:14px 40px;"
+          <div
+            style="background:#fff8e1;border:2px solid #f59e0b;border-radius:10px;padding:16px 20px;margin-top:18px;max-width:280px;margin-left:auto;margin-right:auto;">
+            <p style="font-size:0.88rem;color:#b45309;font-weight:700;margin:0 0 6px 0;">⏳ WAITING FOR ADMIN
+              CONFIRMATION</p>
+            <p style="font-size:0.82rem;color:#78350f;margin:0;line-height:1.6;">Your GCash screenshot and reference
+              number have been received. Please wait while the admin reviews and confirms your payment before your order
+              is processed.</p>
+          </div>
+          <p style="font-size:0.78rem;color:#aaa;margin-top:12px;">You can check the status in <strong>MY ORDERS → TO
+              PAY</strong></p>
+          <button class="submit-btn" style="margin-top:20px;width:auto;padding:14px 40px;"
             onclick="closeModal('checkout-modal')">CONTINUE SHOPPING</button>
         </div>
       </div>
     </div>
   </div>
 
+
+  <div id="notif-modal" class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h2>NOTIFICATIONS</h2>
+      <button class="close-btn" onclick="closeModal('notif-modal')">&times;</button>
+    </div>
+    <div class="modal-body" id="notif-list" style="padding:20px;max-height:400px;overflow-y:auto;">
+    </div>
+  </div>
 
   <div id="my-orders-modal" class="modal modal-my-orders">
     <div class="modal-header">

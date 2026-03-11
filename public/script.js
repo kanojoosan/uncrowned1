@@ -14,71 +14,45 @@ const ALL_SIZES = ['S', 'M', 'L', 'XL', '2XL'];
 const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
 
 let allProducts = [
-  {
-    id: 1, name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png",
+  { id: 1,  name: "Uncrowned Signature Shirt",            category: "shirts",  price: 1200, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png",
     details: ['Drop shoulder cut', 'Boxy oversized fit', 'Front and back logo print', 'Ribbed crew neckline', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 2, name: "Premium Crewneck Shirt", category: "shirts", price: 2800, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png",
+    specs:   ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 2,  name: "Premium Crewneck Shirt",               category: "shirts",  price: 2800, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png",
     details: ['Relaxed crewneck silhouette', 'Chest pocket detail', 'Washed premium finish', 'Dropped shoulders', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '280 GSM', 'HEAVYWEIGHT JERSEY FABRIC']
-  },
-  {
-    id: 3, name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png",
+    specs:   ['100% COTTON', '280 GSM', 'HEAVYWEIGHT JERSEY FABRIC'] },
+  { id: 3,  name: "U Cant See Me - Cena Tribute",         category: "shirts",  price: 4500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png",
     details: ['Limited edition graphic tee', 'Full front tribute print', 'Oversized boxy fit', 'Reinforced stitching', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC']
-  },
-  {
-    id: 4, name: "Premium Crewneck Shirt", category: "shirts", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png",
+    specs:   ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC'] },
+  { id: 4,  name: "Premium Crewneck Shirt",               category: "shirts",  price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png",
     details: ['Classic crewneck style', 'Minimalist embroidered logo', 'Regular fit construction', 'Soft brushed interior', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '260 GSM', 'FLEECE FABRIC']
-  },
-  {
-    id: 5, name: "Crewneck Shirt - White", category: "shirts", price: 3200, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png",
+    specs:   ['100% COTTON', '260 GSM', 'FLEECE FABRIC'] },
+  { id: 5,  name: "Crewneck Shirt - White",               category: "shirts",  price: 3200, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png",
     details: ['Clean all-white colorway', 'Back graphic print', 'Oversized streetwear fit', 'Double-stitched hem', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 6, name: "Signature Denim Pants", category: "pants", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png",
+    specs:   ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 6,  name: "Signature Denim Pants",                category: "pants",   price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png",
     details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 7, name: "Baggy Jeans Pants", category: "pants", price: 2500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png",
+    specs:   ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 7,  name: "Baggy Jeans Pants",                    category: "pants",   price: 2500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png",
     details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 8, name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png",
+    specs:   ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 8,  name: "Gothic Retro Spider - Baggy Jeans",    category: "pants",   price: 2100, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png",
     details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 9, name: "2125 - Divine Sweats", category: "pants", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png",
+    specs:   ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 9,  name: "2125 - Divine Sweats",                 category: "pants",   price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png",
     details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
-  },
-  {
-    id: 10, name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png",
+    specs:   ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+  { id: 10, name: "Aonga Y2k Sweatpants",                 category: "pants", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png",
     details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
-  },
-  {
-    id: 11, name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png",
+    specs:   ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+  { id: 11, name: "Vielseitige Herbst-Windbreaker Jacket",category: "jackets", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png",
     details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
-  },
-  {
-    id: 12, name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png",
+    specs:   ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+  { id: 12, name: "POOPMOOM Y2k Jacket",                  category: "jackets", price: 1000, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png",
     details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
-  },
-  {
-    id: 13, name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png",
+    specs:   ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+  { id: 13, name: "Japanese Zip Up Hoodie Patagonia",     category: "jackets", price: 1600, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png",
     details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
-  },
+    specs:   ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
 ];
 
 let registeredUsers = [];
@@ -89,28 +63,28 @@ let productToDelete = null;
 let allOrders = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-
+  
   populateBirthdaySelects();
 
-
+  
   const savedUser = sessionStorage.getItem('uc_user');
   if (savedUser) {
     try {
       currentUser = JSON.parse(savedUser);
-    } catch (e) {
+    } catch(e) {
       sessionStorage.removeItem('uc_user');
       sessionStorage.removeItem('uc_token');
     }
   }
   updateAuthUI();
 
-
+  
   loadProductsFromAPI();
 
-
+  
   const savedCart = localStorage.getItem('uc_cart');
   if (savedCart) {
-    try { cart = JSON.parse(savedCart); updateCartUI(); } catch (e) { }
+    try { cart = JSON.parse(savedCart); updateCartUI(); } catch(e) {}
   }
 });
 
@@ -160,10 +134,10 @@ function openProductDetail(id) {
   const stockLeft = product.stock != null ? product.stock : null;
   const stockBadge = stockLeft != null
     ? (stockLeft === 0
-      ? `<span class="stock-badge out">OUT OF STOCK</span>`
-      : stockLeft <= 5
-        ? `<span class="stock-badge low">${stockLeft} LEFT</span>`
-        : `<span class="stock-badge in">IN STOCK</span>`)
+        ? `<span class="stock-badge out">OUT OF STOCK</span>`
+        : stockLeft <= 5
+          ? `<span class="stock-badge low">${stockLeft} LEFT</span>`
+          : `<span class="stock-badge in">IN STOCK</span>`)
     : '';
 
   document.getElementById('detail-image').src = product.image;
@@ -178,12 +152,12 @@ function openProductDetail(id) {
   document.getElementById('detail-product-id').value = product.id;
 
   const details = product.details && product.details.length ? product.details : [];
-  const specs = product.specs && product.specs.length ? product.specs : [];
+  const specs   = product.specs   && product.specs.length   ? product.specs   : [];
   const detailEl = document.getElementById('detail-description');
   if (detailEl) {
     detailEl.innerHTML = `
-      ${details.length ? `<div class="detail-desc-section"><div class="detail-desc-title">DETAILS</div>${details.map(d => `<div class="detail-desc-line">${d}</div>`).join('')}</div>` : ''}
-      ${specs.length ? `<div class="detail-desc-section"><div class="detail-desc-title">SPEC</div>${specs.map(s => `<div class="detail-desc-line">${s}</div>`).join('')}</div>` : ''}
+      ${details.length ? `<div class="detail-desc-section"><div class="detail-desc-title">DETAILS</div>${details.map(d=>`<div class="detail-desc-line">${d}</div>`).join('')}</div>` : ''}
+      ${specs.length   ? `<div class="detail-desc-section"><div class="detail-desc-title">SPEC</div>${specs.map(s=>`<div class="detail-desc-line">${s}</div>`).join('')}</div>` : ''}
     `;
   }
   openModal('product-detail-modal');
@@ -230,7 +204,7 @@ function addToCartFromDetail(id) {
 function selectSize(btn, productId) {
   document.querySelectorAll(`#sizes-${productId} .size-btn`).forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-
+  
   const basePrice = parseInt(btn.dataset.base);
   const surcharge = getSurcharge(btn.dataset.size);
   const finalPrice = basePrice + surcharge;
@@ -286,7 +260,7 @@ function removeFromCart(index) {
 
 function updateCartUI() {
   localStorage.setItem('uc_cart', JSON.stringify(cart));
-  const totalItems = cart.reduce((s, i) => s + (i.qty || 1), 0);
+  const totalItems = cart.reduce((s,i) => s + (i.qty||1), 0);
   document.getElementById('cart-count').innerText = totalItems;
   const container = document.getElementById('cart-items');
   container.innerHTML = '';
@@ -372,12 +346,12 @@ function goToStep(step, silent) {
 function updateStepIndicator(step) {
   for (let i = 1; i <= 3; i++) {
     const circle = document.getElementById('step-circle-' + i);
-    const label = document.getElementById('step-label-' + i);
+    const label  = document.getElementById('step-label-' + i);
     circle.classList.remove('active', 'done');
     label.classList.remove('active', 'done');
-    if (i < step) { circle.classList.add('done'); label.classList.add('done'); circle.innerText = '✓'; }
+    if (i < step)        { circle.classList.add('done');   label.classList.add('done');   circle.innerText = '✓'; }
     else if (i === step) { circle.classList.add('active'); label.classList.add('active'); circle.innerText = i; }
-    else { circle.innerText = i; }
+    else                 { circle.innerText = i; }
   }
   const line1 = document.getElementById('step-line-1');
   const line2 = document.getElementById('step-line-2');
@@ -386,23 +360,24 @@ function updateStepIndicator(step) {
 }
 
 function validateAddress() {
-  const fname = document.getElementById('addr-fname').value.trim();
-  const lname = document.getElementById('addr-lname').value.trim();
-  const phone = document.getElementById('addr-phone').value.trim();
-  const street = document.getElementById('addr-street').value.trim();
-  const city = document.getElementById('addr-city').value.trim();
+  const fname    = document.getElementById('addr-fname').value.trim();
+  const lname    = document.getElementById('addr-lname').value.trim();
+  const phone    = document.getElementById('addr-phone').value.trim();
+  const street   = document.getElementById('addr-street').value.trim();
+  const city     = document.getElementById('addr-city').value.trim();
   const province = document.getElementById('addr-province').value.trim();
-  const zip = document.getElementById('addr-zip').value.trim();
-  const region = document.getElementById('addr-region').value;
+  const zip      = document.getElementById('addr-zip').value.trim();
+  const region   = document.getElementById('addr-region').value;
   const err = document.getElementById('address-error');
   if (!fname || !lname) return showCheckError(err, 'Please enter your full name.');
   if (!phone || phone.length !== 11) return showCheckError(err, 'Please enter a valid 11-digit phone number.');
-  if (!street) return showCheckError(err, 'Please enter your street address.');
+  if (!phone.startsWith('09')) return showCheckError(err, '⚠️ Phone number must start with 09.');
+  if (!street)          return showCheckError(err, 'Please enter your street address.');
   if (!/[a-zA-Z]/.test(street)) return showCheckError(err, 'Street address must include a street name, not just numbers (e.g. 123 Rizal St.).');
-  if (!city) return showCheckError(err, 'Please select your city.');
-  if (!province) return showCheckError(err, 'Please enter your province.');
-  if (!zip) return showCheckError(err, 'Please enter your ZIP code.');
-  if (!region) return showCheckError(err, 'Please select your region.');
+  if (!city)            return showCheckError(err, 'Please select your city.');
+  if (!province)        return showCheckError(err, 'Please enter your province.');
+  if (!zip)             return showCheckError(err, 'Please enter your ZIP code.');
+  if (!region)          return showCheckError(err, 'Please select your region.');
   err.style.display = 'none';
   return true;
 }
@@ -417,7 +392,7 @@ function validatePayment() {
 function showCheckError(el, msg) { el.innerText = msg; el.style.display = 'block'; return false; }
 
 function buildReviewPanel() {
-  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty || 1), 0);
+  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty||1), 0);
   const shipping = 150;
   const total = subtotal + shipping;
   const itemsEl = document.getElementById('review-items');
@@ -438,16 +413,16 @@ function buildReviewPanel() {
   });
   document.getElementById('review-subtotal').innerText = `₱${subtotal.toLocaleString()}`;
   document.getElementById('review-shipping').innerText = `₱${shipping.toLocaleString()}`;
-  document.getElementById('review-total').innerText = `₱${total.toLocaleString()}`;
+  document.getElementById('review-total').innerText    = `₱${total.toLocaleString()}`;
 
-  const fname = document.getElementById('addr-fname').value.trim();
-  const lname = document.getElementById('addr-lname').value.trim();
-  const phone = document.getElementById('addr-phone').value.trim();
-  const street = document.getElementById('addr-street').value.trim();
-  const city = document.getElementById('addr-city').value.trim();
+  const fname    = document.getElementById('addr-fname').value.trim();
+  const lname    = document.getElementById('addr-lname').value.trim();
+  const phone    = document.getElementById('addr-phone').value.trim();
+  const street   = document.getElementById('addr-street').value.trim();
+  const city     = document.getElementById('addr-city').value.trim();
   const province = document.getElementById('addr-province').value.trim();
-  const zip = document.getElementById('addr-zip').value.trim();
-  const region = document.getElementById('addr-region').value;
+  const zip      = document.getElementById('addr-zip').value.trim();
+  const region   = document.getElementById('addr-region').value;
   document.getElementById('review-address').innerHTML =
     `<strong>${fname} ${lname}</strong><br>${phone}<br>${street}<br>${city}, ${province} ${zip}<br>${region}`;
 
@@ -461,56 +436,54 @@ function buildReviewPanel() {
 }
 
 function placeOrder(gcashMeta) {
-  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty || 1), 0);
+  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty||1), 0);
   const shipping = 150;
-  const total = subtotal + shipping;
+  const total    = subtotal + shipping;
   const orderNum = 'UL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 
-  const addrSrc = (gcashMeta && gcashMeta.address) ? gcashMeta.address : {
-    fname: document.getElementById('addr-fname').value.trim(),
-    lname: document.getElementById('addr-lname').value.trim(),
-    phone: document.getElementById('addr-phone').value.trim(),
-    street: document.getElementById('addr-street').value.trim(),
-    city: document.getElementById('addr-city').value.trim(),
+  const addrSrc  = (gcashMeta && gcashMeta.address) ? gcashMeta.address : {
+    fname:    document.getElementById('addr-fname').value.trim(),
+    lname:    document.getElementById('addr-lname').value.trim(),
+    phone:    document.getElementById('addr-phone').value.trim(),
+    street:   document.getElementById('addr-street').value.trim(),
+    city:     document.getElementById('addr-city').value.trim(),
     province: document.getElementById('addr-province').value.trim(),
-    zip: document.getElementById('addr-zip').value.trim(),
-    region: document.getElementById('addr-region').value,
+    zip:      document.getElementById('addr-zip').value.trim(),
+    region:   document.getElementById('addr-region').value,
   };
   const { fname, lname, phone, street, city, province, zip, region } = addrSrc;
-  saveAddressToStorage(addrSrc);
 
   const order = {
     orderNum,
     customer: currentUser.username,
-    items: cart.map(i => ({ name: i.name, size: i.size, qty: i.qty || 1, price: i.finalPrice, image: i.image })),
+    items: cart.map(i => ({ name: i.name, size: i.size, qty: i.qty||1, price: i.finalPrice, image: i.image })),
     subtotal, shipping, total,
     address: { name: `${fname} ${lname}`, phone, street, city, province, zip, region },
     payment: selectedPayMethod,
     status: 'pending',
-    gcashProof: gcashMeta ? gcashMeta.gcashProof : null,
-    gcashRef: gcashMeta ? gcashMeta.gcashRef : null,
-    gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
+    gcashProof:   gcashMeta ? gcashMeta.gcashProof   : null,
+    gcashRef:     gcashMeta ? gcashMeta.gcashRef     : null,
+    gcashStatus:  gcashMeta ? gcashMeta.gcashStatus  : null,
     createdAt: new Date().toISOString()
   };
   const isGCashOrder = selectedPayMethod === 'gcash';
-  apiFetch('/api/checkout', {
-    method: 'POST', body: JSON.stringify({
-      cart: cart.map(i => ({ id: i.id, name: i.name, category: i.category, size: i.size, qty: i.qty || 1, finalPrice: i.finalPrice, price: i.finalPrice, image: i.image })),
-      subtotal, shipping, total,
-      address: order.address,
-      paymentMethod: selectedPayMethod,
-      gcashProof: gcashMeta ? gcashMeta.gcashProof : null,
-      gcashRef: gcashMeta ? gcashMeta.gcashRef : null,
-      gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
-    })
-  }).then(data => {
+  apiFetch('/api/checkout', { method: 'POST', body: JSON.stringify({
+    cart: cart.map(i => ({ id: i.id, name: i.name, category: i.category, size: i.size, qty: i.qty||1, finalPrice: i.finalPrice, price: i.finalPrice, image: i.image })),
+    subtotal, shipping, total,
+    address: order.address,
+    paymentMethod: selectedPayMethod,
+    gcashProof:  gcashMeta ? gcashMeta.gcashProof  : null,
+    gcashRef:    gcashMeta ? gcashMeta.gcashRef    : null,
+    gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
+  })}).then(data => {
     const realOrderNum = (data && data.orderNum) ? data.orderNum : orderNum;
     document.getElementById('success-screen-confirmed').style.display = isGCashOrder ? 'none' : 'block';
-    document.getElementById('success-screen-gcash').style.display = isGCashOrder ? 'block' : 'none';
-    document.getElementById('success-order-num').innerText = 'ORDER #' + realOrderNum;
+    document.getElementById('success-screen-gcash').style.display     = isGCashOrder ? 'block' : 'none';
+    document.getElementById('success-order-num').innerText       = 'ORDER #' + realOrderNum;
     document.getElementById('success-order-num-gcash').innerText = 'ORDER #' + realOrderNum;
     document.querySelectorAll('.checkout-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('checkout-success').classList.add('active');
+    if (isGCashOrder) showToast('⏳ Payment submitted! Waiting for admin confirmation.');
     cart = [];
     updateCartUI();
     updateStepIndicator(4);
@@ -541,12 +514,12 @@ function formatExpiry(input) {
   input.value = v;
 }
 function updateCardPreview() {
-  const num = document.getElementById('card-number').value || '•••• •••• •••• ••••';
+  const num  = document.getElementById('card-number').value || '•••• •••• •••• ••••';
   const name = document.getElementById('card-name').value.toUpperCase() || 'YOUR NAME';
-  const exp = document.getElementById('card-expiry').value || 'MM/YY';
-  document.getElementById('card-num-display').innerText = num;
+  const exp  = document.getElementById('card-expiry').value || 'MM/YY';
+  document.getElementById('card-num-display').innerText  = num;
   document.getElementById('card-name-display').innerText = name;
-  document.getElementById('card-exp-display').innerText = exp;
+  document.getElementById('card-exp-display').innerText  = exp;
 }
 
 function openModal(id) {
@@ -584,27 +557,27 @@ function showToast(msg) {
 function signup() {
   hideError('signup-error');
   const username = document.getElementById('signup-username').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const ageVal = document.getElementById('signup-age').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const ageVal   = document.getElementById('signup-age').value.trim();
   const password = document.getElementById('signup-password').value;
-  const agreedTerms = document.getElementById('agree-terms').checked;
+  const agreedTerms   = document.getElementById('agree-terms').checked;
   const agreedPrivacy = document.getElementById('agree-privacy').checked;
   const birthday = document.getElementById('signup-birthday').value;
   const genderEl = document.querySelector('input[name="signup-gender"]:checked');
-  const gender = genderEl ? genderEl.value : '';
+  const gender   = genderEl ? genderEl.value : '';
 
   if (!username) return showError('signup-error', 'Username is required.');
   if (username.length < 3) return showError('signup-error', '⚠️ Username must be at least 3 characters.');
-  if (username.replace(/[^a-zA-Z]/g, '').length > 15) return showError('signup-error', '⚠️ Username must not exceed 15 letters.');
+  if (username.replace(/[^a-zA-Z]/g,'').length > 15) return showError('signup-error', '⚠️ Username must not exceed 15 letters.');
   if ((username.match(/[0-9]/g) || []).length > 2) return showError('signup-error', '⚠️ Username must not exceed 2 numbers.');
-  if (!email) return showError('signup-error', 'Email is required.');
+  if (!email)              return showError('signup-error', 'Email is required.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('signup-error', 'Please enter a valid email address (e.g. juan0606@gmail.com).');
   const localPart = email.split('@')[0];
   const lettersOnly = localPart.replace(/[^a-zA-Z]/g, '');
   const numbersOnly = localPart.replace(/[^0-9]/g, '');
   if (lettersOnly.length > 25) return showError('signup-error', '⚠️ Email username must not exceed 25 letters.');
-  if (numbersOnly.length !== 4) return showError('signup-error', '⚠️ Email username must contain exactly 4 numbers (e.g. juan0606@gmail.com).');
-  if (!ageVal) return showError('signup-error', 'Age is required.');
+  if (numbersOnly.length < 1 || numbersOnly.length > 4) return showError('signup-error', '⚠️ Email username must contain 1 to 4 numbers (e.g. juan0606@gmail.com).');
+  if (!ageVal)             return showError('signup-error', 'Age is required.');
   const age = parseInt(ageVal);
   if (isNaN(age) || age < 18 || age > 60) return showError('signup-error', '⚠️ Age must be between 18 and 60.');
   if (age < 18) return showError('signup-error', '⚠️ You must be 18 or older to register.');
@@ -612,22 +585,23 @@ function signup() {
   const bdYear = parseInt(birthday.split('-')[0]);
   const today = new Date();
   const calculatedAge = today.getFullYear() - bdYear - (
-    new Date(today.getFullYear(), parseInt(birthday.split('-')[1]) - 1, parseInt(birthday.split('-')[2])) > today ? 1 : 0
+    new Date(today.getFullYear(), parseInt(birthday.split('-')[1])-1, parseInt(birthday.split('-')[2])) > today ? 1 : 0
   );
   if (calculatedAge !== age) return showError('signup-error', '⚠️ Age does not match your birthday. Based on your birthday, your age should be ' + calculatedAge + '.');
-  if (!gender) return showError('signup-error', 'Please select your gender.');
+  if (!gender)   return showError('signup-error', 'Please select your gender.');
   if (!password) return showError('signup-error', 'Password is required.');
   const pwStrength = checkPasswordStrength(password);
   if (pwStrength.score < 4) return showError('signup-error', '⚠ ' + pwStrength.tip);
-  if (!agreedTerms) return showError('signup-error', 'Please agree to the Terms & Conditions.');
-  if (!agreedPrivacy) return showError('signup-error', 'Please agree to the Privacy Policy.');
+  if (!agreedTerms)        return showError('signup-error', 'Please agree to the Terms & Conditions.');
+  if (!agreedPrivacy)      return showError('signup-error', 'Please agree to the Privacy Policy.');
   apiFetch('/api/signup', { method: 'POST', body: JSON.stringify({ username, email, password, age, birthday, gender, agreedToTerms: agreedTerms, agreedToPrivacy: agreedPrivacy }) })
     .then(data => {
       if (data.error) return showError('signup-error', data.error);
       sessionStorage.setItem('uc_token', data.token);
+      localStorage.removeItem('uc_addr_' + data.username);
       currentUser = { username: data.username, role: data.role };
       sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
-      ['signup-username', 'signup-email', 'signup-age', 'signup-password', 'signup-birthday'].forEach(id => document.getElementById(id).value = '');
+      ['signup-username','signup-email','signup-age','signup-password','signup-birthday'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('agree-terms').checked = false;
       document.getElementById('agree-privacy').checked = false;
       document.getElementById('signup-strength-bar').style.width = '0%';
@@ -648,9 +622,9 @@ function signup() {
 function login() {
   hideError('login-error');
   const emailOrUser = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
+  const password    = document.getElementById('login-password').value;
   if (!emailOrUser) return showError('login-error', 'Please enter your email or username.');
-  if (!password) return showError('login-error', 'Please enter your password.');
+  if (!password)    return showError('login-error', 'Please enter your password.');
 
   apiFetch('/api/login', { method: 'POST', body: JSON.stringify({ email: emailOrUser, password }) })
     .then(data => {
@@ -666,7 +640,7 @@ function login() {
 }
 
 function selectGender(val) {
-  ['male', 'female', 'other'].forEach(g => {
+  ['male','female','other'].forEach(g => {
     const el = document.getElementById('gender-' + g);
     if (el) el.classList.toggle('selected', g === val);
   });
@@ -674,7 +648,7 @@ function selectGender(val) {
 
 function populateBirthdaySelects() {
   const yearSel = document.getElementById('bday-year');
-  const daySel = document.getElementById('bday-day');
+  const daySel  = document.getElementById('bday-day');
   if (!yearSel || !daySel) return;
   const curYear = new Date().getFullYear();
   for (let y = curYear; y >= 1920; y--) {
@@ -684,7 +658,7 @@ function populateBirthdaySelects() {
   }
   for (let d = 1; d <= 31; d++) {
     const o = document.createElement('option');
-    o.value = String(d).padStart(2, '0'); o.text = d;
+    o.value = String(d).padStart(2,'0'); o.text = d;
     daySel.appendChild(o);
   }
 }
@@ -697,13 +671,106 @@ function updateBirthday() {
   if (hidden) hidden.value = (m && d && y) ? `${y}-${m}-${d}` : '';
 }
 
+function notifKey() { return 'uc_notifs_' + (currentUser?.username || 'guest'); }
+
+function getNotifications() {
+  try { return JSON.parse(localStorage.getItem(notifKey()) || '[]'); } catch(_) { return []; }
+}
+
+function saveNotifications(notifs) {
+  try { localStorage.setItem(notifKey(), JSON.stringify(notifs)); } catch(_) {}
+}
+
+function addNotification(msg, type) {
+  const notifs = getNotifications();
+  notifs.unshift({ id: Date.now(), msg, type, read: false, time: new Date().toISOString() });
+  saveNotifications(notifs.slice(0, 20));
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  const bell  = document.getElementById('notif-bell');
+  const badge = document.getElementById('notif-badge');
+  if (!bell || !badge) return;
+  if (!currentUser || currentUser.role === 'admin') { bell.style.display = 'none'; return; }
+  bell.style.display = 'inline-flex';
+  bell.style.alignItems = 'center';
+  const unread = getNotifications().filter(n => !n.read).length;
+  if (unread > 0) {
+    badge.style.display = 'flex';
+    badge.innerText = unread > 9 ? '9+' : unread;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function openNotifications() {
+  const notifs = getNotifications();
+  const list = document.getElementById('notif-list');
+  if (notifs.length === 0) {
+    list.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px 0;">No notifications yet.</p>';
+  } else {
+    list.innerHTML = notifs.map(n => `
+      <div style="padding:14px 0;border-bottom:1px solid #f0f0f0;display:flex;gap:12px;align-items:flex-start;${n.read ? 'opacity:0.6;' : ''}">
+        <span style="font-size:1.3rem;">${n.type === 'confirmed' ? '✅' : n.type === 'rejected' ? '❌' : '🔔'}</span>
+        <div style="flex:1;">
+          <p style="margin:0 0 4px 0;font-size:0.88rem;font-weight:${n.read ? '400' : '700'};color:#111;">${n.msg}</p>
+          <small style="color:#aaa;">${new Date(n.time).toLocaleDateString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</small>
+        </div>
+      </div>
+    `).join('');
+  }
+  const all = getNotifications().map(n => ({ ...n, read: true }));
+  saveNotifications(all);
+  updateNotifBadge();
+  openModal('notif-modal');
+}
+
+let notifPollInterval = null;
+let lastKnownOrderStatuses = {};
+
+function startNotifPolling() {
+  if (notifPollInterval) clearInterval(notifPollInterval);
+  if (!currentUser || currentUser.role === 'admin') return;
+  apiFetch('/api/orders/my').then(orders => {
+    if (!Array.isArray(orders)) return;
+    orders.forEach(o => { lastKnownOrderStatuses[o.order_num] = o.gcash_status; });
+  });
+  notifPollInterval = setInterval(() => {
+    if (!currentUser || currentUser.role === 'admin') return;
+    apiFetch('/api/orders/my').then(orders => {
+      if (!Array.isArray(orders)) return;
+      orders.forEach(o => {
+        const prev = lastKnownOrderStatuses[o.order_num];
+        if (o.payment_method === 'gcash') {
+          if (prev !== 'confirmed' && o.gcash_status === 'confirmed') {
+            addNotification('✅ Your GCash payment for Order #' + o.order_num + ' has been confirmed! Your order is now being processed.', 'confirmed');
+            showToast('✅ GCash payment confirmed for Order #' + o.order_num + '!');
+          }
+          if (prev !== 'rejected' && o.gcash_status === 'rejected') {
+            addNotification('❌ Your GCash payment for Order #' + o.order_num + ' was rejected. Please check your order in MY ORDERS.', 'rejected');
+            showToast('❌ GCash payment rejected for Order #' + o.order_num + '.');
+          }
+        }
+        lastKnownOrderStatuses[o.order_num] = o.gcash_status;
+      });
+    });
+  }, 15000);
+}
+
+function stopNotifPolling() {
+  if (notifPollInterval) { clearInterval(notifPollInterval); notifPollInterval = null; }
+  lastKnownOrderStatuses = {};
+}
+
 function logout() {
-  apiFetch('/api/logout', { method: 'POST' }).catch(() => { });
+  apiFetch('/api/logout', { method: 'POST' }).catch(() => {});
   sessionStorage.removeItem('uc_token');
   sessionStorage.removeItem('uc_user');
   localStorage.removeItem('uc_cart');
   currentUser = null;
   cart = [];
+  stopNotifPolling();
   updateCartUI();
   updateAuthUI();
   showToast('Logged out successfully.');
@@ -715,12 +782,16 @@ function updateAuthUI() {
     document.getElementById('user-area').style.display = 'flex';
     document.getElementById('user-greeting').innerText = `HI, ${currentUser.username.toUpperCase()}`;
     const isAdmin = currentUser.role === 'admin';
-    document.getElementById('admin-btn').style.display = isAdmin ? 'inline-block' : 'none';
-    document.getElementById('my-orders-btn').style.display = isAdmin ? 'none' : 'inline-block';
+    document.getElementById('admin-btn').style.display      = isAdmin ? 'inline-block' : 'none';
+    document.getElementById('my-orders-btn').style.display  = isAdmin ? 'none' : 'inline-block';
     document.getElementById('my-address-btn').style.display = isAdmin ? 'none' : 'inline-block';
+    updateNotifBadge();
+    startNotifPolling();
   } else {
     document.getElementById('auth-area').style.display = 'flex';
     document.getElementById('user-area').style.display = 'none';
+    const bell = document.getElementById('notif-bell');
+    if (bell) bell.style.display = 'none';
   }
 }
 
@@ -733,13 +804,13 @@ function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach((t, i) => {
     t.classList.toggle('active',
       (tab === 'products' && i === 0) ||
-      (tab === 'users' && i === 1) ||
-      (tab === 'orders' && i === 2)
+      (tab === 'users'    && i === 1) ||
+      (tab === 'orders'   && i === 2)
     );
   });
   document.getElementById('admin-products').style.display = tab === 'products' ? 'block' : 'none';
-  document.getElementById('admin-users').style.display = tab === 'users' ? 'block' : 'none';
-  document.getElementById('admin-orders').style.display = tab === 'orders' ? 'block' : 'none';
+  document.getElementById('admin-users').style.display    = tab === 'users'    ? 'block' : 'none';
+  document.getElementById('admin-orders').style.display   = tab === 'orders'   ? 'block' : 'none';
   if (tab === 'products') loadAdminProducts();
   else if (tab === 'users') loadAdminUsers();
   else if (tab === 'orders') loadAdminOrders();
@@ -759,8 +830,8 @@ function loadAdminProducts() {
     row.className = 'admin-row';
     const stockTxt = p.stock != null
       ? (p.stock === 0
-        ? `<span style="color:#c0392b;font-weight:700;font-size:0.75rem;">OUT OF STOCK</span>`
-        : `<span style="color:${p.stock <= 5 ? '#e67e22' : '#27ae60'};font-weight:700;font-size:0.75rem;">${p.stock} in stock</span>`)
+          ? `<span style="color:#c0392b;font-weight:700;font-size:0.75rem;">OUT OF STOCK</span>`
+          : `<span style="color:${p.stock<=5?'#e67e22':'#27ae60'};font-weight:700;font-size:0.75rem;">${p.stock} in stock</span>`)
       : `<span style="color:#aaa;font-size:0.75rem;">Stock not set</span>`;
     row.innerHTML = `
       <img src="${p.image}" alt="${p.name}" style="width:50px;height:60px;object-fit:cover;flex-shrink:0;">
@@ -771,7 +842,7 @@ function loadAdminProducts() {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;align-items:center;">
         <button class="edit-btn" onclick="openAddProduct(${p.id})">EDIT</button>
-        <button class="delete-btn trash-btn" onclick="promptDelete(${p.id},'${p.name.replace(/'/g, "\\'")}')">🗑</button>
+        <button class="delete-btn trash-btn" onclick="promptDelete(${p.id},'${p.name.replace(/'/g,"\\'")}')">🗑</button>
       </div>
     `;
     list.appendChild(row);
@@ -779,42 +850,42 @@ function loadAdminProducts() {
 }
 
 function loadProductsFromAPI() {
-
+  
   renderProducts(allProducts);
-
+  
   apiFetch('/api/products').then(data => {
     if (Array.isArray(data) && data.length > 0) {
       allProducts = data;
       renderProducts(allProducts);
     } else if (Array.isArray(data) && data.length === 0) {
-
+      
       seedProductsToDB();
     }
   }).catch(() => {
-
+    
     renderProducts(allProducts);
   });
 }
 
 function seedProductsToDB() {
   const toSeed = [
-    { name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder cut', 'Boxy oversized fit', 'Front and back logo print', 'Ribbed crew neckline', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Premium Crewneck Shirt", category: "shirts", price: 2800, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed crewneck silhouette', 'Chest pocket detail', 'Washed premium finish', 'Dropped shoulders', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '280 GSM', 'HEAVYWEIGHT JERSEY FABRIC'] },
-    { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Limited edition graphic tee', 'Full front tribute print', 'Oversized boxy fit', 'Reinforced stitching', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC'] },
-    { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Classic crewneck style', 'Minimalist embroidered logo', 'Regular fit construction', 'Soft brushed interior', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FLEECE FABRIC'] },
-    { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Clean all-white colorway', 'Back graphic print', 'Oversized streetwear fit', 'Double-stitched hem', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop shoulder cut','Boxy oversized fit','Front and back logo print','Ribbed crew neckline','FREE Stickers in every purchase'], specs: ['100% COTTON','260 GSM','FRENCH TERRY FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 2800, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png", sizes: ['S','M','L','XL','2XL'], details: ['Relaxed crewneck silhouette','Chest pocket detail','Washed premium finish','Dropped shoulders','FREE Stickers in every purchase'], specs: ['100% COTTON','280 GSM','HEAVYWEIGHT JERSEY FABRIC'] },
+    { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S','M','L','XL','2XL'], details: ['Limited edition graphic tee','Full front tribute print','Oversized boxy fit','Reinforced stitching','FREE Stickers in every purchase'], specs: ['100% COTTON','240 GSM','COMBED COTTON FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S','M','L','XL','2XL'], details: ['Classic crewneck style','Minimalist embroidered logo','Regular fit construction','Soft brushed interior','FREE Stickers in every purchase'], specs: ['100% COTTON','260 GSM','FLEECE FABRIC'] },
+    { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S','M','L','XL','2XL'], details: ['Clean all-white colorway','Back graphic print','Oversized streetwear fit','Double-stitched hem','FREE Stickers in every purchase'], specs: ['100% COTTON','270 GSM','FRENCH TERRY FABRIC'] },
+    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S','M','L','XL','2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S','M','L','XL','2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S','M','L','XL','2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S','M','L','XL','2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S','M','L','XL','2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
   ];
-
+  
   const originalToken = sessionStorage.getItem('uc_token');
-
+  
   fetch(API + '/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -831,14 +902,14 @@ function seedProductsToDB() {
       }).then(r => r.json()).then(res => {
         seeded++;
         if (seeded === toSeed.length) {
-
+          
           if (originalToken) sessionStorage.setItem('uc_token', originalToken);
           else sessionStorage.removeItem('uc_token');
           loadProductsFromAPI();
         }
       });
     });
-  }).catch(() => { });
+  }).catch(() => {});
 }
 
 function loadAdminUsers() {
@@ -881,21 +952,21 @@ function loadAdminOrders() {
     if (countEl) countEl.innerText = orders.length;
     if (!orders.length) { list.innerHTML = '<p style="color:#888;padding:20px 0;">No orders yet.</p>'; return; }
     orders.forEach((order, idx) => {
-      const statusColors = { pending: '#e67e22', out_for_delivery: '#2980b9', completed: '#27ae60', cancelled: '#c0392b' };
-      const statusLabels = { pending: '⏳ Pending', out_for_delivery: '🚚 Out for Delivery', completed: '✅ Completed', cancelled: '❌ Cancelled' };
-      const color = statusColors[order.status] || '#888';
-      const label = statusLabels[order.status] || order.status;
-      const date = new Date(order.created_at).toLocaleString();
-      const itemsSummary = order.items.map(i => `${i.name} (${i.size})`).join(', ');
+    const statusColors = { pending: '#e67e22', out_for_delivery: '#2980b9', completed: '#27ae60', cancelled: '#c0392b' };
+    const statusLabels = { pending: '⏳ Pending', out_for_delivery: '🚚 Out for Delivery', completed: '✅ Completed', cancelled: '❌ Cancelled' };
+    const color = statusColors[order.status] || '#888';
+    const label = statusLabels[order.status] || order.status;
+    const date  = new Date(order.created_at).toLocaleString();
+    const itemsSummary = order.items.map(i => `${i.name} (${i.size})`).join(', ');
 
-      const isGCash = order.payment_method === 'gcash';
-      const gcashPending = isGCash && order.gcash_status === 'pending_confirmation';
-      const gcashConfirmed = isGCash && order.gcash_status === 'confirmed';
-      const gcashRejected = isGCash && order.gcash_status === 'rejected';
+    const isGCash = order.payment_method === 'gcash';
+    const gcashPending  = isGCash && order.gcash_status === 'pending_confirmation';
+    const gcashConfirmed= isGCash && order.gcash_status === 'confirmed';
+    const gcashRejected = isGCash && order.gcash_status === 'rejected';
 
-      const row = document.createElement('div');
-      row.className = 'admin-order-row';
-      row.innerHTML = `
+    const row = document.createElement('div');
+    row.className = 'admin-order-row';
+    row.innerHTML = `
       <div class="order-row-top">
         <div>
           <strong class="order-num">#${order.order_num}</strong>
@@ -903,9 +974,9 @@ function loadAdminOrders() {
           <span class="order-date">${date}</span>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          ${gcashPending ? `<span class="gcash-badge pending">⏳ AWAITING VERIFICATION</span>` : ''}
+          ${gcashPending   ? `<span class="gcash-badge pending">⏳ AWAITING VERIFICATION</span>` : ''}
           ${gcashConfirmed ? `<span class="gcash-badge confirmed">💙 GCASH CONFIRMED</span>` : ''}
-          ${gcashRejected ? `<span class="gcash-badge rejected">❌ PAYMENT REJECTED</span>` : ''}
+          ${gcashRejected  ? `<span class="gcash-badge rejected">❌ PAYMENT REJECTED</span>` : ''}
           <span class="order-status-badge" style="background:${color};">${label}</span>
         </div>
       </div>
@@ -934,7 +1005,7 @@ function loadAdminOrders() {
         </div>
       </div>
     `;
-      list.appendChild(row);
+    list.appendChild(row);
     });
   }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load orders.</p>'; });
 }
@@ -1012,16 +1083,16 @@ let editingProductId = null;
 function openAddProduct(id) {
   editingProductId = id || null;
   hideError('add-product-error');
-  ALL_SIZES.forEach(s => { const el = document.getElementById('stock-' + s); if (el) el.value = ''; });
+  ALL_SIZES.forEach(s => { const el = document.getElementById('stock-'+s); if(el) el.value = ''; });
   if (id) {
     const p = allProducts.find(p => p.id === id);
     document.getElementById('add-product-title').innerText = 'EDIT PRODUCT';
-    document.getElementById('new-product-image').value = p.image;
-    document.getElementById('new-product-name').value = p.name;
+    document.getElementById('new-product-image').value    = p.image;
+    document.getElementById('new-product-name').value     = p.name;
     document.getElementById('new-product-category').value = p.category;
-    document.getElementById('new-product-price').value = p.price;
-    document.getElementById('new-product-details').value = p.details ? p.details.join('\n') : '';
-    document.getElementById('new-product-specs').value = p.specs ? p.specs.join('\n') : '';
+    document.getElementById('new-product-price').value    = p.price;
+    document.getElementById('new-product-details').value  = p.details ? p.details.join('\n') : '';
+    document.getElementById('new-product-specs').value    = p.specs   ? p.specs.join('\n')   : '';
     const sizeStock = p.size_stock || {};
     ALL_SIZES.forEach(s => {
       const el = document.getElementById('stock-' + s);
@@ -1030,15 +1101,15 @@ function openAddProduct(id) {
     previewImage();
   } else {
     document.getElementById('add-product-title').innerText = 'ADD PRODUCT';
-    document.getElementById('new-product-image').value = '';
-    document.getElementById('new-product-name').value = '';
+    document.getElementById('new-product-image').value    = '';
+    document.getElementById('new-product-name').value     = '';
     document.getElementById('new-product-category').value = '';
-    document.getElementById('new-product-price').value = '';
-    document.getElementById('new-product-details').value = '';
-    document.getElementById('new-product-specs').value = '';
+    document.getElementById('new-product-price').value    = '';
+    document.getElementById('new-product-details').value  = '';
+    document.getElementById('new-product-specs').value    = '';
     document.getElementById('img-preview-img').style.display = 'none';
     document.getElementById('img-placeholder').style.display = 'block';
-    document.getElementById('img-placeholder').innerText = 'IMAGE PREVIEW';
+    document.getElementById('img-placeholder').innerText     = 'IMAGE PREVIEW';
   }
   openModal('add-product-modal');
 }
@@ -1046,19 +1117,19 @@ function openAddProduct(id) {
 function previewImage() {
   const url = document.getElementById('new-product-image').value.trim();
   const img = document.getElementById('img-preview-img');
-  const ph = document.getElementById('img-placeholder');
+  const ph  = document.getElementById('img-placeholder');
   if (url) {
     img.src = url;
-    img.onload = () => { img.style.display = 'block'; ph.style.display = 'none'; };
-    img.onerror = () => { img.style.display = 'none'; ph.style.display = 'block'; ph.innerText = '⚠ Invalid image URL'; };
+    img.onload  = () => { img.style.display = 'block'; ph.style.display = 'none'; };
+    img.onerror = () => { img.style.display = 'none';  ph.style.display = 'block'; ph.innerText = '⚠ Invalid image URL'; };
   } else {
     img.style.display = 'none'; ph.style.display = 'block'; ph.innerText = 'IMAGE PREVIEW';
   }
 }
 
 function saveProduct() {
-  const image = document.getElementById('new-product-image').value.trim();
-  const name = document.getElementById('new-product-name').value.trim();
+  const image    = document.getElementById('new-product-image').value.trim();
+  const name     = document.getElementById('new-product-name').value.trim();
   const category = document.getElementById('new-product-category').value;
   const priceVal = document.getElementById('new-product-price').value;
 
@@ -1069,18 +1140,18 @@ function saveProduct() {
   });
   const sizes = ALL_SIZES.filter(s => size_stock[s] == null || size_stock[s] > 0);
 
-  if (!image) return showError('add-product-error', 'Please enter an image URL.');
-  if (!name) return showError('add-product-error', 'Please enter a product name.');
+  if (!image)    return showError('add-product-error', 'Please enter an image URL.');
+  if (!name)     return showError('add-product-error', 'Please enter a product name.');
   if (!category) return showError('add-product-error', 'Please select a category.');
   if (!priceVal || parseInt(priceVal) < 1) return showError('add-product-error', 'Please enter a valid price.');
   document.getElementById('add-product-error').style.display = 'none';
 
-  const price = parseInt(priceVal);
-  const stock = Object.values(size_stock).reduce((a, b) => a + b, 0) || null;
-  const details = document.getElementById('new-product-details').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
-  const specs = document.getElementById('new-product-specs').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
+  const price   = parseInt(priceVal);
+  const stock   = Object.values(size_stock).reduce((a,b) => a+b, 0) || null;
+  const details = document.getElementById('new-product-details').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  const specs   = document.getElementById('new-product-specs').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
   const method = editingProductId !== null ? 'PUT' : 'POST';
-  const url = editingProductId !== null ? '/api/products/' + editingProductId : '/api/products';
+  const url    = editingProductId !== null ? '/api/products/' + editingProductId : '/api/products';
   apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock, details, specs }) })
     .then(data => {
       if (data.error) return showToast('Error: ' + data.error);
@@ -1099,7 +1170,7 @@ function saveProduct() {
 }
 
 function getCustomerTab(order) {
-
+  
   if (order.status === 'cancelled') {
     if (order.payment_method === 'gcash' && order.gcash_status === 'rejected') return 'to_pay';
     return null;
@@ -1126,8 +1197,8 @@ function refreshMyOrdersBadges() {
   apiFetch('/api/orders/my').then(orders => {
     if (!Array.isArray(orders)) return;
     allOrders = orders;
-    const tabs = ['to_pay', 'to_ship', 'to_receive', 'to_rate'];
-    const counts = { to_pay: 0, to_ship: 0, to_receive: 0, to_rate: 0 };
+    const tabs = ['to_pay','to_ship','to_receive','to_rate'];
+    const counts = { to_pay:0, to_ship:0, to_receive:0, to_rate:0 };
     orders.forEach(o => { const tab = getCustomerTab(o); if (tab) counts[tab]++; });
     tabs.forEach(tab => {
       const el = document.getElementById('badge-' + tab);
@@ -1135,13 +1206,13 @@ function refreshMyOrdersBadges() {
       el.innerText = counts[tab];
       el.classList.toggle('visible', counts[tab] > 0);
     });
-  }).catch(() => { });
+  }).catch(() => {});
 }
 
 function switchMyOrdersTab(tab) {
   currentMyOrdersTab = tab;
   document.querySelectorAll('.my-orders-tab').forEach((t, i) => {
-    const tabs = ['to_pay', 'to_ship', 'to_receive', 'to_rate'];
+    const tabs = ['to_pay','to_ship','to_receive','to_rate'];
     t.classList.toggle('active', tabs[i] === tab);
   });
   renderMyOrders(tab);
@@ -1160,38 +1231,38 @@ function renderMyOrders(tab) {
     list.innerHTML = '';
     const myOrders = allOrders.filter(o => getCustomerTab(o) === tab);
 
-    if (myOrders.length === 0) {
-      const emptyIcons = { to_pay: '💳', to_ship: '📦', to_receive: '🚚', to_rate: '⭐' };
-      const emptyMsgs = {
-        to_pay: 'No orders waiting for payment.',
-        to_ship: 'No orders being prepared.',
-        to_receive: 'No orders out for delivery.',
-        to_rate: 'No completed orders to rate yet.'
-      };
-      list.innerHTML = `
+  if (myOrders.length === 0) {
+    const emptyIcons = { to_pay:'💳', to_ship:'📦', to_receive:'🚚', to_rate:'⭐' };
+    const emptyMsgs  = {
+      to_pay:    'No orders waiting for payment.',
+      to_ship:   'No orders being prepared.',
+      to_receive:'No orders out for delivery.',
+      to_rate:   'No completed orders to rate yet.'
+    };
+    list.innerHTML = `
       <div class="my-order-empty">
         <div class="empty-icon">${emptyIcons[tab]}</div>
         <p>${emptyMsgs[tab]}</p>
       </div>`;
-      return;
-    }
+    return;
+  }
 
-    myOrders.forEach(order => {
-      const statusColors = {
-        pending: '#e67e22',
-        out_for_delivery: '#2980b9',
-        completed: '#27ae60',
-      };
-      const statusLabels = {
-        pending: order.payment_method === 'cod' ? '📦 Preparing' : (order.payment_method === 'gcash' ? '💙 GCash - Verifying Payment' : '💳 Awaiting Payment'),
-        out_for_delivery: '🚚 Out for Delivery',
-        completed: '✅ Delivered',
-      };
-      const color = statusColors[order.status] || '#888';
-      const label = statusLabels[order.status] || order.status;
-      const date = new Date(order.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+  myOrders.forEach(order => {
+    const statusColors = {
+      pending:          '#e67e22',
+      out_for_delivery: '#2980b9',
+      completed:        '#27ae60',
+    };
+    const statusLabels = {
+      pending:          order.payment_method === 'cod' ? '📦 Preparing' : (order.payment_method === 'gcash' ? '💙 GCash - Verifying Payment' : '💳 Awaiting Payment'),
+      out_for_delivery: '🚚 Out for Delivery',
+      completed:        '✅ Delivered',
+    };
+    const color = statusColors[order.status] || '#888';
+    const label = statusLabels[order.status] || order.status;
+    const date  = new Date(order.created_at).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
 
-      const itemsHTML = order.items.map(item => `
+    const itemsHTML = order.items.map(item => `
       <div class="my-order-item">
         <img src="${item.image}" alt="${item.name}">
         <div class="my-order-item-info">
@@ -1202,37 +1273,37 @@ function renderMyOrders(tab) {
       </div>
     `).join('');
 
-
-      let actionBtn = '';
-      if (tab === 'to_pay') {
-        if (order.payment_method === 'gcash') {
-          if (order.gcash_status === 'pending_confirmation') {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify payment</span>`;
-          } else if (order.gcash_status === 'confirmed') {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">💙 GCash Confirmed</span>`;
-          } else if (order.gcash_status === 'rejected') {
-            actionBtn = `<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#c0392b;background:#fdecea;border:1px solid #f5c6c6;padding:6px 12px;border-radius:4px;display:inline-block;">❌ Payment Rejected</span>${order.gcash_reject_reason ? `<div style="font-size:0.72rem;color:#c0392b;margin-top:4px;">Reason: ${order.gcash_reject_reason}</div>` : ''}</div>`;
-          } else {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;padding:6px 12px;">Pending</span>`;
-          }
+    
+    let actionBtn = '';
+    if (tab === 'to_pay') {
+      if (order.payment_method === 'gcash') {
+        if (order.gcash_status === 'pending_confirmation') {
+          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify payment</span>`;
+        } else if (order.gcash_status === 'confirmed') {
+          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">💙 GCash Confirmed</span>`;
+        } else if (order.gcash_status === 'rejected') {
+          actionBtn = `<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#c0392b;background:#fdecea;border:1px solid #f5c6c6;padding:6px 12px;border-radius:4px;display:inline-block;">❌ Payment Rejected</span>${order.gcash_reject_reason ? `<div style="font-size:0.72rem;color:#c0392b;margin-top:4px;">Reason: ${order.gcash_reject_reason}</div>` : ''}</div>`;
         } else {
-          actionBtn = `<button class="my-order-action-btn primary" onclick="showToast('Redirecting to payment...')">PAY NOW</button>`;
+          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;padding:6px 12px;">Pending</span>`;
         }
-      } else if (tab === 'to_ship') {
-        actionBtn = '';
-      } else if (tab === 'to_receive') {
-        actionBtn = `<button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>`;
-      } else if (tab === 'to_rate') {
-        actionBtn = `<button class="my-order-action-btn primary" onclick="openRateModal('${order.order_num}')">RATE NOW</button>`;
+      } else {
+        actionBtn = `<button class="my-order-action-btn primary" onclick="showToast('Redirecting to payment...')">PAY NOW</button>`;
       }
+    } else if (tab === 'to_ship') {
+      actionBtn = '';
+    } else if (tab === 'to_receive') {
+      actionBtn = `<button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>`;
+    } else if (tab === 'to_rate') {
+      actionBtn = `<button class="my-order-action-btn primary" onclick="openRateModal('${order.order_num}')">RATE NOW</button>`;
+    }
 
-      const ratedHTML = order.rated
-        ? `<div class="rated-stars">${'★'.repeat(order.rating)}${'☆'.repeat(5 - order.rating)}</div>${order.rating_comment ? `<div class="rated-comment">"${order.rating_comment}"</div>` : ''}`
-        : '';
+    const ratedHTML = order.rated
+      ? `<div class="rated-stars">${'★'.repeat(order.rating)}${'☆'.repeat(5 - order.rating)}</div>${order.rating_comment ? `<div class="rated-comment">"${order.rating_comment}"</div>` : ''}`
+      : '';
 
-      const card = document.createElement('div');
-      card.className = 'my-order-card';
-      card.innerHTML = `
+    const card = document.createElement('div');
+    card.className = 'my-order-card';
+    card.innerHTML = `
       <div class="my-order-card-top">
         <div>
           <span class="my-order-num">#${order.order_num}</span>
@@ -1247,7 +1318,7 @@ function renderMyOrders(tab) {
         ${actionBtn}
       </div>
     `;
-      list.appendChild(card);
+    list.appendChild(card);
     });
   }).catch(() => { list.innerHTML = '<p style="color:#c00;padding:20px 0;text-align:center;">Failed to load orders.</p>'; });
 }
@@ -1292,44 +1363,44 @@ function submitRating() {
 
 function checkPasswordStrength(pw) {
   const checks = {
-    length: pw.length >= 8,
-    upper: /[A-Z]/.test(pw),
-    lower: /[a-z]/.test(pw),
-    number: /[0-9]/.test(pw),
+    length:  pw.length >= 8,
+    upper:   /[A-Z]/.test(pw),
+    lower:   /[a-z]/.test(pw),
+    number:  /[0-9]/.test(pw),
     special: /[^A-Za-z0-9]/.test(pw),
   };
   const score = Object.values(checks).filter(Boolean).length;
   const tips = [];
-  if (!checks.length) tips.push('at least 8 characters');
-  if (!checks.upper) tips.push('an uppercase letter');
-  if (!checks.lower) tips.push('a lowercase letter');
-  if (!checks.number) tips.push('a number');
+  if (!checks.length)  tips.push('at least 8 characters');
+  if (!checks.upper)   tips.push('an uppercase letter');
+  if (!checks.lower)   tips.push('a lowercase letter');
+  if (!checks.number)  tips.push('a number');
   if (!checks.special) tips.push('a special character (!@#$...)');
   const tip = tips.length ? 'Password needs: ' + tips.join(', ') + '.' : 'Strong password!';
   return { score, tip, checks };
 }
 
 function onPasswordInput() {
-  const pw = document.getElementById('signup-password').value;
+  const pw  = document.getElementById('signup-password').value;
   const bar = document.getElementById('signup-strength-bar');
   const lbl = document.getElementById('signup-strength-label');
   const tip = document.getElementById('pw-tip');
   if (!bar || !lbl) return;
   const { score, checks } = checkPasswordStrength(pw);
-  const pct = ['0%', '20%', '40%', '60%', '80%', '100%'][score];
-  const colors = ['#ccc', '#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#27ae60'];
-  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
-  bar.style.width = pct;
+  const pct    = ['0%','20%','40%','60%','80%','100%'][score];
+  const colors = ['#ccc','#e74c3c','#e67e22','#f1c40f','#2ecc71','#27ae60'];
+  const labels = ['','Weak','Fair','Good','Strong','Very Strong'];
+  bar.style.width      = pct;
   bar.style.background = colors[score];
-  lbl.innerText = score > 0 ? labels[score] : '';
-  lbl.style.color = colors[score];
+  lbl.innerText        = score > 0 ? labels[score] : '';
+  lbl.style.color      = colors[score];
   if (score === 5) lbl.innerText = '✓ ' + labels[score];
   if (tip) {
     const missing = [];
-    if (!checks.length) missing.push('8+ characters');
-    if (!checks.upper) missing.push('uppercase letter (A-Z)');
-    if (!checks.lower) missing.push('lowercase letter (a-z)');
-    if (!checks.number) missing.push('number (0-9)');
+    if (!checks.length)  missing.push('8+ characters');
+    if (!checks.upper)   missing.push('uppercase letter (A-Z)');
+    if (!checks.lower)   missing.push('lowercase letter (a-z)');
+    if (!checks.number)  missing.push('number (0-9)');
     if (!checks.special) missing.push('special character (!@#$...)');
     tip.innerText = pw.length > 0 && missing.length ? '⚠ Needs: ' + missing.join(', ') : '';
     tip.style.color = '#e67e22';
@@ -1339,14 +1410,14 @@ function onPasswordInput() {
 function addrKey() { return 'uc_addr_' + (currentUser?.username || 'guest'); }
 
 function saveAddressToStorage(addr) {
-  try { localStorage.setItem(addrKey(), JSON.stringify(addr)); } catch (_) { }
+  try { localStorage.setItem(addrKey(), JSON.stringify(addr)); } catch(_) {}
 }
 
 function getSavedAddress() {
   try {
     const raw = localStorage.getItem(addrKey());
     return raw ? JSON.parse(raw) : null;
-  } catch (_) { return null; }
+  } catch(_) { return null; }
 }
 
 function formatAddressSummary(a) {
@@ -1359,8 +1430,8 @@ function fillCheckoutForm(a) {
   const map = {
     'addr-fname': a.fname, 'addr-lname': a.lname,
     'addr-phone': a.phone, 'addr-street': a.street,
-    'addr-city': a.city, 'addr-province': a.province,
-    'addr-zip': a.zip, 'addr-region': a.region
+    'addr-city':  a.city,  'addr-province': a.province,
+    'addr-zip':   a.zip,   'addr-region': a.region
   };
   Object.entries(map).forEach(([id, val]) => {
     const el = document.getElementById(id);
@@ -1369,28 +1440,28 @@ function fillCheckoutForm(a) {
 }
 
 function clearCheckoutForm() {
-  ['addr-fname', 'addr-lname', 'addr-phone', 'addr-street', 'addr-city', 'addr-province', 'addr-zip'].forEach(id => {
+  ['addr-fname','addr-lname','addr-phone','addr-street','addr-city','addr-province','addr-zip'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   const reg = document.getElementById('addr-region'); if (reg) reg.value = '';
 }
 
 function prefillSavedAddress() {
-  const addr = getSavedAddress();
-  const card = document.getElementById('saved-addr-card');
-  const banner = document.getElementById('no-addr-banner');
-  const formWrap = document.getElementById('addr-form-wrap');
+  const addr    = getSavedAddress();
+  const card    = document.getElementById('saved-addr-card');
+  const banner  = document.getElementById('no-addr-banner');
+  const formWrap= document.getElementById('addr-form-wrap');
 
   if (addr) {
     document.getElementById('saved-addr-summary').innerHTML = formatAddressSummary(addr);
-    card.style.display = 'block';
-    banner.style.display = 'none';
-    formWrap.style.display = 'none';
+    card.style.display    = 'block';
+    banner.style.display  = 'none';
+    formWrap.style.display= 'none';
     fillCheckoutForm(addr);
   } else {
-    card.style.display = 'none';
-    banner.style.display = 'block';
-    formWrap.style.display = 'none';
+    card.style.display    = 'none';
+    banner.style.display  = 'block';
+    formWrap.style.display= 'none';
     clearCheckoutForm();
   }
 }
@@ -1398,8 +1469,8 @@ function prefillSavedAddress() {
 function showAddressForm(fromCard) {
   const addr = getSavedAddress();
   document.getElementById('saved-addr-card').style.display = 'none';
-  document.getElementById('no-addr-banner').style.display = 'none';
-  document.getElementById('addr-form-wrap').style.display = 'block';
+  document.getElementById('no-addr-banner').style.display  = 'none';
+  document.getElementById('addr-form-wrap').style.display  = 'block';
   if (fromCard && addr) fillCheckoutForm(addr);
   const actions = document.getElementById('addr-form-actions');
   if (actions) actions.style.display = fromCard ? 'block' : 'none';
@@ -1413,19 +1484,19 @@ let gcashProofDataUrl = null;
 let gcashSavedAddress = null;
 
 function launchGCashRedirect() {
-  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty || 1), 0);
-  const total = subtotal + 150;
+  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty||1), 0);
+  const total    = subtotal + 150;
   gcashProofDataUrl = null;
 
   gcashSavedAddress = {
-    fname: document.getElementById('addr-fname').value.trim(),
-    lname: document.getElementById('addr-lname').value.trim(),
-    phone: document.getElementById('addr-phone').value.trim(),
-    street: document.getElementById('addr-street').value.trim(),
-    city: document.getElementById('addr-city').value.trim(),
+    fname:    document.getElementById('addr-fname').value.trim(),
+    lname:    document.getElementById('addr-lname').value.trim(),
+    phone:    document.getElementById('addr-phone').value.trim(),
+    street:   document.getElementById('addr-street').value.trim(),
+    city:     document.getElementById('addr-city').value.trim(),
     province: document.getElementById('addr-province').value.trim(),
-    zip: document.getElementById('addr-zip').value.trim(),
-    region: document.getElementById('addr-region').value,
+    zip:      document.getElementById('addr-zip').value.trim(),
+    region:   document.getElementById('addr-region').value,
   };
 
   closeModal('checkout-modal');
@@ -1472,7 +1543,7 @@ function launchGCashRedirect() {
         </div>
         <div id="gcash-submit-error" style="display:none;color:#c0392b;font-size:0.78rem;font-weight:700;margin-bottom:10px;"></div>
         <button onclick="confirmGCashPayment()" style="width:100%;padding:14px;background:#00a3e0;color:#fff;border:none;border-radius:8px;font-size:0.95rem;font-weight:700;cursor:pointer;letter-spacing:1px;margin-bottom:10px;">
-          ✓ I PAID — SUBMIT ORDER
+          ✓ CONFIRM ORDER & SUBMIT PAYMENT
         </button>
         <button onclick="cancelGCashPayment()" style="width:100%;padding:10px;background:transparent;color:#888;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;cursor:pointer;">
           Cancel
@@ -1511,15 +1582,15 @@ function confirmGCashPayment() {
   errEl.style.display = 'none';
   const overlay = document.getElementById('gcash-overlay');
   if (overlay) overlay.remove();
-  const proofToSend = gcashProofDataUrl;
+  const proofToSend = gcashProofDataUrl;  
   gcashProofDataUrl = null;
   placeOrder({
-    gcashProof: proofToSend,
-    gcashRef: ref,
+    gcashProof:  proofToSend,
+    gcashRef:    ref,
     gcashStatus: 'pending_confirmation',
-    address: gcashSavedAddress
+    address:     gcashSavedAddress
   });
-
+  
 }
 
 function cancelGCashPayment() {
@@ -1531,9 +1602,9 @@ function cancelGCashPayment() {
 
 function openAddressBook() {
   const addr = getSavedAddress();
-  const savedDiv = document.getElementById('address-book-saved');
-  const emptyDiv = document.getElementById('address-book-empty');
-  const formDiv = document.getElementById('address-book-form');
+  const savedDiv  = document.getElementById('address-book-saved');
+  const emptyDiv  = document.getElementById('address-book-empty');
+  const formDiv   = document.getElementById('address-book-form');
   if (addr) {
     document.getElementById('ab-saved-display').innerHTML = `
       <div class="ab-field"><span class="ab-label">NAME</span><span>${addr.fname} ${addr.lname}</span></div>
@@ -1544,11 +1615,11 @@ function openAddressBook() {
     `;
     savedDiv.style.display = 'block';
     emptyDiv.style.display = 'none';
-    formDiv.style.display = 'none';
+    formDiv.style.display  = 'none';
   } else {
     savedDiv.style.display = 'none';
     emptyDiv.style.display = 'block';
-    formDiv.style.display = 'block';
+    formDiv.style.display  = 'block';
     clearAddressBookForm();
   }
   openModal('address-book-modal');
@@ -1558,14 +1629,12 @@ function showAddressBookForm() {
   const addr = getSavedAddress();
   document.getElementById('address-book-saved').style.display = 'none';
   document.getElementById('address-book-empty').style.display = 'none';
-  document.getElementById('address-book-form').style.display = 'block';
+  document.getElementById('address-book-form').style.display  = 'block';
   if (addr) {
-    const map = {
-      'ab-fname': addr.fname, 'ab-lname': addr.lname,
+    const map = { 'ab-fname': addr.fname, 'ab-lname': addr.lname,
       'ab-phone': addr.phone, 'ab-street': addr.street,
       'ab-city': addr.city, 'ab-province': addr.province,
-      'ab-zip': addr.zip, 'ab-region': addr.region
-    };
+      'ab-zip': addr.zip, 'ab-region': addr.region };
     Object.entries(map).forEach(([id, val]) => {
       const el = document.getElementById(id); if (el && val) el.value = val;
     });
@@ -1573,7 +1642,7 @@ function showAddressBookForm() {
 }
 
 function clearAddressBookForm() {
-  ['ab-fname', 'ab-lname', 'ab-phone', 'ab-street', 'ab-city', 'ab-province', 'ab-zip'].forEach(id => {
+  ['ab-fname','ab-lname','ab-phone','ab-street','ab-city','ab-province','ab-zip'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   const r = document.getElementById('ab-region'); if (r) r.value = '';
@@ -1584,17 +1653,18 @@ function cancelAddressBookForm() {
 }
 
 function saveAddressBook() {
-  const fname = document.getElementById('ab-fname').value.trim();
-  const lname = document.getElementById('ab-lname').value.trim();
-  const phone = document.getElementById('ab-phone').value.trim();
-  const street = document.getElementById('ab-street').value.trim();
-  const city = document.getElementById('ab-city').value.trim();
+  const fname    = document.getElementById('ab-fname').value.trim();
+  const lname    = document.getElementById('ab-lname').value.trim();
+  const phone    = document.getElementById('ab-phone').value.trim();
+  const street   = document.getElementById('ab-street').value.trim();
+  const city     = document.getElementById('ab-city').value.trim();
   const province = document.getElementById('ab-province').value.trim();
-  const zip = document.getElementById('ab-zip').value.trim();
-  const region = document.getElementById('ab-region').value;
+  const zip      = document.getElementById('ab-zip').value.trim();
+  const region   = document.getElementById('ab-region').value;
   if (!fname || !lname) return showToast('Please enter your full name.');
   if (!phone || phone.length !== 11) return showToast('Please enter a valid 11-digit phone number.');
-  if (!street) return showToast('Please enter your street address.');
+  if (!phone.startsWith('09')) return showToast('⚠️ Phone number must start with 09.');
+  if (!street)          return showToast('Please enter your street address.');
   if (!/[a-zA-Z]/.test(street)) return showToast('Street address must include a street name (e.g. 123 Rizal St.).');
   if (!city || !province || !zip || !region) return showToast('Please fill in all address fields.');
   saveAddressToStorage({ fname, lname, phone, street, city, province, zip, region });

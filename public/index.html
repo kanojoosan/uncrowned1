@@ -111,9 +111,10 @@
     <div class="modal-body">
       <div id="signup-error" class="error-msg" style="display:none;"></div>
       <div class="form-group"><label>USERNAME</label><input type="text" id="signup-username"
-          placeholder="streetwear_fan"></div>
-      <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="your@email.com">
+          placeholder="streetwear_fan" maxlength="20" oninput="this.value=this.value.replace(/[^a-zA-Z0-9_]/g,'')">
       </div>
+      <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="your@email.com"
+          maxlength="35"></div>
       <div class="form-group"><label>AGE</label><input type="number" id="signup-age" placeholder="Must be 18+" min="18"
           max="60"
           oninput="this.value=this.value.replace(/[^0-9]/g,'').substring(0,2);if(parseInt(this.value)>60)this.value='60'">
@@ -451,7 +452,7 @@
               placeholder="09XXXXXXXXX" maxlength="11"
               oninput="this.value=this.value.replace(/\D/g,'').substring(0,11)"></div>
           <div class="form-group"><label>STREET ADDRESS</label><input type="text" id="addr-street"
-              placeholder="123 Rizal St., Unit 4B" maxlength="80" oninput="validateStreetInput(this)"></div>
+              placeholder="123 Rizal St., Unit 4B" maxlength="40" oninput="validateStreetInput(this)"></div>
           <div class="form-row">
             <div class="form-group">
               <label>CITY / MUNICIPALITY</label>
@@ -773,7 +774,7 @@
         <div class="form-group"><label>PHONE NUMBER</label><input type="text" id="ab-phone" placeholder="09XXXXXXXXX"
             maxlength="11" oninput="this.value=this.value.replace(/\D/g,'').substring(0,11)"></div>
         <div class="form-group"><label>STREET ADDRESS</label><input type="text" id="ab-street"
-            placeholder="123 Rizal St., Unit 4B" maxlength="80" oninput="validateStreetInput(this)"></div>
+            placeholder="123 Rizal St., Unit 4B" maxlength="40" oninput="validateStreetInput(this)"></div>
         <div class="form-row">
           <div class="form-group">
             <label>CITY</label>

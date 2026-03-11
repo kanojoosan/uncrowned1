@@ -998,20 +998,12 @@ function loadAdminUsers() {
         <small style="display:block;color:#888;">${u.email} · Age: ${u.age}</small>
         <small style="display:block;color:#aaa;">Joined: ${new Date(u.created_at).toLocaleDateString()}</small>
       </div>
-      <button onclick="deleteCustomer(${u.id},'${u.username}')" style="background:#fde8e8;color:#c0392b;border:none;padding:6px 14px;border-radius:6px;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🗑 DELETE</button>`;
+`;
       list.appendChild(row);
     });
   }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load users.</p>'; });
 }
 
-function deleteCustomer(userId, username) {
-  if (!confirm('Delete account of ' + username + '? This cannot be undone.')) return;
-  apiFetch('/api/admin/users/' + userId, { method: 'DELETE' })
-    .then(data => {
-      if (data.success) { showToast('🗑 ' + username + ' deleted.'); loadAdminUsers(); }
-      else showToast('Failed to delete user.');
-    }).catch(() => showToast('Failed to delete user.'));
-}
 
 function loadAdminOrders() {
   const list = document.getElementById('admin-order-list');

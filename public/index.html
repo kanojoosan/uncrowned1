@@ -111,10 +111,10 @@
     <div class="modal-body">
       <div id="signup-error" class="error-msg" style="display:none;"></div>
       <div class="form-group"><label>USERNAME</label><input type="text" id="signup-username"
-          placeholder="streetwear_fan" maxlength="20" oninput="this.value=this.value.replace(/[^a-zA-Z0-9_]/g,'')">
+          placeholder="streetwear_fan" maxlength="17" oninput="this.value=this.value.replace(/[^a-zA-Z0-9_]/g,'')">
       </div>
       <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="your@email.com"
-          maxlength="35"></div>
+          maxlength="38"></div>
       <div class="form-group"><label>AGE</label><input type="number" id="signup-age" placeholder="Must be 18+" min="18"
           max="60"
           oninput="this.value=this.value.replace(/[^0-9]/g,'').substring(0,2);if(parseInt(this.value)>60)this.value='60'">

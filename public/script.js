@@ -595,14 +595,14 @@ function signup() {
 
   if (!username) return showError('signup-error', 'Username is required.');
   if (username.length < 3) return showError('signup-error', '⚠️ Username must be at least 3 characters.');
-  if (username.length > 20) return showError('signup-error', '⚠️ Username must not exceed 20 characters.');
-  if ((username.match(/[0-9]/g) || []).length > 3) return showError('signup-error', '⚠️ Username must contain 3 numbers only.');
+  if (username.replace(/[^a-zA-Z]/g, '').length > 15) return showError('signup-error', '⚠️ Username must not exceed 15 letters.');
+  if ((username.match(/[0-9]/g) || []).length > 2) return showError('signup-error', '⚠️ Username must not exceed 2 numbers.');
   if (!email) return showError('signup-error', 'Email is required.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('signup-error', 'Please enter a valid email address (e.g. juan0606@gmail.com).');
   const localPart = email.split('@')[0];
   const lettersOnly = localPart.replace(/[^a-zA-Z]/g, '');
   const numbersOnly = localPart.replace(/[^0-9]/g, '');
-  if (lettersOnly.length > 20) return showError('signup-error', '⚠️ Email username must not exceed 20 letters.');
+  if (lettersOnly.length > 25) return showError('signup-error', '⚠️ Email username must not exceed 25 letters.');
   if (numbersOnly.length !== 4) return showError('signup-error', '⚠️ Email username must contain exactly 4 numbers (e.g. juan0606@gmail.com).');
   if (!ageVal) return showError('signup-error', 'Age is required.');
   const age = parseInt(ageVal);

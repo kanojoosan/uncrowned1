@@ -41,43 +41,43 @@ let allProducts = [
   },
   {
     id: 6, name: "Signature Denim Pants", category: "pants", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png",
-    details: ['Straight leg denim cut', 'Five-pocket construction', 'Signature logo patch', 'Mid-rise waistband', 'FREE Stickers in every purchase'],
-    specs: ['98% COTTON 2% ELASTANE', 'MEDIUM WASH DENIM', 'RIGID DENIM FABRIC']
+    details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
   },
   {
     id: 7, name: "Baggy Jeans Pants", category: "pants", price: 2500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png",
-    details: ['Wide baggy leg silhouette', 'Relaxed fit through the hip', 'Faded streetwear wash', 'Functional side pockets', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', 'HEAVY WASH DENIM', 'RAW DENIM FABRIC']
+    details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
   },
   {
     id: 8, name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png",
-    details: ['Gothic spider graphic embroidery', 'Baggy oversized leg', 'Distressed retro finish', 'Heavy-duty belt loops', 'FREE Stickers in every purchase'],
-    specs: ['100% COTTON', 'ACID WASH DENIM', 'DISTRESSED DENIM FABRIC']
+    details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
   },
   {
     id: 9, name: "2125 - Divine Sweats", category: "pants", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png",
-    details: ['Tapered sweatpant silhouette', 'Elastic waistband with drawstring', 'Ribbed ankle cuffs', 'Side pocket with zipper', 'FREE Stickers in every purchase'],
-    specs: ['80% COTTON 20% POLYESTER', '300 GSM', 'FLEECE FABRIC']
+    details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']
   },
   {
-    id: 10, name: "Aonga Y2k Sweatpants", category: "jackets", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png",
-    details: ['Y2K inspired colorblock design', 'Wide relaxed leg fit', 'Elastic waist with logo drawcord', 'Contrast side stripes', 'FREE Stickers in every purchase'],
-    specs: ['100% POLYESTER', 'TRICOT FABRIC', 'MOISTURE RESISTANT']
+    id: 10, name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png",
+    details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
   },
   {
     id: 11, name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png",
-    details: ['Lightweight windbreaker shell', 'Full zip front closure', 'Packable hood design', 'Elastic cuffs and hem', 'FREE Stickers in every purchase'],
-    specs: ['100% NYLON', 'RIPSTOP WINDBREAKER FABRIC', 'WATER RESISTANT COATING']
+    details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
   },
   {
     id: 12, name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png",
-    details: ['Bold Y2K patchwork design', 'Oversized boxy jacket fit', 'Snap button front closure', 'Large logo back print', 'FREE Stickers in every purchase'],
-    specs: ['65% POLYESTER 35% COTTON', 'TWILL FABRIC', 'LIGHTWEIGHT SHELL']
+    details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
   },
   {
     id: 13, name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, sizes: ALL_SIZES, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png",
-    details: ['Full zip hoodie construction', 'Japanese embroidered lettering', 'Kangaroo front pockets', 'Adjustable drawstring hood', 'FREE Stickers in every purchase'],
-    specs: ['60% COTTON 40% POLYESTER', '320 GSM', 'HEAVY FLEECE FABRIC']
+    details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'],
+    specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']
   },
 ];
 
@@ -803,14 +803,14 @@ function seedProductsToDB() {
     { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Limited edition graphic tee', 'Full front tribute print', 'Oversized boxy fit', 'Reinforced stitching', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC'] },
     { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Classic crewneck style', 'Minimalist embroidered logo', 'Regular fit construction', 'Soft brushed interior', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FLEECE FABRIC'] },
     { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Clean all-white colorway', 'Back graphic print', 'Oversized streetwear fit', 'Double-stitched hem', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Straight leg denim cut', 'Five-pocket construction', 'Signature logo patch', 'Mid-rise waistband', 'FREE Stickers in every purchase'], specs: ['98% COTTON 2% ELASTANE', 'MEDIUM WASH DENIM', 'RIGID DENIM FABRIC'] },
-    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Wide baggy leg silhouette', 'Relaxed fit through the hip', 'Faded streetwear wash', 'Functional side pockets', 'FREE Stickers in every purchase'], specs: ['100% COTTON', 'HEAVY WASH DENIM', 'RAW DENIM FABRIC'] },
-    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Gothic spider graphic embroidery', 'Baggy oversized leg', 'Distressed retro finish', 'Heavy-duty belt loops', 'FREE Stickers in every purchase'], specs: ['100% COTTON', 'ACID WASH DENIM', 'DISTRESSED DENIM FABRIC'] },
-    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Tapered sweatpant silhouette', 'Elastic waistband with drawstring', 'Ribbed ankle cuffs', 'Side pocket with zipper', 'FREE Stickers in every purchase'], specs: ['80% COTTON 20% POLYESTER', '300 GSM', 'FLEECE FABRIC'] },
-    { name: "Aonga Y2k Sweatpants", category: "jackets", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Y2K inspired colorblock design', 'Wide relaxed leg fit', 'Elastic waist with logo drawcord', 'Contrast side stripes', 'FREE Stickers in every purchase'], specs: ['100% POLYESTER', 'TRICOT FABRIC', 'MOISTURE RESISTANT'] },
-    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Lightweight windbreaker shell', 'Full zip front closure', 'Packable hood design', 'Elastic cuffs and hem', 'FREE Stickers in every purchase'], specs: ['100% NYLON', 'RIPSTOP WINDBREAKER FABRIC', 'WATER RESISTANT COATING'] },
-    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Bold Y2K patchwork design', 'Oversized boxy jacket fit', 'Snap button front closure', 'Large logo back print', 'FREE Stickers in every purchase'], specs: ['65% POLYESTER 35% COTTON', 'TWILL FABRIC', 'LIGHTWEIGHT SHELL'] },
-    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Full zip hoodie construction', 'Japanese embroidered lettering', 'Kangaroo front pockets', 'Adjustable drawstring hood', 'FREE Stickers in every purchase'], specs: ['60% COTTON 40% POLYESTER', '320 GSM', 'HEAVY FLEECE FABRIC'] },
+    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
   ];
 
   const originalToken = sessionStorage.getItem('uc_token');

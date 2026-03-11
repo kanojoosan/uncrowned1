@@ -745,6 +745,17 @@ function switchAdminTab(tab) {
   else if (tab === 'orders') loadAdminOrders();
 }
 
+function fixProductDetails() {
+  if (!confirm('This will update ALL pants and jackets in the DB with the correct details and specs. Continue?')) return;
+  apiFetch('/api/products/fix-details', { method: 'POST' }).then(data => {
+    if (data.error) return showToast('Error: ' + data.error);
+    showToast('✅ Pants & jackets details updated!');
+    apiFetch('/api/products').then(products => {
+      if (Array.isArray(products)) { allProducts = products; renderProducts(allProducts); loadAdminProducts(); }
+    });
+  }).catch(() => showToast('Failed to update details.'));
+}
+
 function loadAdminProducts() {
   const list = document.getElementById('admin-product-list');
   list.innerHTML = '';

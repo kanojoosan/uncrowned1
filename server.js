@@ -104,6 +104,12 @@ async function initDB() {
   try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch (_) { }
   try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch (_) { }
   try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
+  const pantsDetails = JSON.stringify(['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase']);
+  const pantsSpecs = JSON.stringify(['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']);
+  const jacketsDetails = JSON.stringify(['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase']);
+  const jacketsSpecs = JSON.stringify(['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']);
+  try { await db.query('UPDATE products SET details=?, specs=? WHERE category=?', [pantsDetails, pantsSpecs, 'pants']); } catch (_) { }
+  try { await db.query('UPDATE products SET details=?, specs=? WHERE category=?', [jacketsDetails, jacketsSpecs, 'jackets']); } catch (_) { }
   console.log('Database tables ready.');
 }
 
@@ -179,17 +185,6 @@ app.delete('/api/products/:id', requireAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/products/fix-details', requireAdmin, async (req, res) => {
-  const pantsDetails = JSON.stringify(['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase']);
-  const pantsSpecs = JSON.stringify(['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']);
-  const jacketsDetails = JSON.stringify(['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase']);
-  const jacketsSpecs = JSON.stringify(['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC']);
-  try {
-    await db.query('UPDATE products SET details=?, specs=? WHERE category=?', [pantsDetails, pantsSpecs, 'pants']);
-    await db.query('UPDATE products SET details=?, specs=? WHERE category=?', [jacketsDetails, jacketsSpecs, 'jackets']);
-    res.json({ status: 'success', message: 'Pants and jackets details updated in DB.' });
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
 
 app.post('/api/signup', async (req, res) => {
   const { username, email, password, age, birthday, gender, agreedToTerms, agreedToPrivacy } = req.body;
@@ -401,4 +396,4 @@ initDB().then(() => {
 }).catch(err => {
   console.error('Database error:', err.message);
   process.exit(1);
-});
+}); 

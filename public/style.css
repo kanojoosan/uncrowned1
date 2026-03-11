@@ -221,7 +221,7 @@ main {
 .product-info {
   display: flex;
   justify-content: space-between;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .product-cat {
@@ -1940,10 +1940,11 @@ footer {
 }
 
 .detail-title {
-  font-family: 'Anton', sans-serif;
-  font-size: 1.8rem;
-  letter-spacing: 1px;
-  line-height: 1.1;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
   text-transform: uppercase;
   margin: 0;
 }
@@ -1955,8 +1956,8 @@ footer {
 }
 
 .detail-price {
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .detail-size-section {

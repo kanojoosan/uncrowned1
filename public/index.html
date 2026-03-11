@@ -462,125 +462,95 @@
           <div class="form-row">
             <div class="form-group">
               <label>CITY / MUNICIPALITY</label>
-              <select id="addr-city">
+              <select id="addr-city" onchange="onCityChange(this,'addr')">
                 <option value="">Select city...</option>
                 <optgroup label="NCR - Metro Manila">
-                  <option>Caloocan</option>
-                  <option>Las Piñas</option>
-                  <option>Makati</option>
-                  <option>Malabon</option>
-                  <option>Mandaluyong</option>
-                  <option>Manila</option>
-                  <option>Marikina</option>
-                  <option>Muntinlupa</option>
-                  <option>Navotas</option>
-                  <option>Parañaque</option>
-                  <option>Pasay</option>
-                  <option>Pasig</option>
-                  <option>Pateros</option>
-                  <option>Quezon City</option>
-                  <option>San Juan</option>
-                  <option>Taguig</option>
-                  <option>Valenzuela</option>
+                  <option value="Caloocan|Metro Manila|NCR - Metro Manila|1400">Caloocan</option>
+                  <option value="Las Piñas|Metro Manila|NCR - Metro Manila|1740">Las Piñas</option>
+                  <option value="Makati|Metro Manila|NCR - Metro Manila|1200">Makati</option>
+                  <option value="Malabon|Metro Manila|NCR - Metro Manila|1470">Malabon</option>
+                  <option value="Mandaluyong|Metro Manila|NCR - Metro Manila|1550">Mandaluyong</option>
+                  <option value="Manila|Metro Manila|NCR - Metro Manila|1000">Manila</option>
+                  <option value="Marikina|Metro Manila|NCR - Metro Manila|1800">Marikina</option>
+                  <option value="Muntinlupa|Metro Manila|NCR - Metro Manila|1770">Muntinlupa</option>
+                  <option value="Navotas|Metro Manila|NCR - Metro Manila|1485">Navotas</option>
+                  <option value="Parañaque|Metro Manila|NCR - Metro Manila|1700">Parañaque</option>
+                  <option value="Pasay|Metro Manila|NCR - Metro Manila|1300">Pasay</option>
+                  <option value="Pasig|Metro Manila|NCR - Metro Manila|1600">Pasig</option>
+                  <option value="Pateros|Metro Manila|NCR - Metro Manila|1620">Pateros</option>
+                  <option value="Quezon City|Metro Manila|NCR - Metro Manila|1100">Quezon City</option>
+                  <option value="San Juan|Metro Manila|NCR - Metro Manila|1500">San Juan</option>
+                  <option value="Taguig|Metro Manila|NCR - Metro Manila|1630">Taguig</option>
+                  <option value="Valenzuela|Metro Manila|NCR - Metro Manila|1440">Valenzuela</option>
                 </optgroup>
                 <optgroup label="Region III - Central Luzon">
-                  <option>Angeles</option>
-                  <option>Balanga</option>
-                  <option>Cabanatuan</option>
-                  <option>Gapan</option>
-                  <option>Malolos</option>
-                  <option>Meycauayan</option>
-                  <option>Munoz</option>
-                  <option>Olongapo</option>
-                  <option>Palayan</option>
-                  <option>San Fernando (Pampanga)</option>
-                  <option>San Jose del Monte</option>
-                  <option>Tarlac City</option>
-                  <option>Telabastagan</option>
+                  <option value="Angeles|Pampanga|Region III - Central Luzon|2009">Angeles</option>
+                  <option value="Balanga|Bataan|Region III - Central Luzon|2100">Balanga</option>
+                  <option value="Cabanatuan|Nueva Ecija|Region III - Central Luzon|3100">Cabanatuan</option>
+                  <option value="Malolos|Bulacan|Region III - Central Luzon|3000">Malolos</option>
+                  <option value="Meycauayan|Bulacan|Region III - Central Luzon|3020">Meycauayan</option>
+                  <option value="Olongapo|Zambales|Region III - Central Luzon|2200">Olongapo</option>
+                  <option value="San Fernando (Pampanga)|Pampanga|Region III - Central Luzon|2000">San Fernando
+                    (Pampanga)</option>
+                  <option value="San Jose del Monte|Bulacan|Region III - Central Luzon|3023">San Jose del Monte</option>
+                  <option value="Tarlac City|Tarlac|Region III - Central Luzon|2300">Tarlac City</option>
                 </optgroup>
                 <optgroup label="Region IV-A - CALABARZON">
-                  <option>Antipolo</option>
-                  <option>Bacoor</option>
-                  <option>Batangas City</option>
-                  <option>Calamba</option>
-                  <option>Cavite City</option>
-                  <option>Dasmariñas</option>
-                  <option>General Santos</option>
-                  <option>Imus</option>
-                  <option>Lipa</option>
-                  <option>Lucena</option>
-                  <option>San Pablo</option>
-                  <option>Santa Rosa</option>
-                  <option>Tagaytay</option>
-                  <option>Tanauan</option>
+                  <option value="Antipolo|Rizal|Region IV-A - CALABARZON|1870">Antipolo</option>
+                  <option value="Bacoor|Cavite|Region IV-A - CALABARZON|4102">Bacoor</option>
+                  <option value="Batangas City|Batangas|Region IV-A - CALABARZON|4200">Batangas City</option>
+                  <option value="Calamba|Laguna|Region IV-A - CALABARZON|4027">Calamba</option>
+                  <option value="Dasmariñas|Cavite|Region IV-A - CALABARZON|4114">Dasmariñas</option>
+                  <option value="Imus|Cavite|Region IV-A - CALABARZON|4103">Imus</option>
+                  <option value="Lipa|Batangas|Region IV-A - CALABARZON|4217">Lipa</option>
+                  <option value="Lucena|Quezon|Region IV-A - CALABARZON|4301">Lucena</option>
+                  <option value="Santa Rosa|Laguna|Region IV-A - CALABARZON|4026">Santa Rosa</option>
+                  <option value="Tagaytay|Cavite|Region IV-A - CALABARZON|4120">Tagaytay</option>
                 </optgroup>
                 <optgroup label="Region VII - Central Visayas">
-                  <option>Cebu City</option>
-                  <option>Danao</option>
-                  <option>Lapu-Lapu</option>
-                  <option>Mandaue</option>
-                  <option>Naga (Cebu)</option>
-                  <option>Talisay (Cebu)</option>
-                  <option>Toledo</option>
+                  <option value="Cebu City|Cebu|Region VII - Central Visayas|6000">Cebu City</option>
+                  <option value="Lapu-Lapu|Cebu|Region VII - Central Visayas|6015">Lapu-Lapu</option>
+                  <option value="Mandaue|Cebu|Region VII - Central Visayas|6014">Mandaue</option>
+                  <option value="Talisay (Cebu)|Cebu|Region VII - Central Visayas|6045">Talisay (Cebu)</option>
                 </optgroup>
                 <optgroup label="Region XI - Davao Region">
-                  <option>Davao City</option>
-                  <option>Digos</option>
-                  <option>Mati</option>
-                  <option>Panabo</option>
-                  <option>Samal</option>
-                  <option>Tagum</option>
+                  <option value="Davao City|Davao del Sur|Region XI - Davao Region|8000">Davao City</option>
+                  <option value="Tagum|Davao del Norte|Region XI - Davao Region|8100">Tagum</option>
+                  <option value="Panabo|Davao del Norte|Region XI - Davao Region|8105">Panabo</option>
+                </optgroup>
+                <optgroup label="Region IX - Zamboanga Peninsula">
+                  <option value="Zamboanga City|Zamboanga del Sur|Region IX - Zamboanga Peninsula|7000">Zamboanga City
+                  </option>
+                  <option value="Pagadian|Zamboanga del Sur|Region IX - Zamboanga Peninsula|7016">Pagadian</option>
+                </optgroup>
+                <optgroup label="Region X - Northern Mindanao">
+                  <option value="Cagayan de Oro|Misamis Oriental|Region X - Northern Mindanao|9000">Cagayan de Oro
+                  </option>
+                  <option value="Iligan|Lanao del Norte|Region X - Northern Mindanao|9200">Iligan</option>
                 </optgroup>
                 <optgroup label="Other Cities">
-                  <option>Baguio</option>
-                  <option>Butuan</option>
-                  <option>Cagayan de Oro</option>
-                  <option>Cotabato City</option>
-                  <option>Dumaguete</option>
-                  <option>General Santos</option>
-                  <option>Iligan</option>
-                  <option>Iloilo City</option>
-                  <option>Legazpi</option>
-                  <option>Naga (Camarines Sur)</option>
-                  <option>Puerto Princesa</option>
-                  <option>Roxas City</option>
-                  <option>San Fernando (La Union)</option>
-                  <option>Tacloban</option>
-                  <option>Tuguegarao</option>
-                  <option>Vigan</option>
-                  <option>Zamboanga City</option>
+                  <option value="Baguio|Benguet|CAR - Cordillera|2600">Baguio</option>
+                  <option value="Butuan|Agusan del Norte|Region XIII - Caraga|8600">Butuan</option>
+                  <option value="Dumaguete|Negros Oriental|Region VII - Central Visayas|6200">Dumaguete</option>
+                  <option value="General Santos|South Cotabato|Region XII - SOCCSKSARGEN|9500">General Santos</option>
+                  <option value="Iloilo City|Iloilo|Region VI - Western Visayas|5000">Iloilo City</option>
+                  <option value="Legazpi|Albay|Region V - Bicol Region|4500">Legazpi</option>
+                  <option value="Puerto Princesa|Palawan|Region IV-B - MIMAROPA|5300">Puerto Princesa</option>
+                  <option value="Tacloban|Leyte|Region VIII - Eastern Visayas|6500">Tacloban</option>
+                  <option value="Tuguegarao|Cagayan|Region II - Cagayan Valley|3500">Tuguegarao</option>
                 </optgroup>
               </select>
             </div>
             <div class="form-group"><label>PROVINCE</label><input type="text" id="addr-province"
-                placeholder="Metro Manila" maxlength="50"
-                oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+                placeholder="Auto-filled" readonly style="background:#f5f5f5;color:#888;"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label>ZIP CODE</label><input type="text" id="addr-zip" placeholder="1000"
-                maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+            <div class="form-group"><label>ZIP CODE</label><input type="text" id="addr-zip" placeholder="Auto-filled"
+                readonly style="background:#f5f5f5;color:#888;"></div>
             <div class="form-group">
               <label>REGION</label>
-              <select id="addr-region">
-                <option value="">Select region...</option>
-                <option>NCR - Metro Manila</option>
-                <option>Region I - Ilocos Region</option>
-                <option>Region II - Cagayan Valley</option>
-                <option>Region III - Central Luzon</option>
-                <option>Region IV-A - CALABARZON</option>
-                <option>Region IV-B - MIMAROPA</option>
-                <option>Region V - Bicol Region</option>
-                <option>Region VI - Western Visayas</option>
-                <option>Region VII - Central Visayas</option>
-                <option>Region VIII - Eastern Visayas</option>
-                <option>Region IX - Zamboanga Peninsula</option>
-                <option>Region X - Northern Mindanao</option>
-                <option>Region XI - Davao Region</option>
-                <option>Region XII - SOCCSKSARGEN</option>
-                <option>Region XIII - Caraga</option>
-                <option>BARMM</option>
-                <option>CAR - Cordillera</option>
-              </select>
+              <input type="text" id="addr-region" placeholder="Auto-filled" readonly
+                style="background:#f5f5f5;color:#888;width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;font-size:0.85rem;box-sizing:border-box;">
             </div>
           </div>
           <div class="form-group checkbox-group" style="margin-top:6px;">
@@ -800,103 +770,95 @@
         <div class="form-row">
           <div class="form-group">
             <label>CITY</label>
-            <select id="ab-city">
+            <select id="ab-city" onchange="onCityChange(this,'ab')">
               <option value="">Select city...</option>
               <optgroup label="NCR - Metro Manila">
-                <option>Caloocan</option>
-                <option>Las Piñas</option>
-                <option>Makati</option>
-                <option>Malabon</option>
-                <option>Mandaluyong</option>
-                <option>Manila</option>
-                <option>Marikina</option>
-                <option>Muntinlupa</option>
-                <option>Navotas</option>
-                <option>Parañaque</option>
-                <option>Pasay</option>
-                <option>Pasig</option>
-                <option>Pateros</option>
-                <option>Quezon City</option>
-                <option>San Juan</option>
-                <option>Taguig</option>
-                <option>Valenzuela</option>
+                <option value="Caloocan|Metro Manila|NCR - Metro Manila|1400">Caloocan</option>
+                <option value="Las Piñas|Metro Manila|NCR - Metro Manila|1740">Las Piñas</option>
+                <option value="Makati|Metro Manila|NCR - Metro Manila|1200">Makati</option>
+                <option value="Malabon|Metro Manila|NCR - Metro Manila|1470">Malabon</option>
+                <option value="Mandaluyong|Metro Manila|NCR - Metro Manila|1550">Mandaluyong</option>
+                <option value="Manila|Metro Manila|NCR - Metro Manila|1000">Manila</option>
+                <option value="Marikina|Metro Manila|NCR - Metro Manila|1800">Marikina</option>
+                <option value="Muntinlupa|Metro Manila|NCR - Metro Manila|1770">Muntinlupa</option>
+                <option value="Navotas|Metro Manila|NCR - Metro Manila|1485">Navotas</option>
+                <option value="Parañaque|Metro Manila|NCR - Metro Manila|1700">Parañaque</option>
+                <option value="Pasay|Metro Manila|NCR - Metro Manila|1300">Pasay</option>
+                <option value="Pasig|Metro Manila|NCR - Metro Manila|1600">Pasig</option>
+                <option value="Pateros|Metro Manila|NCR - Metro Manila|1620">Pateros</option>
+                <option value="Quezon City|Metro Manila|NCR - Metro Manila|1100">Quezon City</option>
+                <option value="San Juan|Metro Manila|NCR - Metro Manila|1500">San Juan</option>
+                <option value="Taguig|Metro Manila|NCR - Metro Manila|1630">Taguig</option>
+                <option value="Valenzuela|Metro Manila|NCR - Metro Manila|1440">Valenzuela</option>
               </optgroup>
               <optgroup label="Region III - Central Luzon">
-                <option>Angeles</option>
-                <option>Balanga</option>
-                <option>Cabanatuan</option>
-                <option>Malolos</option>
-                <option>Olongapo</option>
-                <option>San Fernando (Pampanga)</option>
-                <option>San Jose del Monte</option>
-                <option>Tarlac City</option>
+                <option value="Angeles|Pampanga|Region III - Central Luzon|2009">Angeles</option>
+                <option value="Balanga|Bataan|Region III - Central Luzon|2100">Balanga</option>
+                <option value="Cabanatuan|Nueva Ecija|Region III - Central Luzon|3100">Cabanatuan</option>
+                <option value="Malolos|Bulacan|Region III - Central Luzon|3000">Malolos</option>
+                <option value="Meycauayan|Bulacan|Region III - Central Luzon|3020">Meycauayan</option>
+                <option value="Olongapo|Zambales|Region III - Central Luzon|2200">Olongapo</option>
+                <option value="San Fernando (Pampanga)|Pampanga|Region III - Central Luzon|2000">San Fernando (Pampanga)
+                </option>
+                <option value="San Jose del Monte|Bulacan|Region III - Central Luzon|3023">San Jose del Monte</option>
+                <option value="Tarlac City|Tarlac|Region III - Central Luzon|2300">Tarlac City</option>
               </optgroup>
               <optgroup label="Region IV-A - CALABARZON">
-                <option>Antipolo</option>
-                <option>Bacoor</option>
-                <option>Batangas City</option>
-                <option>Calamba</option>
-                <option>Dasmariñas</option>
-                <option>Imus</option>
-                <option>Lipa</option>
-                <option>Lucena</option>
-                <option>Santa Rosa</option>
-                <option>Tagaytay</option>
+                <option value="Antipolo|Rizal|Region IV-A - CALABARZON|1870">Antipolo</option>
+                <option value="Bacoor|Cavite|Region IV-A - CALABARZON|4102">Bacoor</option>
+                <option value="Batangas City|Batangas|Region IV-A - CALABARZON|4200">Batangas City</option>
+                <option value="Calamba|Laguna|Region IV-A - CALABARZON|4027">Calamba</option>
+                <option value="Dasmariñas|Cavite|Region IV-A - CALABARZON|4114">Dasmariñas</option>
+                <option value="Imus|Cavite|Region IV-A - CALABARZON|4103">Imus</option>
+                <option value="Lipa|Batangas|Region IV-A - CALABARZON|4217">Lipa</option>
+                <option value="Lucena|Quezon|Region IV-A - CALABARZON|4301">Lucena</option>
+                <option value="Santa Rosa|Laguna|Region IV-A - CALABARZON|4026">Santa Rosa</option>
+                <option value="Tagaytay|Cavite|Region IV-A - CALABARZON|4120">Tagaytay</option>
               </optgroup>
               <optgroup label="Region VII - Central Visayas">
-                <option>Cebu City</option>
-                <option>Lapu-Lapu</option>
-                <option>Mandaue</option>
-                <option>Talisay (Cebu)</option>
+                <option value="Cebu City|Cebu|Region VII - Central Visayas|6000">Cebu City</option>
+                <option value="Lapu-Lapu|Cebu|Region VII - Central Visayas|6015">Lapu-Lapu</option>
+                <option value="Mandaue|Cebu|Region VII - Central Visayas|6014">Mandaue</option>
+                <option value="Talisay (Cebu)|Cebu|Region VII - Central Visayas|6045">Talisay (Cebu)</option>
               </optgroup>
               <optgroup label="Region XI - Davao Region">
-                <option>Davao City</option>
-                <option>Tagum</option>
-                <option>Panabo</option>
+                <option value="Davao City|Davao del Sur|Region XI - Davao Region|8000">Davao City</option>
+                <option value="Tagum|Davao del Norte|Region XI - Davao Region|8100">Tagum</option>
+                <option value="Panabo|Davao del Norte|Region XI - Davao Region|8105">Panabo</option>
+              </optgroup>
+              <optgroup label="Region IX - Zamboanga Peninsula">
+                <option value="Zamboanga City|Zamboanga del Sur|Region IX - Zamboanga Peninsula|7000">Zamboanga City
+                </option>
+                <option value="Pagadian|Zamboanga del Sur|Region IX - Zamboanga Peninsula|7016">Pagadian</option>
+              </optgroup>
+              <optgroup label="Region X - Northern Mindanao">
+                <option value="Cagayan de Oro|Misamis Oriental|Region X - Northern Mindanao|9000">Cagayan de Oro
+                </option>
+                <option value="Iligan|Lanao del Norte|Region X - Northern Mindanao|9200">Iligan</option>
               </optgroup>
               <optgroup label="Other Cities">
-                <option>Baguio</option>
-                <option>Butuan</option>
-                <option>Cagayan de Oro</option>
-                <option>Dumaguete</option>
-                <option>General Santos</option>
-                <option>Iloilo City</option>
-                <option>Legazpi</option>
-                <option>Puerto Princesa</option>
-                <option>Tacloban</option>
-                <option>Tuguegarao</option>
-                <option>Zamboanga City</option>
+                <option value="Baguio|Benguet|CAR - Cordillera|2600">Baguio</option>
+                <option value="Butuan|Agusan del Norte|Region XIII - Caraga|8600">Butuan</option>
+                <option value="Dumaguete|Negros Oriental|Region VII - Central Visayas|6200">Dumaguete</option>
+                <option value="General Santos|South Cotabato|Region XII - SOCCSKSARGEN|9500">General Santos</option>
+                <option value="Iloilo City|Iloilo|Region VI - Western Visayas|5000">Iloilo City</option>
+                <option value="Legazpi|Albay|Region V - Bicol Region|4500">Legazpi</option>
+                <option value="Puerto Princesa|Palawan|Region IV-B - MIMAROPA|5300">Puerto Princesa</option>
+                <option value="Tacloban|Leyte|Region VIII - Eastern Visayas|6500">Tacloban</option>
+                <option value="Tuguegarao|Cagayan|Region II - Cagayan Valley|3500">Tuguegarao</option>
               </optgroup>
             </select>
           </div>
-          <div class="form-group"><label>PROVINCE</label><input type="text" id="ab-province" placeholder="Metro Manila"
-              maxlength="50" oninput="this.value=this.value.replace(/[^a-zA-ZÀ-ÿ\s\-'\.]/g,'')"></div>
+          <div class="form-group"><label>PROVINCE</label><input type="text" id="ab-province" placeholder="Auto-filled"
+              readonly style="background:#f5f5f5;color:#888;"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>ZIP CODE</label><input type="text" id="ab-zip" placeholder="1000" maxlength="4"
-              oninput="this.value=this.value.replace(/\D/g,'')"></div>
+          <div class="form-group"><label>ZIP CODE</label><input type="text" id="ab-zip" placeholder="Auto-filled"
+              readonly style="background:#f5f5f5;color:#888;"></div>
           <div class="form-group">
             <label>REGION</label>
-            <select id="ab-region">
-              <option value="">Select region...</option>
-              <option>NCR - Metro Manila</option>
-              <option>Region I - Ilocos Region</option>
-              <option>Region II - Cagayan Valley</option>
-              <option>Region III - Central Luzon</option>
-              <option>Region IV-A - CALABARZON</option>
-              <option>Region IV-B - MIMAROPA</option>
-              <option>Region V - Bicol Region</option>
-              <option>Region VI - Western Visayas</option>
-              <option>Region VII - Central Visayas</option>
-              <option>Region VIII - Eastern Visayas</option>
-              <option>Region IX - Zamboanga Peninsula</option>
-              <option>Region X - Northern Mindanao</option>
-              <option>Region XI - Davao Region</option>
-              <option>Region XII - SOCCSKSARGEN</option>
-              <option>Region XIII - Caraga</option>
-              <option>BARMM</option>
-              <option>CAR - Cordillera</option>
-            </select>
+            <input type="text" id="ab-region" placeholder="Auto-filled" readonly
+              style="background:#f5f5f5;color:#888;width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;font-size:0.85rem;box-sizing:border-box;">
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:6px;">

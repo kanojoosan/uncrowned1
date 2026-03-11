@@ -1,3 +1,36 @@
+function onCityChange(select, prefix) {
+  const val = select.value;
+  if (!val) return;
+  const parts = val.split('|');
+  const city = parts[0], province = parts[1], region = parts[2], zip = parts[3];
+  const el = id => document.getElementById(prefix + '-' + id);
+  if (el('province')) el('province').value = province || '';
+  if (el('region')) el('region').value = region || '';
+  if (el('zip')) el('zip').value = zip || '';
+  if (prefix === 'addr') updateShippingDisplay();
+}
+
+function getShippingFee() {
+  const cityEl = document.getElementById('addr-city');
+  if (!cityEl || !cityEl.value) return 150;
+  const city = cityEl.value.split('|')[0];
+  if (city === 'Pasig') return 50;
+  const region = cityEl.value.split('|')[2] || '';
+  if (region === 'NCR - Metro Manila') return 100;
+  if (region.includes('Region III') || region.includes('Region IV')) return 150;
+  return 200;
+}
+
+function updateShippingDisplay() {
+  const fee = getShippingFee();
+  const shippingEl = document.getElementById('review-shipping');
+  const totalEl = document.getElementById('review-total');
+  if (!shippingEl || !totalEl) return;
+  const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty || 1), 0);
+  shippingEl.innerText = '₱' + fee.toLocaleString();
+  totalEl.innerText = '₱' + (subtotal + fee).toLocaleString();
+}
+
 const API = 'https://uncrowned1-production.up.railway.app';
 async function apiFetch(path, opts = {}) {
   const token = sessionStorage.getItem('uc_token');
@@ -390,7 +423,7 @@ function validateAddress() {
   const lname = document.getElementById('addr-lname').value.trim();
   const phone = document.getElementById('addr-phone').value.trim();
   const street = document.getElementById('addr-street').value.trim();
-  const city = document.getElementById('addr-city').value.trim();
+  const city = (document.getElementById('addr-city').value.trim().split('|')[0]);
   const province = document.getElementById('addr-province').value.trim();
   const zip = document.getElementById('addr-zip').value.trim();
   const region = document.getElementById('addr-region').value;
@@ -400,7 +433,7 @@ function validateAddress() {
   if (!phone.startsWith('09')) return showCheckError(err, '⚠️ Phone number must start with 09.');
   if (!street) return showCheckError(err, 'Please enter your street address.');
   if (!/[a-zA-Z]/.test(street)) return showCheckError(err, 'Street address must include a street name (e.g. 123 Rizal St.).');
-  if ((street.match(/[0-9]/g) || []).length !== 3) return showCheckError(err, '⚠️ Street address must contain exactly 3 numbers (e.g. 123 Rizal St.).');
+  if ((street.match(/[0-9]/g) || []).length < 1 || (street.match(/[0-9]/g) || []).length > 3) return showCheckError(err, '⚠️ Street address must contain 1 to 3 numbers (e.g. 123 Rizal St.).');
   if (!city) return showCheckError(err, 'Please select your city.');
   if (!province) return showCheckError(err, 'Please enter your province.');
   if (!zip) return showCheckError(err, 'Please enter your ZIP code.');
@@ -446,7 +479,7 @@ function buildReviewPanel() {
   const lname = document.getElementById('addr-lname').value.trim();
   const phone = document.getElementById('addr-phone').value.trim();
   const street = document.getElementById('addr-street').value.trim();
-  const city = document.getElementById('addr-city').value.trim();
+  const city = (document.getElementById('addr-city').value.trim().split('|')[0]);
   const province = document.getElementById('addr-province').value.trim();
   const zip = document.getElementById('addr-zip').value.trim();
   const region = document.getElementById('addr-region').value;
@@ -464,7 +497,7 @@ function buildReviewPanel() {
 
 function placeOrder(gcashMeta) {
   const subtotal = cart.reduce((s, i) => s + i.finalPrice * (i.qty || 1), 0);
-  const shipping = 150;
+  const shipping = (gcashMeta && gcashMeta.shippingFee) ? gcashMeta.shippingFee : getShippingFee();
   const total = subtotal + shipping;
   const orderNum = 'UL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 
@@ -473,7 +506,7 @@ function placeOrder(gcashMeta) {
     lname: document.getElementById('addr-lname').value.trim(),
     phone: document.getElementById('addr-phone').value.trim(),
     street: document.getElementById('addr-street').value.trim(),
-    city: document.getElementById('addr-city').value.trim(),
+    city: (document.getElementById('addr-city').value.trim().split('|')[0]),
     province: document.getElementById('addr-province').value.trim(),
     zip: document.getElementById('addr-zip').value.trim(),
     region: document.getElementById('addr-region').value,
@@ -1493,16 +1526,20 @@ function formatAddressSummary(a) {
 
 function fillCheckoutForm(a) {
   if (!a) return;
-  const map = {
-    'addr-fname': a.fname, 'addr-lname': a.lname,
-    'addr-phone': a.phone, 'addr-street': a.street,
-    'addr-city': a.city, 'addr-province': a.province,
-    'addr-zip': a.zip, 'addr-region': a.region
-  };
-  Object.entries(map).forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (el && val != null) el.value = val;
-  });
+  const fnameEl = document.getElementById('addr-fname'); if (fnameEl) fnameEl.value = a.fname || '';
+  const lnameEl = document.getElementById('addr-lname'); if (lnameEl) lnameEl.value = a.lname || '';
+  const phoneEl = document.getElementById('addr-phone'); if (phoneEl) phoneEl.value = a.phone || '';
+  const streetEl = document.getElementById('addr-street'); if (streetEl) streetEl.value = a.street || '';
+  const provEl = document.getElementById('addr-province'); if (provEl) provEl.value = a.province || '';
+  const zipEl = document.getElementById('addr-zip'); if (zipEl) zipEl.value = a.zip || '';
+  const regEl = document.getElementById('addr-region'); if (regEl) regEl.value = a.region || '';
+  const cityEl = document.getElementById('addr-city');
+  if (cityEl && a.city) {
+    const opts = Array.from(cityEl.options);
+    const match = opts.find(o => o.value.startsWith(a.city + '|'));
+    if (match) cityEl.value = match.value;
+    else cityEl.value = a.city;
+  }
 }
 
 function clearCheckoutForm() {
@@ -1559,7 +1596,7 @@ function launchGCashRedirect() {
     lname: document.getElementById('addr-lname').value.trim(),
     phone: document.getElementById('addr-phone').value.trim(),
     street: document.getElementById('addr-street').value.trim(),
-    city: document.getElementById('addr-city').value.trim(),
+    city: (document.getElementById('addr-city').value.trim().split('|')[0]),
     province: document.getElementById('addr-province').value.trim(),
     zip: document.getElementById('addr-zip').value.trim(),
     region: document.getElementById('addr-region').value,
@@ -1715,7 +1752,8 @@ function confirmGCashPayment() {
     gcashProof: proofToSend,
     gcashRef: ref,
     gcashStatus: 'pending_confirmation',
-    address: gcashSavedAddress
+    address: gcashSavedAddress,
+    shippingFee: getShippingFee()
   });
 
 }
@@ -1786,7 +1824,7 @@ function saveAddressBook() {
   const lname = document.getElementById('ab-lname').value.trim();
   const phone = document.getElementById('ab-phone').value.trim();
   const street = document.getElementById('ab-street').value.trim();
-  const city = document.getElementById('ab-city').value.trim();
+  const city = (document.getElementById('ab-city').value.trim().split('|')[0]);
   const province = document.getElementById('ab-province').value.trim();
   const zip = document.getElementById('ab-zip').value.trim();
   const region = document.getElementById('ab-region').value;
@@ -1795,7 +1833,7 @@ function saveAddressBook() {
   if (!phone.startsWith('09')) return showToast('⚠️ Phone number must start with 09.');
   if (!street) return showToast('Please enter your street address.');
   if (!/[a-zA-Z]/.test(street)) return showToast('Street address must include a street name (e.g. 123 Rizal St.).');
-  if ((street.match(/[0-9]/g) || []).length !== 3) return showToast('⚠️ Street address must contain exactly 3 numbers (e.g. 123 Rizal St.).');
+  if ((street.match(/[0-9]/g) || []).length < 1 || (street.match(/[0-9]/g) || []).length > 3) return showToast('⚠️ Street address must contain 1 to 3 numbers (e.g. 123 Rizal St.).');
   if (!city || !province || !zip || !region) return showToast('Please fill in all address fields.');
   saveAddressToStorage({ fname, lname, phone, street, city, province, zip, region });
   showToast('✅ Address saved!');

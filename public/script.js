@@ -594,7 +594,7 @@ function goToStep(step, silent) {
     if (currentStep === 2 && !validatePayment()) return;
   }
   if (step === 3 && !silent) {
-    if (selectedPayMethod === 'gcash') {
+    if (selectedPayMethod === 'gcash' || selectedPayMethod === 'instapay') {
       launchGCashRedirect();
       return;
     }
@@ -693,6 +693,8 @@ function buildReviewPanel() {
   let payHTML = '';
   if (selectedPayMethod === 'gcash') {
     payHTML = `📱 <strong>GCash</strong><br>09931229769`;
+  } else if (selectedPayMethod === 'instapay') {
+    payHTML = `⚡ <strong>InstaPay</strong><br>Tirso Jr. Gervacio`;
   } else {
     payHTML = `💵 <strong>Cash on Delivery</strong><br>Pay when your order arrives.`;
   }
@@ -736,7 +738,7 @@ function placeOrder(gcashMeta) {
     gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
     createdAt: new Date().toISOString()
   };
-  const isGCashOrder = selectedPayMethod === 'gcash';
+  const isGCashOrder = selectedPayMethod === 'gcash' || selectedPayMethod === 'instapay';
   apiFetch('/api/checkout', {
     method: 'POST', body: JSON.stringify({
       cart: cart.map(i => ({ id: i.id, name: i.name, category: i.category, size: i.size, qty: i.qty || 1, finalPrice: i.finalPrice, price: i.finalPrice, image: i.image })),
@@ -773,7 +775,7 @@ function placeOrder(gcashMeta) {
 
 function selectPayMethod(method) {
   selectedPayMethod = method;
-  ['gcash', 'cod'].forEach(m => {
+  ['gcash', 'instapay', 'cod'].forEach(m => {
     const btn = document.getElementById('pm-' + m);
     const pan = document.getElementById('pay-panel-' + m);
     if (btn) btn.classList.toggle('selected', m === method);
@@ -1019,13 +1021,25 @@ function startNotifPolling() {
   notifPollInterval = setInterval(() => {
     if (!currentUser || currentUser.role === 'admin') return;
     apiFetch('/api/orders/my').then(orders => {
+      if (orders && orders.error) {
+        // Session expired - stop polling, clear session
+        stopNotifPolling();
+        sessionStorage.removeItem('uc_token');
+        sessionStorage.removeItem('uc_user');
+        currentUser = null;
+        cart = [];
+        updateCartUI();
+        updateAuthUI();
+        showToast('⚠️ Session expired. Please log in again.');
+        return;
+      }
       if (!Array.isArray(orders)) return;
       orders.forEach(o => {
         const prev = lastKnownOrderStatuses[o.order_num] || {};
         const prevStatus = prev.status;
         const prevGcash = prev.gcash_status;
 
-        if (o.payment_method === 'gcash') {
+        if (o.payment_method === 'gcash' || o.payment_method === 'instapay') {
           if (prevGcash !== 'confirmed' && o.gcash_status === 'confirmed') {
             addNotification('✅ Your GCash payment for Order #' + o.order_num + ' has been confirmed! Your order is now being prepared for shipping.', 'confirmed');
             showToast('✅ GCash payment confirmed for Order #' + o.order_num + '!');
@@ -1050,7 +1064,7 @@ function startNotifPolling() {
           showToast('📦 Order #' + o.order_num + ' has been delivered!');
         }
 
-        if (prevStatus !== 'cancelled' && o.status === 'cancelled' && o.payment_method !== 'gcash') {
+        if (prevStatus !== 'cancelled' && o.status === 'cancelled' && o.payment_method !== 'gcash' && o.payment_method !== 'instapay') {
           addNotification('❌ Order #' + o.order_num + ' has been cancelled.', 'rejected');
           showToast('❌ Order #' + o.order_num + ' has been cancelled.');
         }
@@ -1280,7 +1294,7 @@ function loadAdminOrders() {
       const date = new Date(order.created_at).toLocaleString();
       const itemsSummary = order.items.map(i => `${i.name} (${i.size})`).join(', ');
 
-      const isGCash = order.payment_method === 'gcash';
+      const isGCash = order.payment_method === 'gcash' || order.payment_method === 'instapay';
       const gcashPending = isGCash && order.gcash_status === 'pending_confirmation';
       const gcashConfirmed = isGCash && order.gcash_status === 'confirmed';
       const gcashRejected = isGCash && order.gcash_status === 'rejected';
@@ -1493,7 +1507,7 @@ function saveProduct() {
 function getCustomerTab(order) {
 
   if (order.status === 'cancelled') {
-    if (order.payment_method === 'gcash' && order.gcash_status === 'rejected') return 'to_pay';
+    if ((order.payment_method === 'gcash' || order.payment_method === 'instapay') && order.gcash_status === 'rejected') return 'to_pay';
     return null;
   }
   if (order.status === 'pending') {
@@ -1547,7 +1561,17 @@ function renderMyOrders(tab) {
   apiFetch('/api/orders/my').then(orders => {
     console.log('MY ORDERS API:', orders);
     if (orders && orders.error) {
-      list.innerHTML = '<p style="color:#c00;padding:20px 0;text-align:center;">Please log in to view orders.</p>';
+      // Session expired (server restarted) - clear stale token and force re-login
+      sessionStorage.removeItem('uc_token');
+      sessionStorage.removeItem('uc_user');
+      currentUser = null;
+      cart = [];
+      stopNotifPolling();
+      updateCartUI();
+      updateAuthUI();
+      closeModal('my-orders-modal');
+      showToast('⚠️ Session expired. Please log in again.');
+      setTimeout(() => openModal('login-modal'), 600);
       return;
     }
     allOrders = Array.isArray(orders) ? orders : [];

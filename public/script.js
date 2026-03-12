@@ -1070,17 +1070,19 @@ function logout() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
   overlay.innerHTML = `
-    <div style="background:#fff;padding:32px 28px;max-width:320px;width:90%;text-align:center;border-radius:4px;">
-      <div style="font-size:1.8rem;margin-bottom:10px;">👋</div>
-      <div style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:8px;">LOG OUT?</div>
-      <p style="font-size:0.85rem;color:#666;margin:0 0 24px 0;">Are you sure you want to log out of your account?</p>
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;background:#f5f5f5;border:none;font-family:'Inter',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:1px;cursor:pointer;border-radius:2px;">CANCEL</button>
-        <button id="confirm-logout-btn" style="flex:1;padding:12px;background:#111;color:#fff;border:none;font-family:'Inter',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:1px;cursor:pointer;border-radius:2px;">YES, LOG OUT</button>
+    <div style="background:#fff;padding:24px 20px;max-width:320px;width:90%;text-align:center;border-radius:4px;">
+      <div style="font-size:1.6rem;margin-bottom:8px;">👋</div>
+      <div style="font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:1px;margin-bottom:6px;">LOG OUT?</div>
+      <p style="font-size:0.82rem;color:#666;margin:0 0 18px 0;">Are you sure you want to log out of your account?</p>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.body.removeChild(this.closest('div').closest('div').parentElement)" style="flex:1;padding:11px 6px;background:#f5f5f5;border:none;font-family:'Inter',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:1px;cursor:pointer;border-radius:2px;">CANCEL</button>
+        <button id="confirm-logout-btn" style="flex:1;padding:11px 6px;background:#111;color:#fff;border:none;font-family:'Inter',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:1px;cursor:pointer;border-radius:2px;">YES, LOG OUT</button>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
+  const cancelBtn = overlay.querySelector('button');
+  cancelBtn.onclick = () => overlay.remove();
   document.getElementById('confirm-logout-btn').onclick = () => {
     overlay.remove();
     apiFetch('/api/logout', { method: 'POST' }).catch(() => { });

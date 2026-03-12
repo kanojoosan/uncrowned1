@@ -334,6 +334,25 @@ function getFinalPrice(basePrice, size) {
   return basePrice + getSurcharge(size);
 }
 
+function getSizeChartHTML(category) {
+  const cat = (category || '').toLowerCase();
+  let rows, headers;
+  if (cat === 'pants') {
+    headers = ['SIZE', 'LENGTH', 'WIDTH', 'WAIST'];
+    rows = [['SMALL', '40', '23', '28-30'], ['MEDIUM', '41', '23', '30-32'], ['LARGE', '42', '25', '32-34'], ['XL', '43', '26', '36-38'], ['2XL', '44', '27', '40-42']];
+  } else if (cat === 'jackets') {
+    headers = ['SIZE', 'LENGTH', 'CHEST', 'SHOULDER'];
+    rows = [['SMALL', '27', '21', '17'], ['MEDIUM', '28', '22', '18'], ['LARGE', '29', '23', '19'], ['XL', '30', '24', '20'], ['2XL', '31', '25', '21']];
+  } else {
+    headers = ['SIZE', 'LENGTH', 'CHEST', 'SHOULDER'];
+    rows = [['SMALL', '27', '20', '17'], ['MEDIUM', '28', '21', '18'], ['LARGE', '29', '22', '19'], ['XL', '30', '23.5', '20'], ['2XL', '31', '25', '21']];
+  }
+  return `<table style="width:100%;border-collapse:collapse;font-size:0.65rem;font-family:'Inter',sans-serif;">
+    <thead><tr>${headers.map(h => `<th style="border:1px solid rgba(255,255,255,0.4);padding:4px 6px;letter-spacing:1px;font-weight:700;color:#fff;background:rgba(0,0,0,0.5);">${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid rgba(255,255,255,0.35);padding:4px 6px;text-align:center;color:#fff;font-weight:600;">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+}
+
 function renderProducts(products) {
   const grid = document.getElementById('product-grid');
   grid.innerHTML = '';
@@ -348,7 +367,12 @@ function renderProducts(products) {
     card.innerHTML = `
       <div class="image-container">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
-        <div class="card-hover-overlay"><span>VIEW PRODUCT</span></div>
+        <div class="card-hover-overlay">
+          <div class="card-size-chart">
+            <div style="color:#fff;font-family:'Anton',sans-serif;font-size:0.75rem;letter-spacing:2px;margin-bottom:6px;text-align:center;">SIZE GUIDE (inches)</div>
+            ${getSizeChartHTML(product.category)}
+          </div>
+        </div>
       </div>
       <div class="product-info">
         <span class="prod-name">${product.name}</span>

@@ -4,8 +4,8 @@ const BARANGAY_DATA = {
     { name: 'Buting', zip: '1607' }, { name: 'Caniogan', zip: '1603' }, { name: 'Dela Paz', zip: '1611' },
     { name: 'Kalawaan', zip: '1609' }, { name: 'Kapasigan', zip: '1609' }, { name: 'Kapitolyo', zip: '1603' },
     { name: 'Malinao', zip: '1609' }, { name: 'Manggahan', zip: '1611' }, { name: 'Maybunga', zip: '1607' },
-    { name: 'Oranbo', zip: '1600' }, { name: 'Palatiw', zip: '1609' }, { name: 'Pinagbuhatan', zip: '1607' },
-    { name: 'Pineda', zip: '1600' }, { name: 'Rosario', zip: '1609' }, { name: 'Sagad', zip: '1607' },
+    { name: 'Oranbo', zip: '1600' }, { name: 'Palatiw', zip: '1609' }, { name: 'Pinagbuhatan', zip: '1602' },
+    { name: 'Pineda', zip: '1600' }, { name: 'Rosario', zip: '1609' }, { name: 'Sagad', zip: '1602' },
     { name: 'San Antonio', zip: '1603' }, { name: 'San Joaquin', zip: '1611' }, { name: 'San Jose', zip: '1600' },
     { name: 'San Miguel', zip: '1600' }, { name: 'San Nicolas', zip: '1600' }, { name: 'Santa Cruz', zip: '1603' },
     { name: 'Santa Lucia', zip: '1611' }, { name: 'Santa Rosa', zip: '1609' }, { name: 'Santo Tomas', zip: '1603' },
@@ -17,7 +17,7 @@ const BARANGAY_DATA = {
     { name: 'Kasilawan', zip: '1209' }, { name: 'La Paz', zip: '1214' }, { name: 'Magallanes', zip: '1232' },
     { name: 'Olympia', zip: '1207' }, { name: 'Palanan', zip: '1235' }, { name: 'Pembo', zip: '1218' },
     { name: 'Pinagkaisahan', zip: '1214' }, { name: 'Pio del Pilar', zip: '1230' }, { name: 'Poblacion', zip: '1210' },
-    { name: 'Rizal', zip: '1216' }, { name: 'Salcedo', zip: '1200' }, { name: 'San Antonio', zip: '1203' },
+    { name: 'Rizal', zip: '1216' }, { name: 'Salcedo', zip: '1227' }, { name: 'San Antonio', zip: '1203' },
     { name: 'San Isidro', zip: '1234' }, { name: 'San Lorenzo', zip: '1223' }, { name: 'Santa Cruz', zip: '1203' },
     { name: 'Singkamas', zip: '1207' }, { name: 'South Cemetery', zip: '1209' }, { name: 'Tejeros', zip: '1209' },
     { name: 'Urdaneta', zip: '1223' }, { name: 'Valenzuela', zip: '1204' }
@@ -59,11 +59,11 @@ const BARANGAY_DATA = {
     { name: 'Vergara', zip: '1550' }, { name: 'Wack-Wack Greenhills', zip: '1555' }
   ],
   'Marikina': [
-    { name: 'Barangka', zip: '1810' }, { name: 'Calumpang', zip: '1810' }, { name: 'Concepcion Dos', zip: '1810' },
-    { name: 'Concepcion Uno', zip: '1810' }, { name: 'Fortune', zip: '1810' }, { name: 'Industrial Valley', zip: '1810' },
-    { name: 'Jesus dela Peña', zip: '1810' }, { name: 'Kalumpang', zip: '1810' }, { name: 'Malanday', zip: '1810' },
-    { name: 'Nangka', zip: '1810' }, { name: 'Parang', zip: '1810' }, { name: 'San Roque', zip: '1810' },
-    { name: 'Santa Elena', zip: '1810' }, { name: 'Santo Niño', zip: '1810' }, { name: 'Tañong', zip: '1810' },
+    { name: 'Barangka', zip: '1809' }, { name: 'Calumpang', zip: '1808' }, { name: 'Concepcion Dos', zip: '1816' },
+    { name: 'Concepcion Uno', zip: '1816' }, { name: 'Fortune', zip: '1812' }, { name: 'Industrial Valley', zip: '1810' },
+    { name: 'Jesus dela Peña', zip: '1815' }, { name: 'Kalumpang', zip: '1814' }, { name: 'Malanday', zip: '1811' },
+    { name: 'Nangka', zip: '1810' }, { name: 'Parang', zip: '1809' }, { name: 'San Roque', zip: '1813' },
+    { name: 'Santa Elena', zip: '1810' }, { name: 'Santo Niño', zip: '1811' }, { name: 'Tañong', zip: '1810' },
     { name: 'Tumana', zip: '1810' }
   ],
   'Parañaque': [

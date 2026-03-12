@@ -1,14 +1,194 @@
+const BARANGAY_DATA = {
+  'Pasig': [
+    { name: 'Bagong Ilog', zip: '1600' }, { name: 'Bagong Katipunan', zip: '1600' }, { name: 'Bambang', zip: '1607' },
+    { name: 'Buting', zip: '1607' }, { name: 'Caniogan', zip: '1603' }, { name: 'Dela Paz', zip: '1611' },
+    { name: 'Kalawaan', zip: '1609' }, { name: 'Kapasigan', zip: '1609' }, { name: 'Kapitolyo', zip: '1603' },
+    { name: 'Malinao', zip: '1609' }, { name: 'Manggahan', zip: '1611' }, { name: 'Maybunga', zip: '1607' },
+    { name: 'Oranbo', zip: '1600' }, { name: 'Palatiw', zip: '1609' }, { name: 'Pinagbuhatan', zip: '1607' },
+    { name: 'Pineda', zip: '1600' }, { name: 'Rosario', zip: '1609' }, { name: 'Sagad', zip: '1607' },
+    { name: 'San Antonio', zip: '1603' }, { name: 'San Joaquin', zip: '1611' }, { name: 'San Jose', zip: '1600' },
+    { name: 'San Miguel', zip: '1600' }, { name: 'San Nicolas', zip: '1600' }, { name: 'Santa Cruz', zip: '1603' },
+    { name: 'Santa Lucia', zip: '1611' }, { name: 'Santa Rosa', zip: '1609' }, { name: 'Santo Tomas', zip: '1603' },
+    { name: 'Santolan', zip: '1610' }, { name: 'Sumilang', zip: '1600' }, { name: 'Ugong', zip: '1604' }
+  ],
+  'Makati': [
+    { name: 'Bel-Air', zip: '1209' }, { name: 'Carmona', zip: '1209' }, { name: 'Dasmariñas', zip: '1211' },
+    { name: 'Forbes Park', zip: '1211' }, { name: 'Guadalupe Nuevo', zip: '1212' }, { name: 'Guadalupe Viejo', zip: '1212' },
+    { name: 'Kasilawan', zip: '1209' }, { name: 'La Paz', zip: '1214' }, { name: 'Magallanes', zip: '1232' },
+    { name: 'Olympia', zip: '1207' }, { name: 'Palanan', zip: '1235' }, { name: 'Pembo', zip: '1218' },
+    { name: 'Pinagkaisahan', zip: '1214' }, { name: 'Pio del Pilar', zip: '1230' }, { name: 'Poblacion', zip: '1210' },
+    { name: 'Rizal', zip: '1216' }, { name: 'Salcedo', zip: '1200' }, { name: 'San Antonio', zip: '1203' },
+    { name: 'San Isidro', zip: '1234' }, { name: 'San Lorenzo', zip: '1223' }, { name: 'Santa Cruz', zip: '1203' },
+    { name: 'Singkamas', zip: '1207' }, { name: 'South Cemetery', zip: '1209' }, { name: 'Tejeros', zip: '1209' },
+    { name: 'Urdaneta', zip: '1223' }, { name: 'Valenzuela', zip: '1204' }
+  ],
+  'Quezon City': [
+    { name: 'Alicia', zip: '1105' }, { name: 'Bagong Silangan', zip: '1119' }, { name: 'Batasan Hills', zip: '1126' },
+    { name: 'Commonwealth', zip: '1121' }, { name: 'Cubao', zip: '1109' }, { name: 'Diliman', zip: '1101' },
+    { name: 'Fairview', zip: '1118' }, { name: 'Kamuning', zip: '1103' }, { name: 'Loyola Heights', zip: '1108' },
+    { name: 'Novaliches', zip: '1123' }, { name: 'Project 2', zip: '1107' }, { name: 'Project 4', zip: '1109' },
+    { name: 'Project 6', zip: '1100' }, { name: 'Quirino District', zip: '1112' }, { name: 'San Francisco', zip: '1127' },
+    { name: 'Tandang Sora', zip: '1116' }, { name: 'Teachers Village', zip: '1101' }, { name: 'UP Campus', zip: '1101' },
+    { name: 'Visayas Avenue', zip: '1128' }, { name: 'West Triangle', zip: '1104' }
+  ],
+  'Manila': [
+    { name: 'Binondo', zip: '1006' }, { name: 'Ermita', zip: '1000' }, { name: 'Intramuros', zip: '1002' },
+    { name: 'Malate', zip: '1004' }, { name: 'Paco', zip: '1007' }, { name: 'Pandacan', zip: '1011' },
+    { name: 'Port Area', zip: '1018' }, { name: 'Quiapo', zip: '1001' }, { name: 'Sampaloc', zip: '1008' },
+    { name: 'San Andres', zip: '1015' }, { name: 'San Miguel', zip: '1005' }, { name: 'San Nicolas', zip: '1010' },
+    { name: 'Santa Ana', zip: '1009' }, { name: 'Santa Cruz', zip: '1003' }, { name: 'Santa Mesa', zip: '1016' },
+    { name: 'Tondo', zip: '1012' }
+  ],
+  'Taguig': [
+    { name: 'Bagumbayan', zip: '1635' }, { name: 'Bambang', zip: '1635' }, { name: 'BGC (Bonifacio Global City)', zip: '1634' },
+    { name: 'Calzada', zip: '1630' }, { name: 'Central Bicutan', zip: '1631' }, { name: 'Central Signal Village', zip: '1632' },
+    { name: 'Fort Bonifacio', zip: '1634' }, { name: 'Hagonoy', zip: '1635' }, { name: 'Ibayo-Tipas', zip: '1635' },
+    { name: 'Katuparan', zip: '1632' }, { name: 'Ligid-Tipas', zip: '1635' }, { name: 'Lower Bicutan', zip: '1631' },
+    { name: 'Maharlika Village', zip: '1640' }, { name: 'North Daang Hari', zip: '1632' }, { name: 'North Signal Village', zip: '1632' },
+    { name: 'Palingon', zip: '1635' }, { name: 'Pinagsama', zip: '1632' }, { name: 'San Miguel', zip: '1635' },
+    { name: 'Santa Ana', zip: '1635' }, { name: 'South Daang Hari', zip: '1632' }, { name: 'Tuktukan', zip: '1635' },
+    { name: 'Upper Bicutan', zip: '1631' }, { name: 'Ususan', zip: '1635' }, { name: 'Wawa', zip: '1635' }
+  ],
+  'Mandaluyong': [
+    { name: 'Barangka Drive', zip: '1550' }, { name: 'Buayang Bato', zip: '1550' }, { name: 'Burol', zip: '1550' },
+    { name: 'Daang Bakal', zip: '1550' }, { name: 'Hagdang Bato Itaas', zip: '1550' }, { name: 'Hagdang Bato Libis', zip: '1550' },
+    { name: 'Harapin Ang Bukas', zip: '1550' }, { name: 'Highway Hills', zip: '1550' }, { name: 'Hulo', zip: '1550' },
+    { name: 'Mauway', zip: '1550' }, { name: 'Namayan', zip: '1550' }, { name: 'New Zañiga', zip: '1550' },
+    { name: 'Old Zañiga', zip: '1550' }, { name: 'Pag-asa', zip: '1550' }, { name: 'Plainview', zip: '1550' },
+    { name: 'Pleasant Hills', zip: '1550' }, { name: 'Poblacion', zip: '1550' }, { name: 'San Joaquin', zip: '1550' },
+    { name: 'Vergara', zip: '1550' }, { name: 'Wack-Wack Greenhills', zip: '1555' }
+  ],
+  'Marikina': [
+    { name: 'Barangka', zip: '1810' }, { name: 'Calumpang', zip: '1810' }, { name: 'Concepcion Dos', zip: '1810' },
+    { name: 'Concepcion Uno', zip: '1810' }, { name: 'Fortune', zip: '1810' }, { name: 'Industrial Valley', zip: '1810' },
+    { name: 'Jesus dela Peña', zip: '1810' }, { name: 'Kalumpang', zip: '1810' }, { name: 'Malanday', zip: '1810' },
+    { name: 'Nangka', zip: '1810' }, { name: 'Parang', zip: '1810' }, { name: 'San Roque', zip: '1810' },
+    { name: 'Santa Elena', zip: '1810' }, { name: 'Santo Niño', zip: '1810' }, { name: 'Tañong', zip: '1810' },
+    { name: 'Tumana', zip: '1810' }
+  ],
+  'Parañaque': [
+    { name: 'Baclaran', zip: '1700' }, { name: 'BF Homes', zip: '1720' }, { name: 'Don Bosco', zip: '1711' },
+    { name: 'Don Galo', zip: '1704' }, { name: 'La Huerta', zip: '1705' }, { name: 'Marcelo Green', zip: '1704' },
+    { name: 'Merville', zip: '1709' }, { name: 'Moonwalk', zip: '1709' }, { name: 'San Antonio', zip: '1701' },
+    { name: 'San Dionisio', zip: '1704' }, { name: 'San Isidro', zip: '1702' }, { name: 'San Martin de Porres', zip: '1704' },
+    { name: 'Santo Niño', zip: '1702' }, { name: 'Sun Valley', zip: '1714' }, { name: 'Tambo', zip: '1701' },
+    { name: 'Vitalez', zip: '1701' }
+  ],
+  'Caloocan': [
+    { name: 'Bagong Silang', zip: '1428' }, { name: 'Barangay 1', zip: '1400' }, { name: 'Camarin', zip: '1422' },
+    { name: 'Deparo', zip: '1424' }, { name: 'Grace Park East', zip: '1403' }, { name: 'Grace Park West', zip: '1403' },
+    { name: 'Maypajo', zip: '1409' }, { name: 'Monumento', zip: '1400' }, { name: 'Novaliches', zip: '1420' },
+    { name: 'Pangarap Village', zip: '1427' }, { name: 'Sangandaan', zip: '1411' }
+  ],
+  'Las Piñas': [
+    { name: 'Almanza Dos', zip: '1750' }, { name: 'Almanza Uno', zip: '1750' }, { name: 'BF Resort', zip: '1740' },
+    { name: 'CAA-BF International', zip: '1740' }, { name: 'Daniel Fajardo', zip: '1750' }, { name: 'Elias Aldana', zip: '1750' },
+    { name: 'Ilaya', zip: '1750' }, { name: 'Mariposa', zip: '1740' }, { name: 'Pamplona Dos', zip: '1742' },
+    { name: 'Pamplona Tres', zip: '1743' }, { name: 'Pamplona Uno', zip: '1741' }, { name: 'Pilar', zip: '1750' },
+    { name: 'Pulang Lupa Dos', zip: '1740' }, { name: 'Pulang Lupa Uno', zip: '1740' }, { name: 'Talon Dos', zip: '1745' },
+    { name: 'Talon Kuatro', zip: '1747' }, { name: 'Talon Singko', zip: '1748' }, { name: 'Talon Tres', zip: '1746' },
+    { name: 'Talon Uno', zip: '1744' }, { name: 'Zapote', zip: '1750' }
+  ],
+  'Muntinlupa': [
+    { name: 'Alabang', zip: '1770' }, { name: 'Ayala Alabang', zip: '1780' }, { name: 'Bayanan', zip: '1773' },
+    { name: 'Buli', zip: '1774' }, { name: 'Cupang', zip: '1771' }, { name: 'Putatan', zip: '1772' },
+    { name: 'Sucat', zip: '1775' }, { name: 'Tunasan', zip: '1773' }
+  ],
+  'Pasay': [
+    { name: 'Baclaran', zip: '1300' }, { name: 'Bagong Ilog', zip: '1300' }, { name: 'Don Bosco', zip: '1300' },
+    { name: 'Libertad', zip: '1300' }, { name: 'Malibay', zip: '1300' }, { name: 'Maricaban', zip: '1300' },
+    { name: 'Palanyag', zip: '1300' }, { name: 'Pasay Rotonda', zip: '1300' }, { name: 'San Isidro', zip: '1300' },
+    { name: 'San Jose', zip: '1300' }, { name: 'Villamor Airbase', zip: '1309' }
+  ],
+  'San Juan': [
+    { name: 'Addition Hills', zip: '1500' }, { name: 'Balong Bato', zip: '1500' }, { name: 'Corazon de Jesus', zip: '1500' },
+    { name: 'Ermitaño', zip: '1500' }, { name: 'Greenhills', zip: '1502' }, { name: 'Isabelita', zip: '1500' },
+    { name: 'Kabayanan', zip: '1500' }, { name: 'Little Baguio', zip: '1500' }, { name: 'Maytunas', zip: '1500' },
+    { name: 'Onse', zip: '1500' }, { name: 'Pasadena', zip: '1500' }, { name: 'Pedro Cruz', zip: '1500' },
+    { name: 'Progreso', zip: '1500' }, { name: 'Rivera', zip: '1500' }, { name: 'Salapan', zip: '1500' },
+    { name: 'San Perfecto', zip: '1500' }, { name: 'St. Joseph', zip: '1502' }, { name: 'Tibagan', zip: '1500' },
+    { name: 'West Crame', zip: '1500' }
+  ],
+  'Valenzuela': [
+    { name: 'Arkong Bato', zip: '1440' }, { name: 'Bagbaguin', zip: '1441' }, { name: 'Balangkas', zip: '1444' },
+    { name: 'Bignay', zip: '1441' }, { name: 'Bisig', zip: '1440' }, { name: 'Canumay East', zip: '1446' },
+    { name: 'Canumay West', zip: '1446' }, { name: 'Coloong', zip: '1444' }, { name: 'Dalandanan', zip: '1445' },
+    { name: 'Gen. T. de Leon', zip: '1442' }, { name: 'Isla', zip: '1440' }, { name: 'Karuhatan', zip: '1441' },
+    { name: 'Lingunan', zip: '1447' }, { name: 'Mabolo', zip: '1444' }, { name: 'Malanday', zip: '1447' },
+    { name: 'Malinta', zip: '1444' }, { name: 'Mapulang Lupa', zip: '1440' }, { name: 'Marulas', zip: '1443' },
+    { name: 'Maysan', zip: '1440' }, { name: 'Palasan', zip: '1440' }, { name: 'Parada', zip: '1440' },
+    { name: 'Pariancillo Villa', zip: '1440' }, { name: 'Pasolo', zip: '1440' }, { name: 'Poblacion', zip: '1440' },
+    { name: 'Punturin', zip: '1440' }, { name: 'Rincon', zip: '1440' }, { name: 'Tagalag', zip: '1441' },
+    { name: 'Ugong', zip: '1440' }, { name: 'Viente Reales', zip: '1440' }, { name: 'Wawang Pulo', zip: '1440' }
+  ],
+  'Malabon': [
+    { name: 'Acacia', zip: '1470' }, { name: 'Baritan', zip: '1470' }, { name: 'Basurero', zip: '1470' },
+    { name: 'Catmon', zip: '1470' }, { name: 'Concepcion', zip: '1470' }, { name: 'Dampalit', zip: '1470' },
+    { name: 'Flores', zip: '1470' }, { name: 'Hulong Duhat', zip: '1470' }, { name: 'Ibaba', zip: '1470' },
+    { name: 'Longos', zip: '1470' }, { name: 'Maysilo', zip: '1470' }, { name: 'Muzon', zip: '1470' },
+    { name: 'Niugan', zip: '1470' }, { name: 'Panghulo', zip: '1470' }, { name: 'Potrero', zip: '1470' },
+    { name: 'San Agustin', zip: '1470' }, { name: 'Santolan', zip: '1470' }, { name: 'Tañong', zip: '1470' },
+    { name: 'Tinajeros', zip: '1470' }, { name: 'Tonsuya', zip: '1470' }, { name: 'Tugatog', zip: '1470' }
+  ],
+  'Navotas': [
+    { name: 'Bagumbayan North', zip: '1485' }, { name: 'Bagumbayan South', zip: '1485' },
+    { name: 'Bangculasi', zip: '1485' }, { name: 'Daanghari', zip: '1485' }, { name: 'Navotas East', zip: '1485' },
+    { name: 'Navotas West', zip: '1485' }, { name: 'North Bay Blvd. North', zip: '1485' },
+    { name: 'North Bay Blvd. South', zip: '1485' }, { name: 'San Jose', zip: '1485' }, { name: 'San Roque', zip: '1485' },
+    { name: 'San Rafael Village', zip: '1485' }, { name: 'Sipac-Almacen', zip: '1485' }, { name: 'Tangos', zip: '1485' }
+  ],
+  'Pateros': [
+    { name: 'Aguho', zip: '1620' }, { name: 'Magtanggol', zip: '1620' }, { name: 'Martires del 96', zip: '1620' },
+    { name: 'San Pedro', zip: '1620' }, { name: 'San Roque', zip: '1620' }, { name: 'Santa Ana', zip: '1620' },
+    { name: 'Santo Rosario-Kanluran', zip: '1620' }, { name: 'Santo Rosario-Silangan', zip: '1620' }, { name: 'Tabacalera', zip: '1620' }
+  ],
+  'Antipolo': [{ name: 'Bagong Nayon', zip: '1870' }, { name: 'Beverly Hills', zip: '1870' }, { name: 'Calauan', zip: '1870' },
+  { name: 'Cupang', zip: '1870' }, { name: 'Dalig', zip: '1870' }, { name: 'Dela Paz', zip: '1870' },
+  { name: 'Mambugan', zip: '1870' }, { name: 'Mayamot', zip: '1870' }, { name: 'Ynares', zip: '1870' }],
+  'Cebu City': [{ name: 'Apas', zip: '6000' }, { name: 'Banilad', zip: '6000' }, { name: 'Basak Pardo', zip: '6000' },
+  { name: 'Carbon', zip: '6000' }, { name: 'IT Park', zip: '6000' }, { name: 'Lahug', zip: '6000' },
+  { name: 'Mabolo', zip: '6000' }, { name: 'Maguikay', zip: '6000' }, { name: 'Sambag', zip: '6000' }, { name: 'Talamban', zip: '6000' }],
+  'Davao City': [{ name: 'Agdao', zip: '8000' }, { name: 'Buhangin', zip: '8000' }, { name: 'Bunawan', zip: '8000' },
+  { name: 'Calinan', zip: '8000' }, { name: 'Mintal', zip: '8000' }, { name: 'Paquibato', zip: '8000' }, { name: 'Poblacion', zip: '8000' }, { name: 'Talomo', zip: '8000' }],
+};
+
+function getBrgyOptions(city) {
+  const list = BARANGAY_DATA[city];
+  if (!list || !list.length) return '<option value="">No barangay data</option>';
+  return '<option value="">Select barangay...</option>' + list.map(b => `<option value="${b.name}|${b.zip}">${b.name}</option>`).join('');
+}
+
 function onCityChange(select, prefix) {
   const val = select.value;
-  if (!val) return;
+  const brgyEl = document.getElementById(prefix + '-brgy');
+  if (!val) {
+    if (brgyEl) { brgyEl.innerHTML = '<option value="">Select city first...</option>'; brgyEl.disabled = true; }
+    return;
+  }
   const parts = val.split('|');
   const city = parts[0], province = parts[1], region = parts[2], zip = parts[3];
   const el = id => document.getElementById(prefix + '-' + id);
   if (el('province')) { el('province').value = province || ''; el('province').style.color = '#111'; el('province').style.fontWeight = '500'; }
   if (el('region')) { el('region').value = region || ''; el('region').style.color = '#111'; el('region').style.fontWeight = '500'; }
   if (el('zip')) { el('zip').value = zip || ''; el('zip').style.color = '#111'; el('zip').style.fontWeight = '500'; }
+  if (brgyEl) {
+    brgyEl.innerHTML = getBrgyOptions(city);
+    brgyEl.disabled = false;
+    brgyEl.style.color = '#111';
+  }
   if (prefix === 'addr') updateShippingDisplay();
 }
+
+function onBrgyChange(select, prefix) {
+  const val = select.value;
+  if (!val) return;
+  const parts = val.split('|');
+  const zip = parts[1];
+  const el = id => document.getElementById(prefix + '-' + id);
+  if (zip && el('zip')) { el('zip').value = zip; el('zip').style.color = '#111'; el('zip').style.fontWeight = '500'; }
+}
+
+
 
 function getShippingFee() {
   const cityEl = document.getElementById('addr-city');
@@ -507,11 +687,12 @@ function placeOrder(gcashMeta) {
     phone: document.getElementById('addr-phone').value.trim(),
     street: document.getElementById('addr-street').value.trim(),
     city: (document.getElementById('addr-city').value.trim().split('|')[0]),
+    barangay: ((document.getElementById('addr-brgy')?.value || '').split('|')[0]),
     province: document.getElementById('addr-province').value.trim(),
     zip: document.getElementById('addr-zip').value.trim(),
     region: document.getElementById('addr-region').value,
   };
-  const { fname, lname, phone, street, city, province, zip, region } = addrSrc;
+  const { fname, lname, phone, street, barangay, city, province, zip, region } = addrSrc;
   const saveCb = document.getElementById('save-address-cb');
   if (saveCb && saveCb.checked) {
     saveAddressToStorage(addrSrc);
@@ -523,7 +704,7 @@ function placeOrder(gcashMeta) {
     customer: currentUser.username,
     items: cart.map(i => ({ name: i.name, size: i.size, qty: i.qty || 1, price: i.finalPrice, image: i.image })),
     subtotal, shipping, total,
-    address: { name: `${fname} ${lname}`, phone, street, city, province, zip, region },
+    address: { name: `${fname} ${lname}`, phone, street, barangay: barangay || '', city, province, zip, region },
     payment: selectedPayMethod,
     status: 'pending',
     gcashProof: gcashMeta ? gcashMeta.gcashProof : null,
@@ -649,7 +830,7 @@ function signup() {
   const lettersOnly = localPart.replace(/[^a-zA-Z]/g, '');
   const numbersOnly = localPart.replace(/[^0-9]/g, '');
   if (lettersOnly.length > 25) return showError('signup-error', '⚠️ Email username must not exceed 25 letters.');
-  if (numbersOnly.length < 2 || numbersOnly.length > 4) return showError('signup-error', '⚠️ Email username must contain 2 to 4 numbers (e.g. juan0606@gmail.com).');
+  if (numbersOnly.length > 4) return showError('signup-error', '⚠️ Email username must contain 0 to 4 numbers (e.g. juan@gmail.com or juan06@gmail.com).');
   if (!ageVal) return showError('signup-error', 'Age is required.');
   const age = parseInt(ageVal);
   if (isNaN(age) || age < 18 || age > 60) return showError('signup-error', '⚠️ Age must be between 18 and 60.');
@@ -1530,15 +1711,23 @@ function fillCheckoutForm(a) {
   const lnameEl = document.getElementById('addr-lname'); if (lnameEl) lnameEl.value = a.lname || '';
   const phoneEl = document.getElementById('addr-phone'); if (phoneEl) phoneEl.value = a.phone || '';
   const streetEl = document.getElementById('addr-street'); if (streetEl) streetEl.value = a.street || '';
-  const provEl = document.getElementById('addr-province'); if (provEl) provEl.value = a.province || '';
-  const zipEl = document.getElementById('addr-zip'); if (zipEl) zipEl.value = a.zip || '';
-  const regEl = document.getElementById('addr-region'); if (regEl) regEl.value = a.region || '';
+  const provEl = document.getElementById('addr-province'); if (provEl) { provEl.value = a.province || ''; provEl.style.color = '#111'; }
+  const zipEl = document.getElementById('addr-zip'); if (zipEl) { zipEl.value = a.zip || ''; zipEl.style.color = '#111'; }
+  const regEl = document.getElementById('addr-region'); if (regEl) { regEl.value = a.region || ''; regEl.style.color = '#111'; }
   const cityEl = document.getElementById('addr-city');
   if (cityEl && a.city) {
     const opts = Array.from(cityEl.options);
     const match = opts.find(o => o.value.startsWith(a.city + '|'));
-    if (match) cityEl.value = match.value;
+    if (match) { cityEl.value = match.value; onCityChange(cityEl, 'addr'); }
     else cityEl.value = a.city;
+  }
+  if (a.barangay) {
+    const brgyEl = document.getElementById('addr-brgy');
+    if (brgyEl) {
+      const bOpts = Array.from(brgyEl.options);
+      const bMatch = bOpts.find(o => o.value.startsWith(a.barangay + '|'));
+      if (bMatch) brgyEl.value = bMatch.value;
+    }
   }
 }
 
@@ -1597,6 +1786,7 @@ function launchGCashRedirect() {
     phone: document.getElementById('addr-phone').value.trim(),
     street: document.getElementById('addr-street').value.trim(),
     city: (document.getElementById('addr-city').value.trim().split('|')[0]),
+    barangay: ((document.getElementById('addr-brgy')?.value || '').split('|')[0]),
     province: document.getElementById('addr-province').value.trim(),
     zip: document.getElementById('addr-zip').value.trim(),
     region: document.getElementById('addr-region').value,

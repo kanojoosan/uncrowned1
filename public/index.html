@@ -459,6 +459,10 @@
               oninput="this.value=this.value.replace(/\D/g,'').substring(0,11)"></div>
           <div class="form-group"><label>STREET ADDRESS</label><input type="text" id="addr-street"
               placeholder="123 Rizal St., Unit 4B" maxlength="40" oninput="validateStreetInput(this)"></div>
+          <div class="form-group"><label>BARANGAY</label><select id="addr-brgy" onchange="onBrgyChange(this,'addr')"
+              disabled>
+              <option value="">Select city first...</option>
+            </select></div>
           <div class="form-row">
             <div class="form-group">
               <label>CITY / MUNICIPALITY</label>
@@ -767,6 +771,9 @@
             maxlength="11" oninput="this.value=this.value.replace(/\D/g,'').substring(0,11)"></div>
         <div class="form-group"><label>STREET ADDRESS</label><input type="text" id="ab-street"
             placeholder="123 Rizal St., Unit 4B" maxlength="40" oninput="validateStreetInput(this)"></div>
+        <div class="form-group"><label>BARANGAY</label><select id="ab-brgy" onchange="onBrgyChange(this,'ab')" disabled>
+            <option value="">Select city first...</option>
+          </select></div>
         <div class="form-row">
           <div class="form-group">
             <label>CITY</label>

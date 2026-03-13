@@ -2227,29 +2227,32 @@ footer {
   font-weight: 700;
 }
 
-/* Admin full page nav */
-.ap-nav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #555;
-  transition: all 0.15s;
-  border-left: 3px solid transparent;
-  text-transform: uppercase;
+
+#admin-fullpage .ap-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 11px 22px !important;
+  cursor: pointer !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  color: #555 !important;
+  transition: all 0.15s !important;
+  border-left: 3px solid transparent !important;
+  text-transform: uppercase !important;
+  background: transparent !important;
+  list-style: none !important;
+  text-decoration: none !important;
 }
 
-.ap-nav:hover {
-  color: #fff;
-  background: #111;
+#admin-fullpage .ap-nav:hover {
+  color: #fff !important;
+  background: #141414 !important;
 }
 
-.ap-nav.active {
-  color: #fff;
-  border-left-color: #fff;
-  background: #111;
+#admin-fullpage .ap-nav.active {
+  color: #fff !important;
+  border-left-color: #fff !important;
+  background: #141414 !important;
 }

@@ -1071,51 +1071,56 @@
     </div>
   </div>
 
-  <!-- FULL PAGE ADMIN PANEL -->
-  <div id="admin-fullpage"
-    style="display:none;position:fixed;inset:0;z-index:99999;background:#f6f6f6;overflow:hidden;">
-    <div style="display:flex;height:100vh;">
-      <!-- Sidebar -->
-      <aside
-        style="width:220px;background:#0a0a0a;color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;">
-        <div style="padding:24px 20px 18px;border-bottom:1px solid #222;">
-          <div style="font-family:'Anton',sans-serif;font-size:1.4rem;letter-spacing:2px;">UNCROWNED.</div>
-          <div style="font-size:0.62rem;letter-spacing:3px;color:#555;margin-top:2px;">ADMIN PANEL</div>
-        </div>
-        <nav style="padding:12px 0;flex:1;">
-          <div style="padding:14px 8px 4px 20px;font-size:0.58rem;letter-spacing:3px;color:#444;">MAIN</div>
-          <div class="ap-nav active" onclick="apTab('dashboard')">📊 <span>Dashboard</span></div>
-          <div style="padding:14px 8px 4px 20px;font-size:0.58rem;letter-spacing:3px;color:#444;">MANAGE</div>
-          <div class="ap-nav" onclick="apTab('orders')">🛒 <span>Orders</span></div>
-          <div class="ap-nav" onclick="apTab('products')">👕 <span>Products</span></div>
-          <div class="ap-nav" onclick="apTab('customers')">👥 <span>Customers</span></div>
-          <div class="ap-nav" onclick="apTab('inventory')">📦 <span>Inventory</span></div>
-        </nav>
-        <div style="padding:14px 20px;border-top:1px solid #222;font-size:0.68rem;color:#444;">
-          <div>Logged in as</div>
-          <div style="color:#fff;font-weight:700;margin-top:2px;" id="ap-admin-name">ADMIN</div>
-          <button onclick="apLogout()"
-            style="width:100%;margin-top:10px;padding:9px;background:#1a1a1a;border:1px solid #333;color:#888;font-size:0.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Inter',sans-serif;">LOG
-            OUT</button>
-        </div>
-      </aside>
-      <!-- Main -->
-      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-        <!-- Topbar -->
-        <div
-          style="background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8e8e8;flex-shrink:0;">
-          <div style="font-size:0.72rem;font-weight:700;letter-spacing:2px;color:#888;" id="ap-topbar-title">DASHBOARD
-          </div>
-          <div style="display:flex;align-items:center;gap:16px;">
-            <div style="font-size:0.68rem;color:#888;" id="ap-date"></div>
-            <div
-              style="background:#0a0a0a;color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:2px;padding:4px 10px;">
-              ADMIN</div>
-          </div>
-        </div>
-        <!-- Content -->
-        <div style="flex:1;overflow-y:auto;padding:28px;" id="ap-content"></div>
+
+  <div id="admin-fullpage" style="display:none;position:fixed;inset:0;z-index:99999;font-family:'Inter',sans-serif;">
+
+    <div id="ap-sidebar"
+      style="position:fixed;top:0;left:0;width:240px;height:100vh;background:#0a0a0a;color:#fff;display:flex;flex-direction:column;z-index:2;">
+      <div style="padding:26px 22px 18px;border-bottom:1px solid #1e1e1e;">
+        <div style="font-family:'Anton',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;">UNCROWNED.</div>
+        <div style="font-size:0.6rem;letter-spacing:3px;color:#444;margin-top:3px;">ADMIN PANEL</div>
       </div>
+      <nav style="flex:1;overflow-y:auto;padding:16px 0;">
+        <div style="padding:12px 22px 5px;font-size:0.58rem;letter-spacing:3px;color:#3a3a3a;font-weight:700;">MAIN
+        </div>
+        <div class="ap-nav active" onclick="apTab('dashboard')"><span style="width:20px;text-align:center;">📊</span>
+          Dashboard</div>
+        <div style="padding:16px 22px 5px;font-size:0.58rem;letter-spacing:3px;color:#3a3a3a;font-weight:700;">MANAGE
+        </div>
+        <div class="ap-nav" onclick="apTab('orders')"><span style="width:20px;text-align:center;">🛒</span> Orders</div>
+        <div class="ap-nav" onclick="apTab('products')"><span style="width:20px;text-align:center;">👕</span> Products
+        </div>
+        <div class="ap-nav" onclick="apTab('customers')"><span style="width:20px;text-align:center;">👥</span> Customers
+        </div>
+        <div class="ap-nav" onclick="apTab('inventory')"><span style="width:20px;text-align:center;">📦</span> Inventory
+        </div>
+      </nav>
+      <div style="padding:16px 22px;border-top:1px solid #1e1e1e;">
+        <div style="font-size:0.62rem;color:#444;margin-bottom:4px;">Logged in as</div>
+        <div style="color:#fff;font-weight:700;font-size:0.85rem;margin-bottom:12px;" id="ap-admin-name">ADMIN</div>
+        <button onclick="apLogout()"
+          style="width:100%;padding:10px;background:transparent;border:1px solid #333;color:#666;font-size:0.68rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s;"
+          onmouseover="this.style.background='#c0392b';this.style.color='#fff';this.style.borderColor='#c0392b';"
+          onmouseout="this.style.background='transparent';this.style.color='#666';this.style.borderColor='#333';">LOG
+          OUT</button>
+      </div>
+    </div>
+
+    <div style="margin-left:240px;height:100vh;display:flex;flex-direction:column;background:#f5f5f5;">
+
+      <div
+        style="background:#fff;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid #ebebeb;flex-shrink:0;">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#aaa;" id="ap-topbar-title">DASHBOARD
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="font-size:0.68rem;color:#bbb;" id="ap-date"></div>
+          <div
+            style="background:#0a0a0a;color:#fff;font-size:0.6rem;font-weight:700;letter-spacing:2px;padding:5px 12px;">
+            ADMIN</div>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:28px;" id="ap-content"></div>
     </div>
   </div>
 

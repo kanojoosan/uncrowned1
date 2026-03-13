@@ -188,8 +188,6 @@ function onBrgyChange(select, prefix) {
   if (zip && el('zip')) { el('zip').value = zip; el('zip').style.color = '#111'; el('zip').style.fontWeight = '500'; }
 }
 
-
-
 function getShippingFee() {
   const cityEl = document.getElementById('addr-city');
   if (!cityEl || !cityEl.value) return 150;
@@ -211,7 +209,9 @@ function updateShippingDisplay() {
   totalEl.innerText = '₱' + (subtotal + fee).toLocaleString();
 }
 
-const API = 'https://uncrowned1-production.up.railway.app';
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `http://${window.location.hostname}:3000`
+  : 'https://uncrowned1-production.up.railway.app';
 async function apiFetch(path, opts = {}) {
   const token = sessionStorage.getItem('uc_token');
   const res = await fetch(API + path, {
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   populateBirthdaySelects();
 
-  // restore session from localStorage (passed from opener tab)
+
   const transferToken = localStorage.getItem('uc_admin_token');
   const transferUser = localStorage.getItem('uc_admin_user');
   if (transferToken && transferUser) {
@@ -326,12 +326,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   updateAuthUI();
 
-  // if URL has ?admin=1 and user is admin, show full-page admin panel
+
   if (new URLSearchParams(window.location.search).get('admin') === '1') {
     if (currentUser && currentUser.role === 'admin') {
       apInit();
     } else {
-      // not logged in as admin — redirect to home
+
       window.location.href = window.location.pathname;
     }
     return;
@@ -943,11 +943,11 @@ function login() {
       currentUser = { username: data.username, role: data.role };
       sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
       if (data.role === 'admin') {
-        // store token + user in localStorage so the new tab can pick it up
+
         localStorage.setItem('uc_admin_token', data.token);
         localStorage.setItem('uc_admin_user', JSON.stringify({ username: data.username, role: data.role }));
         closeModal('login-modal');
-        // open same page with ?admin=1 in new tab
+
         const a = document.createElement('a');
         a.href = window.location.pathname + '?admin=1';
         a.target = '_blank';
@@ -1067,7 +1067,7 @@ function startNotifPolling() {
     if (!currentUser || currentUser.role === 'admin') return;
     apiFetch('/api/orders/my').then(orders => {
       if (orders && orders.error) {
-        // Session expired - stop polling, clear session
+
         stopNotifPolling();
         sessionStorage.removeItem('uc_token');
         sessionStorage.removeItem('uc_user');
@@ -1183,8 +1183,6 @@ function updateAuthUI() {
   }
 }
 
-
-
 function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach((t, i) => {
     t.classList.toggle('active',
@@ -1212,7 +1210,7 @@ function renderInventory() {
   let products = [...allProducts];
   if (catFilter !== 'all') products = products.filter(p => p.category === catFilter);
 
-  // Summary cards
+
   let totalIn = 0, totalLow = 0, totalOut = 0, totalValue = 0;
   allProducts.forEach(p => {
     const ss = p.size_stock || {};
@@ -1244,7 +1242,7 @@ function renderInventory() {
     </div>
   `;
 
-  // Filter by status
+
   if (statusFilter !== 'all') {
     products = products.filter(p => {
       const ss = p.size_stock || {};
@@ -1431,7 +1429,6 @@ function loadAdminUsers() {
     });
   }).catch(() => { list.innerHTML = '<p style="color:#c00;">Failed to load users.</p>'; });
 }
-
 
 function loadAdminOrders() {
   const list = document.getElementById('admin-order-list');
@@ -1718,7 +1715,7 @@ function renderMyOrders(tab) {
   apiFetch('/api/orders/my').then(orders => {
     console.log('MY ORDERS API:', orders);
     if (orders && orders.error) {
-      // Session expired (server restarted) - clear stale token and force re-login
+
       sessionStorage.removeItem('uc_token');
       sessionStorage.removeItem('uc_user');
       currentUser = null;
@@ -2254,7 +2251,6 @@ function saveAddressBook() {
   openAddressBook();
 }
 
-// ── ADMIN FULL PAGE PANEL ─────────────────────────
 let apOrders = [], apProducts = [], apCustomers = [], apCharts = {}, apEditId = null;
 
 function apInit() {

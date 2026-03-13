@@ -388,18 +388,26 @@ function openProductDetail(id) {
   const product = allProducts.find(p => p.id === id);
   if (!product) return;
   const sizes = (product.sizes && product.sizes.length > 0) ? product.sizes : ALL_SIZES;
+  const ss = product.size_stock || {};
+  const hasSizeStock = Object.keys(ss).length > 0;
+
   const sizeButtons = sizes.map(s => {
     const surcharge = getSurcharge(s);
     const tag = surcharge > 0 ? `<span class="size-surcharge-detail">+₱${surcharge}</span>` : '';
-    return `<button class="detail-size-btn" onclick="selectDetailSize(this,${product.id})" data-size="${s}" data-base="${product.price}">${s}${tag}</button>`;
+    const qty = hasSizeStock ? (ss[s] != null ? ss[s] : 0) : null;
+    const isOut = hasSizeStock && qty === 0;
+    const isLow = hasSizeStock && qty > 0 && qty <= 2;
+    const stockTag = isOut ? `<span style="display:block;font-size:0.55rem;color:#c0392b;font-weight:700;letter-spacing:0.5px;">OUT</span>`
+      : isLow ? `<span style="display:block;font-size:0.55rem;color:#e67e22;font-weight:700;letter-spacing:0.5px;">${qty} LEFT</span>` : '';
+    return `<button class="detail-size-btn${isOut ? ' size-out' : ''}" ${isOut ? 'disabled' : `onclick="selectDetailSize(this,${product.id})"`} data-size="${s}" data-base="${product.price}" style="${isOut ? 'opacity:0.4;cursor:not-allowed;text-decoration:line-through;' : ''}">${s}${tag}${stockTag}</button>`;
   }).join('');
 
-  const stockLeft = product.stock != null ? product.stock : null;
-  const stockBadge = stockLeft != null
-    ? (stockLeft === 0
+  const totalStock = hasSizeStock ? Object.values(ss).reduce((a, b) => a + b, 0) : product.stock;
+  const stockBadge = totalStock != null
+    ? (totalStock === 0
       ? `<span class="stock-badge out">OUT OF STOCK</span>`
-      : stockLeft <= 5
-        ? `<span class="stock-badge low">${stockLeft} LEFT</span>`
+      : totalStock <= 5
+        ? `<span class="stock-badge low">${totalStock} LEFT</span>`
         : `<span class="stock-badge in">IN STOCK</span>`)
     : '';
 
@@ -441,13 +449,16 @@ function selectDetailSize(btn, productId) {
 function addToCartFromDetail(id) {
   const product = allProducts.find(p => p.id === id);
   if (!product) return;
-  if (product.stock != null && product.stock <= 0) return showToast('Sorry, this item is out of stock.');
   const selectedBtn = document.querySelector('.detail-size-btn.selected');
   if (!selectedBtn) {
     document.getElementById('detail-size-error').style.display = 'block';
     return;
   }
   const size = selectedBtn.dataset.size;
+  const ss = product.size_stock || {};
+  const hasSizeStock = Object.keys(ss).length > 0;
+  if (hasSizeStock && (ss[size] == null || ss[size] <= 0)) return showToast(`Sorry, ${size} is out of stock.`);
+  if (!hasSizeStock && product.stock != null && product.stock <= 0) return showToast('Sorry, this item is out of stock.');
   const finalPrice = getFinalPrice(product.price, size);
   const existing = cart.find(i => i.id === id && i.size === size);
   if (existing) {
@@ -456,7 +467,8 @@ function addToCartFromDetail(id) {
   } else {
     cart.push({ ...product, size, finalPrice, qty: 1 });
   }
-  if (product.stock != null) product.stock = Math.max(0, product.stock - 1);
+  if (hasSizeStock && ss[size] != null) ss[size] = Math.max(0, ss[size] - 1);
+  else if (product.stock != null) product.stock = Math.max(0, product.stock - 1);
   updateCartUI();
   closeModal('product-detail-modal');
   document.getElementById('cart-modal').classList.add('active');
@@ -1148,15 +1160,130 @@ function switchAdminTab(tab) {
     t.classList.toggle('active',
       (tab === 'products' && i === 0) ||
       (tab === 'users' && i === 1) ||
-      (tab === 'orders' && i === 2)
+      (tab === 'orders' && i === 2) ||
+      (tab === 'inventory' && i === 3)
     );
   });
   document.getElementById('admin-products').style.display = tab === 'products' ? 'block' : 'none';
   document.getElementById('admin-users').style.display = tab === 'users' ? 'block' : 'none';
   document.getElementById('admin-orders').style.display = tab === 'orders' ? 'block' : 'none';
+  document.getElementById('admin-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
   if (tab === 'products') loadAdminProducts();
   else if (tab === 'users') loadAdminUsers();
   else if (tab === 'orders') loadAdminOrders();
+  else if (tab === 'inventory') renderInventory();
+}
+
+function renderInventory() {
+  const catFilter = (document.getElementById('inv-filter-cat')?.value || 'all');
+  const statusFilter = (document.getElementById('inv-filter-status')?.value || 'all');
+  const ALL_SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+
+  let products = [...allProducts];
+  if (catFilter !== 'all') products = products.filter(p => p.category === catFilter);
+
+  // Summary cards
+  let totalIn = 0, totalLow = 0, totalOut = 0, totalValue = 0;
+  allProducts.forEach(p => {
+    const ss = p.size_stock || {};
+    const hasStock = Object.keys(ss).length > 0;
+    if (!hasStock) { totalOut++; return; }
+    const total = Object.values(ss).reduce((a, b) => a + b, 0);
+    if (total === 0) totalOut++;
+    else if (total <= 5) totalLow++;
+    else totalIn++;
+    totalValue += total * p.price;
+  });
+  const summaryEl = document.getElementById('inv-summary');
+  summaryEl.innerHTML = `
+    <div style="flex:1;min-width:120px;background:#f0faf4;border:1.5px solid #b7e4c7;border-radius:6px;padding:12px 14px;text-align:center;">
+      <div style="font-size:1.4rem;font-weight:800;color:#27ae60;">${totalIn}</div>
+      <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:#27ae60;">IN STOCK</div>
+    </div>
+    <div style="flex:1;min-width:120px;background:#fff8f0;border:1.5px solid #f5cba7;border-radius:6px;padding:12px 14px;text-align:center;">
+      <div style="font-size:1.4rem;font-weight:800;color:#e67e22;">${totalLow}</div>
+      <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:#e67e22;">LOW STOCK</div>
+    </div>
+    <div style="flex:1;min-width:120px;background:#fff0f0;border:1.5px solid #f5c6c6;border-radius:6px;padding:12px 14px;text-align:center;">
+      <div style="font-size:1.4rem;font-weight:800;color:#c0392b;">${totalOut}</div>
+      <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:#c0392b;">OUT OF STOCK</div>
+    </div>
+    <div style="flex:1;min-width:120px;background:#f0f4ff;border:1.5px solid #b0c4de;border-radius:6px;padding:12px 14px;text-align:center;">
+      <div style="font-size:1.1rem;font-weight:800;color:#2c3e50;">₱${totalValue.toLocaleString()}</div>
+      <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:#2c3e50;">TOTAL VALUE</div>
+    </div>
+  `;
+
+  // Filter by status
+  if (statusFilter !== 'all') {
+    products = products.filter(p => {
+      const ss = p.size_stock || {};
+      const total = Object.values(ss).reduce((a, b) => a + b, 0);
+      const hasStock = Object.keys(ss).length > 0;
+      if (statusFilter === 'out') return !hasStock || total === 0;
+      if (statusFilter === 'low') return hasStock && total > 0 && total <= 5;
+      if (statusFilter === 'in') return hasStock && total > 6;
+      return true;
+    });
+  }
+
+  const container = document.getElementById('admin-inventory-list');
+  if (products.length === 0) { container.innerHTML = '<p style="color:#888;padding:20px 0;text-align:center;">No products found.</p>'; return; }
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;min-width:600px;">
+    <thead>
+      <tr style="background:#111;color:#fff;">
+        <th style="padding:10px 12px;text-align:left;font-weight:700;letter-spacing:1px;">PRODUCT</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">S</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">M</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">L</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">XL</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">2XL</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">TOTAL</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">STATUS</th>
+        <th style="padding:10px 8px;text-align:center;letter-spacing:1px;">VALUE</th>
+      </tr>
+    </thead><tbody>`;
+
+  products.forEach((p, idx) => {
+    const ss = p.size_stock || {};
+    const hasStock = Object.keys(ss).length > 0;
+    const total = Object.values(ss).reduce((a, b) => a + b, 0);
+    const bg = idx % 2 === 0 ? '#fff' : '#fafafa';
+    let statusBadge, statusColor;
+    if (!hasStock || total === 0) { statusBadge = 'OUT OF STOCK'; statusColor = '#c0392b'; }
+    else if (total <= 5) { statusBadge = 'LOW STOCK'; statusColor = '#e67e22'; }
+    else { statusBadge = 'IN STOCK'; statusColor = '#27ae60'; }
+
+    const sizeCell = s => {
+      if (!hasStock) return `<td style="padding:8px;text-align:center;background:#fdecea;color:#c0392b;font-weight:700;">—</td>`;
+      const qty = ss[s] != null ? ss[s] : 0;
+      const cellBg = qty === 0 ? '#fdecea' : qty <= 2 ? '#fff3e0' : '#fff';
+      const color = qty === 0 ? '#c0392b' : qty <= 2 ? '#e67e22' : '#111';
+      return `<td style="padding:8px;text-align:center;background:${cellBg};color:${color};font-weight:700;">${qty === 0 ? '0' : qty}</td>`;
+    };
+
+    html += `<tr style="background:${bg};border-bottom:1px solid #f0f0f0;">
+      <td style="padding:10px 12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <img src="${p.image}" style="width:36px;height:42px;object-fit:cover;border-radius:2px;flex-shrink:0;">
+          <div>
+            <div style="font-weight:700;font-size:0.78rem;">${p.name}</div>
+            <div style="color:#888;font-size:0.7rem;letter-spacing:1px;">${p.category.toUpperCase()} · ₱${p.price.toLocaleString()}</div>
+          </div>
+        </div>
+      </td>
+      ${ALL_SIZES.map(s => sizeCell(s)).join('')}
+      <td style="padding:8px;text-align:center;font-weight:800;">${hasStock ? total : '—'}</td>
+      <td style="padding:8px;text-align:center;">
+        <span style="background:${statusColor}18;color:${statusColor};font-size:0.65rem;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:3px;white-space:nowrap;">${statusBadge}</span>
+      </td>
+      <td style="padding:8px;text-align:center;font-weight:700;">₱${hasStock ? (total * p.price).toLocaleString() : '0'}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  container.innerHTML = html;
 }
 
 function loadAdminProducts() {

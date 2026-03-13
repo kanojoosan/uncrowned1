@@ -305,6 +305,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   populateBirthdaySelects();
 
+  // restore session from localStorage (passed from opener tab)
+  const transferToken = localStorage.getItem('uc_admin_token');
+  const transferUser = localStorage.getItem('uc_admin_user');
+  if (transferToken && transferUser) {
+    sessionStorage.setItem('uc_token', transferToken);
+    sessionStorage.setItem('uc_user', transferUser);
+    localStorage.removeItem('uc_admin_token');
+    localStorage.removeItem('uc_admin_user');
+  }
 
   const savedUser = sessionStorage.getItem('uc_user');
   if (savedUser) {
@@ -317,9 +326,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   updateAuthUI();
 
+  // if URL has ?admin=1 and user is admin, show full-page admin panel
+  if (new URLSearchParams(window.location.search).get('admin') === '1') {
+    if (currentUser && currentUser.role === 'admin') {
+      apInit();
+    } else {
+      // not logged in as admin — redirect to home
+      window.location.href = window.location.pathname;
+    }
+    return;
+  }
 
   loadProductsFromAPI();
-
 
   const savedCart = localStorage.getItem('uc_cart');
   if (savedCart) {
@@ -925,8 +943,18 @@ function login() {
       currentUser = { username: data.username, role: data.role };
       sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
       if (data.role === 'admin') {
-        sessionStorage.setItem('uc_admin_token', data.token);
-        window.location.href = 'admin.html';
+        // store token + user in localStorage so the new tab can pick it up
+        localStorage.setItem('uc_admin_token', data.token);
+        localStorage.setItem('uc_admin_user', JSON.stringify({ username: data.username, role: data.role }));
+        closeModal('login-modal');
+        // open same page with ?admin=1 in new tab
+        const a = document.createElement('a');
+        a.href = window.location.pathname + '?admin=1';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
         return;
       }
       updateAuthUI(); closeModal('login-modal');
@@ -1155,7 +1183,7 @@ function updateAuthUI() {
   }
 }
 
-function openAdminPanel() { window.location.href = 'admin.html'; }
+
 
 function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach((t, i) => {
@@ -2224,4 +2252,463 @@ function saveAddressBook() {
   saveAddressToStorage({ fname, lname, phone, street, city, province, zip, region });
   showToast('✅ Address saved!');
   openAddressBook();
-} 
+}
+
+// ── ADMIN FULL PAGE PANEL ─────────────────────────
+let apOrders = [], apProducts = [], apCustomers = [], apCharts = {}, apEditId = null;
+
+function apInit() {
+  document.getElementById('admin-fullpage').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.title = 'UNCROWNED — Admin Panel';
+  document.getElementById('ap-date').innerText = new Date().toLocaleDateString('en-PH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+  document.getElementById('ap-admin-name').innerText = (currentUser?.username || 'ADMIN').toUpperCase();
+  apLoadAll();
+}
+
+async function apLoadAll() {
+  try {
+    const [orders, products, users] = await Promise.all([
+      apiFetch('/api/admin/orders'),
+      apiFetch('/api/products'),
+      apiFetch('/api/admin/users')
+    ]);
+    apOrders = Array.isArray(orders) ? orders : [];
+    apProducts = Array.isArray(products) ? products : [];
+    apCustomers = Array.isArray(users) ? users.filter(u => u.role !== 'admin') : [];
+    apTab('dashboard');
+  } catch (e) { showToast('Failed to load admin data.'); }
+}
+
+function apLogout() {
+  if (!confirm('Log out?')) return;
+  sessionStorage.removeItem('uc_token');
+  sessionStorage.removeItem('uc_user');
+  currentUser = null;
+  window.close();
+}
+
+function apTab(name) {
+  document.querySelectorAll('.ap-nav').forEach((n, i) => {
+    n.classList.toggle('active', ['dashboard', 'orders', 'products', 'customers', 'inventory'][i] === name);
+  });
+  const titles = { dashboard: 'DASHBOARD', orders: 'ORDERS', products: 'PRODUCTS', customers: 'CUSTOMERS', inventory: 'INVENTORY' };
+  document.getElementById('ap-topbar-title').innerText = titles[name] || name;
+  ({ dashboard: apDashboard, orders: apRenderOrders, products: apRenderProducts, customers: apRenderCustomers, inventory: apRenderInventory })[name]?.();
+}
+
+function apDashboard() {
+  const completed = apOrders.filter(o => o.status === 'completed');
+  const revenue = completed.reduce((s, o) => s + (Number(o.total) || 0), 0);
+  const pending = apOrders.filter(o => o.status === 'pending').length;
+  const outOfStock = apProducts.filter(p => { const ss = p.size_stock || {}; return Object.keys(ss).length > 0 && Object.values(ss).reduce((a, b) => a + b, 0) === 0; }).length;
+  document.getElementById('ap-content').innerHTML = `
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:4px;">DASHBOARD</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:24px;">Last updated: ${new Date().toLocaleTimeString()}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+      ${apStat('TOTAL REVENUE', '₱' + revenue.toLocaleString(), 'from completed orders', '#00c48c', '💰')}
+      ${apStat('TOTAL ORDERS', apOrders.length, pending + ' pending', '#1e90ff', '🛒')}
+      ${apStat('CUSTOMERS', apCustomers.length, 'registered accounts', '#ffa502', '👥')}
+      ${apStat('PRODUCTS', apProducts.length, outOfStock + ' out of stock', '#ff4757', '👕')}
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:16px;">
+      <div style="background:#fff;border:1px solid #e8e8e8;padding:20px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:2px;margin-bottom:4px;">REVENUE BY CATEGORY</div>
+        <div style="font-size:0.62rem;color:#888;margin-bottom:14px;">Total sales per category</div>
+        <div style="height:200px;"><canvas id="apc-revenue"></canvas></div>
+      </div>
+      <div style="background:#fff;border:1px solid #e8e8e8;padding:20px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:2px;margin-bottom:4px;">ORDER STATUS</div>
+        <div style="font-size:0.62rem;color:#888;margin-bottom:14px;">All orders distribution</div>
+        <div style="height:200px;"><canvas id="apc-status"></canvas></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+      <div style="background:#fff;border:1px solid #e8e8e8;padding:20px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:2px;margin-bottom:4px;">PAYMENT METHODS</div>
+        <div style="font-size:0.62rem;color:#888;margin-bottom:14px;">GCash vs Cash on Delivery</div>
+        <div style="height:180px;"><canvas id="apc-payment"></canvas></div>
+      </div>
+      <div style="background:#fff;border:1px solid #e8e8e8;padding:20px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:2px;margin-bottom:4px;">STOCK BY SIZE</div>
+        <div style="font-size:0.62rem;color:#888;margin-bottom:14px;">Total units per size</div>
+        <div style="height:180px;"><canvas id="apc-stock"></canvas></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e8e8;">
+      <div style="padding:14px 18px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.7rem;font-weight:700;letter-spacing:2px;">RECENT ORDERS</span>
+        <button onclick="apTab('orders')" style="padding:6px 14px;background:#fff;border:1.5px solid #111;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;">VIEW ALL</button>
+      </div>
+      <div style="overflow-x:auto;">${apOrderTable(apOrders.slice(0, 8), false)}</div>
+    </div>`;
+  setTimeout(apBuildCharts, 100);
+}
+
+function apStat(label, value, sub, color, icon) {
+  return `<div style="background:#fff;border:1px solid #e8e8e8;padding:18px 20px;position:relative;border-left:3px solid ${color};">
+    <div style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px;">${label}</div>
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:1px;line-height:1;">${value}</div>
+    <div style="font-size:0.68rem;color:#888;margin-top:4px;">${sub}</div>
+    <div style="position:absolute;right:14px;top:14px;font-size:1.4rem;opacity:0.12;">${icon}</div>
+  </div>`;
+}
+
+function apBuildCharts() {
+  if (typeof Chart === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload = apBuildCharts;
+    document.head.appendChild(s);
+    return;
+  }
+  const catRev = { shirts: 0, pants: 0, jackets: 0 };
+  apOrders.filter(o => o.status === 'completed').forEach(o => {
+    const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
+    items.forEach(item => { const p = apProducts.find(x => x.name === item.name); if (p) catRev[p.category] = (catRev[p.category] || 0) + (item.price * (item.qty || 1)); });
+  });
+  apMkChart('apc-revenue', 'bar', ['Shirts', 'Pants', 'Jackets'], [catRev.shirts, catRev.pants, catRev.jackets], ['#0a0a0a', '#333', '#666']);
+  const sc = {}; apOrders.forEach(o => { sc[o.status] = (sc[o.status] || 0) + 1; });
+  apMkChart('apc-status', 'doughnut', Object.keys(sc).map(s => s.replace('_', ' ').toUpperCase()), Object.values(sc),
+    Object.keys(sc).map(s => ({ pending: '#ffa502', out_for_delivery: '#1e90ff', completed: '#00c48c', cancelled: '#ff4757' }[s] || '#888')));
+  const gcash = apOrders.filter(o => o.payment_method === 'gcash').length;
+  const cod = apOrders.filter(o => o.payment_method === 'cod').length;
+  apMkChart('apc-payment', 'pie', ['GCash', 'COD'], [gcash, cod], ['#00c48c', '#0a0a0a']);
+  const st = { S: 0, M: 0, L: 0, XL: 0, '2XL': 0 };
+  apProducts.forEach(p => { const ss = p.size_stock || {}; Object.entries(ss).forEach(([s, q]) => { if (st[s] != null) st[s] += q; }); });
+  apMkChart('apc-stock', 'bar', Object.keys(st), Object.values(st), ['#0a0a0a', '#222', '#444', '#666', '#888']);
+}
+
+function apMkChart(id, type, labels, data, colors) {
+  if (apCharts[id]) apCharts[id].destroy();
+  const ctx = document.getElementById(id); if (!ctx) return;
+  apCharts[id] = new Chart(ctx, {
+    type,
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: type === 'bar' ? colors : '#fff', borderWidth: type === 'bar' ? 0 : 2, borderRadius: type === 'bar' ? 2 : 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: type !== 'bar', labels: { font: { family: 'Inter', size: 10 }, padding: 10 } } },
+      scales: type === 'bar' ? { x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 9 } } }, y: { grid: { color: '#f0f0f0' }, ticks: { font: { family: 'Inter', size: 9 } } } } : undefined
+    }
+  });
+}
+
+function apTh() { return 'padding:10px 14px;text-align:left;font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#888;border-bottom:1px solid #e8e8e8;background:#fafafa;'; }
+function apTd() { return 'padding:10px 14px;vertical-align:middle;'; }
+function apBtn(bg) { return `background:${bg};color:#fff;border:none;padding:4px 10px;font-size:0.62rem;font-weight:700;letter-spacing:1px;cursor:pointer;margin-right:4px;`; }
+
+function apStatusBadge(o) {
+  const labels = { pending: 'Pending', out_for_delivery: 'Out for Delivery', completed: 'Delivered', cancelled: 'Cancelled' };
+  const colors = { pending: '#ffa502', out_for_delivery: '#1e90ff', completed: '#00c48c', cancelled: '#ff4757' };
+  const c = colors[o.status] || '#888';
+  let extra = '';
+  if (o.payment_method === 'gcash') {
+    if (o.gcash_status === 'pending_confirmation') extra += ' <span style="background:#fff8e8;color:#ffa502;padding:2px 6px;font-size:0.58rem;font-weight:800;">GCASH PENDING</span>';
+    else if (o.gcash_status === 'rejected') extra += ' <span style="background:#fff0f0;color:#ff4757;padding:2px 6px;font-size:0.58rem;font-weight:800;">REJECTED</span>';
+    else if (o.gcash_status === 'confirmed') extra += ' <span style="background:#e8faf5;color:#00c48c;padding:2px 6px;font-size:0.58rem;font-weight:800;">GCASH OK</span>';
+  }
+  return `<span style="background:${c}18;color:${c};padding:3px 8px;font-size:0.62rem;font-weight:800;">${labels[o.status] || o.status}</span>${extra}`;
+}
+
+function apOrderTable(orders, showActions) {
+  if (!orders.length) return '<div style="padding:30px;text-align:center;color:#888;font-size:0.8rem;">No orders found.</div>';
+  return `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+    <thead><tr>
+      <th style="${apTh()}">ORDER #</th><th style="${apTh()}">CUSTOMER</th><th style="${apTh()}">TOTAL</th>
+      <th style="${apTh()}">PAYMENT</th><th style="${apTh()}">STATUS</th><th style="${apTh()}">DATE</th>
+      ${showActions ? `<th style="${apTh()}">ACTION</th>` : ''}
+    </tr></thead>
+    <tbody>${orders.map(o => {
+    const idx = apOrders.indexOf(o);
+    const isGCash = o.payment_method === 'gcash';
+    const gcashPending = isGCash && o.gcash_status === 'pending_confirmation';
+    const gcashConfirmed = isGCash && o.gcash_status === 'confirmed';
+    let actions = '';
+    if (showActions) {
+      if (gcashPending) { actions += `<button onclick="apApproveGCash(${idx})" style="${apBtn('#00c48c')}">✓ APPROVE</button><button onclick="apRejectGCash(${idx})" style="${apBtn('#ff4757')}">✗ REJECT</button>`; }
+      if (o.status === 'pending' && (!isGCash || gcashConfirmed)) actions += `<button onclick="apUpdateStatus(${idx},'out_for_delivery')" style="${apBtn('#1e90ff')}">🚚 SHIP</button>`;
+      if (o.status === 'out_for_delivery') actions += `<button onclick="apUpdateStatus(${idx},'completed')" style="${apBtn('#0a0a0a')}">✅ DONE</button>`;
+      if (o.status !== 'completed' && o.status !== 'cancelled') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
+    }
+    return `<tr style="border-bottom:1px solid #f5f5f5;">
+        <td style="${apTd()};font-size:0.72rem;font-weight:700;">${o.order_num}</td>
+        <td style="${apTd()}">${o.username}</td>
+        <td style="${apTd()};font-weight:700;">₱${Number(o.total).toLocaleString()}</td>
+        <td style="${apTd()}"><span style="background:${isGCash ? '#e8faf5' : '#f4f4f4'};color:${isGCash ? '#00c48c' : '#888'};padding:2px 8px;font-size:0.62rem;font-weight:800;">${(o.payment_method || '').toUpperCase()}</span></td>
+        <td style="${apTd()}">${apStatusBadge(o)}</td>
+        <td style="${apTd()};color:#888;font-size:0.7rem;">${o.created_at ? new Date(o.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
+        ${showActions ? `<td style="${apTd()};white-space:nowrap;">${actions || '<span style="color:#ccc;">—</span>'}</td>` : ''}
+      </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function apRenderOrders() {
+  document.getElementById('ap-content').innerHTML = `
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:4px;">ORDERS</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:20px;">Manage and fulfill customer orders</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <input id="ap-osearch" placeholder="Search order # or customer..." oninput="apFilterOrders()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;flex:1;min-width:180px;outline:none;">
+      <select id="ap-ostatus" onchange="apFilterOrders()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
+        <option value="all">ALL STATUS</option><option value="pending">PENDING</option>
+        <option value="out_for_delivery">OUT FOR DELIVERY</option><option value="completed">COMPLETED</option><option value="cancelled">CANCELLED</option>
+      </select>
+      <select id="ap-opay" onchange="apFilterOrders()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
+        <option value="all">ALL PAYMENTS</option><option value="gcash">GCASH</option><option value="cod">COD</option>
+      </select>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e8e8;overflow-x:auto;" id="ap-otable">${apOrderTable(apOrders, true)}</div>`;
+}
+
+function apFilterOrders() {
+  const s = (document.getElementById('ap-osearch')?.value || '').toLowerCase();
+  const st = document.getElementById('ap-ostatus')?.value || 'all';
+  const py = document.getElementById('ap-opay')?.value || 'all';
+  let o = [...apOrders];
+  if (s) o = o.filter(x => (x.order_num + x.username).toLowerCase().includes(s));
+  if (st !== 'all') o = o.filter(x => x.status === st);
+  if (py !== 'all') o = o.filter(x => x.payment_method === py);
+  document.getElementById('ap-otable').innerHTML = apOrderTable(o, true);
+}
+
+async function apUpdateStatus(idx, status) {
+  const o = apOrders[idx]; if (!o) return;
+  await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
+  o.status = status; apRenderOrders(); showToast('✅ Order updated.');
+}
+
+async function apApproveGCash(idx) {
+  const o = apOrders[idx]; if (!o) return;
+  await apiFetch('/api/admin/orders/' + o.order_num + '/gcash', { method: 'PUT', body: JSON.stringify({ gcash_status: 'confirmed' }) });
+  o.gcash_status = 'confirmed'; apRenderOrders(); showToast('✅ GCash approved.');
+}
+
+function apRejectGCash(idx) {
+  const reason = prompt('Rejection reason:'); if (!reason) return;
+  const o = apOrders[idx];
+  apiFetch('/api/admin/orders/' + o.order_num + '/gcash', { method: 'PUT', body: JSON.stringify({ gcash_status: 'rejected', gcash_reject_reason: reason }) })
+    .then(() => { o.gcash_status = 'rejected'; o.gcash_reject_reason = reason; apRenderOrders(); showToast('❌ GCash rejected.'); });
+}
+
+function apRenderProducts() {
+  document.getElementById('ap-content').innerHTML = `
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:4px;">PRODUCTS</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:20px;">Add, edit, or remove products</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <input id="ap-psearch" placeholder="Search products..." oninput="apFilterProducts()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;flex:1;min-width:180px;outline:none;">
+      <select id="ap-pcat" onchange="apFilterProducts()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
+        <option value="all">ALL CATEGORIES</option><option value="shirts">SHIRTS</option><option value="pants">PANTS</option><option value="jackets">JACKETS</option>
+      </select>
+      <button onclick="apOpenProductForm()" style="padding:8px 18px;background:#0a0a0a;color:#fff;border:none;font-size:0.72rem;font-weight:700;letter-spacing:1px;cursor:pointer;">+ ADD PRODUCT</button>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e8e8;overflow-x:auto;" id="ap-ptable"></div>`;
+  apFilterProducts();
+}
+
+function apFilterProducts() {
+  const s = (document.getElementById('ap-psearch')?.value || '').toLowerCase();
+  const c = document.getElementById('ap-pcat')?.value || 'all';
+  let p = [...apProducts];
+  if (s) p = p.filter(x => x.name.toLowerCase().includes(s));
+  if (c !== 'all') p = p.filter(x => x.category === c);
+  const el = document.getElementById('ap-ptable');
+  if (!p.length) { el.innerHTML = '<div style="padding:30px;text-align:center;color:#888;">No products found.</div>'; return; }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+    <thead><tr><th style="${apTh()}">IMAGE</th><th style="${apTh()}">NAME</th><th style="${apTh()}">CATEGORY</th><th style="${apTh()}">PRICE</th><th style="${apTh()}">STOCK</th><th style="${apTh()}">ACTION</th></tr></thead>
+    <tbody>${p.map(x => {
+    const ss = x.size_stock || {}; const tot = Object.values(ss).reduce((a, b) => a + b, 0); const hasSS = Object.keys(ss).length > 0;
+    const badge = !hasSS ? '<span style="background:#f4f4f4;color:#888;padding:2px 8px;font-size:0.6rem;font-weight:800;">NOT SET</span>'
+      : tot === 0 ? '<span style="background:#fff0f0;color:#ff4757;padding:2px 8px;font-size:0.6rem;font-weight:800;">OUT OF STOCK</span>'
+        : tot <= 5 ? `<span style="background:#fff8e8;color:#ffa502;padding:2px 8px;font-size:0.6rem;font-weight:800;">${tot} LEFT</span>`
+          : `<span style="background:#e8faf5;color:#00c48c;padding:2px 8px;font-size:0.6rem;font-weight:800;">${tot} IN STOCK</span>`;
+    return `<tr style="border-bottom:1px solid #f5f5f5;">
+        <td style="${apTd()}"><img src="${x.image}" style="width:36px;height:44px;object-fit:cover;" onerror="this.style.display='none'"></td>
+        <td style="${apTd()};font-weight:700;">${x.name}</td>
+        <td style="${apTd()}"><span style="background:#f4f4f4;color:#888;padding:2px 8px;font-size:0.6rem;font-weight:800;">${x.category.toUpperCase()}</span></td>
+        <td style="${apTd()};font-weight:700;">₱${Number(x.price).toLocaleString()}</td>
+        <td style="${apTd()}">${badge}</td>
+        <td style="${apTd()}">
+          <button onclick="apOpenProductForm(${x.id})" style="padding:5px 12px;background:#fff;border:1.5px solid #111;font-size:0.65rem;font-weight:700;cursor:pointer;margin-right:4px;">EDIT</button>
+          <button onclick="apDeleteProduct(${x.id},'${x.name.replace(/'/g, "\\'")}' )" style="padding:5px 12px;background:#ff4757;color:#fff;border:none;font-size:0.65rem;font-weight:700;cursor:pointer;">🗑</button>
+        </td>
+      </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function apOpenProductForm(id = null) {
+  apEditId = id;
+  const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+  const p = id ? apProducts.find(x => x.id === id) : null;
+  const ss = p?.size_stock || {};
+  const ov = document.createElement('div');
+  ov.id = 'ap-pform-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML = `<div style="background:#fff;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="padding:18px 22px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:5;">
+      <span style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:2px;">${id ? 'EDIT' : 'ADD'} PRODUCT</span>
+      <button onclick="document.getElementById('ap-pform-overlay').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">×</button>
+    </div>
+    <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">PRODUCT NAME</label>
+        <input id="apf-name" value="${p?.name || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;box-sizing:border-box;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">CATEGORY</label>
+          <select id="apf-cat" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;">
+            <option value="shirts" ${p?.category === 'shirts' ? 'selected' : ''}>Shirts</option>
+            <option value="pants" ${p?.category === 'pants' ? 'selected' : ''}>Pants</option>
+            <option value="jackets" ${p?.category === 'jackets' ? 'selected' : ''}>Jackets</option>
+          </select></div>
+        <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">PRICE (₱)</label>
+          <input id="apf-price" type="number" value="${p?.price || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;box-sizing:border-box;"></div>
+      </div>
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">IMAGE URL</label>
+        <input id="apf-image" value="${p?.image || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;box-sizing:border-box;"></div>
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:8px;">STOCK PER SIZE</label>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+          ${SIZES.map(s => `<div style="text-align:center;"><div style="font-size:0.62rem;font-weight:700;margin-bottom:4px;">${s}</div>
+            <input id="apf-${s}" type="number" min="0" value="${ss[s] != null ? ss[s] : ''}" placeholder="0" style="width:100%;padding:8px 4px;text-align:center;border:1.5px solid #e8e8e8;font-size:0.82rem;outline:none;box-sizing:border-box;"></div>`).join('')}
+        </div></div>
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">DETAILS (one per line)</label>
+        <textarea id="apf-details" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.82rem;outline:none;box-sizing:border-box;resize:vertical;">${(p?.details || []).join('\n')}</textarea></div>
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">SPECS (one per line)</label>
+        <textarea id="apf-specs" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.82rem;outline:none;box-sizing:border-box;resize:vertical;">${(p?.specs || []).join('\n')}</textarea></div>
+      <div id="apf-err" style="color:#ff4757;font-size:0.75rem;display:none;"></div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid #e8e8e8;display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('ap-pform-overlay').remove()" style="padding:10px 20px;background:#fff;border:1.5px solid #e8e8e8;font-size:0.72rem;font-weight:700;cursor:pointer;">CANCEL</button>
+      <button onclick="apSaveProduct()" style="padding:10px 20px;background:#0a0a0a;color:#fff;border:none;font-size:0.72rem;font-weight:700;letter-spacing:1px;cursor:pointer;">SAVE PRODUCT</button>
+    </div>
+  </div>`;
+  document.getElementById('admin-fullpage').appendChild(ov);
+}
+
+async function apSaveProduct() {
+  const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+  const name = document.getElementById('apf-name').value.trim();
+  const category = document.getElementById('apf-cat').value;
+  const price = parseInt(document.getElementById('apf-price').value);
+  const image = document.getElementById('apf-image').value.trim();
+  const errEl = document.getElementById('apf-err');
+  if (!name || !price || !image) { errEl.style.display = 'block'; errEl.innerText = '⚠ Fill in all required fields.'; return; }
+  const size_stock = {};
+  SIZES.forEach(s => { const el = document.getElementById('apf-' + s); if (el && el.value !== '') size_stock[s] = parseInt(el.value) || 0; });
+  const stock = Object.values(size_stock).reduce((a, b) => a + b, 0) || null;
+  const sizes = SIZES.filter(s => size_stock[s] == null || size_stock[s] > 0);
+  const details = document.getElementById('apf-details').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const specs = document.getElementById('apf-specs').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const d = await apiFetch(apEditId ? `/api/products/${apEditId}` : '/api/products',
+    { method: apEditId ? 'PUT' : 'POST', body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock, details, specs }) });
+  if (d.error) { errEl.style.display = 'block'; errEl.innerText = '⚠ ' + d.error; return; }
+  const fresh = await apiFetch('/api/products');
+  if (Array.isArray(fresh)) { apProducts = fresh; allProducts = fresh; }
+  document.getElementById('ap-pform-overlay')?.remove();
+  apRenderProducts();
+  showToast(apEditId ? '✅ Product updated.' : '✅ Product added.');
+}
+
+async function apDeleteProduct(id, name) {
+  if (!confirm(`Delete "${name}"?`)) return;
+  await apiFetch('/api/products/' + id, { method: 'DELETE' });
+  apProducts = apProducts.filter(p => p.id !== id); allProducts = allProducts.filter(p => p.id !== id);
+  apRenderProducts(); showToast('🗑 Product deleted.');
+}
+
+function apRenderCustomers() {
+  document.getElementById('ap-content').innerHTML = `
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:4px;">CUSTOMERS</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:20px;">All registered customer accounts</div>
+    <div style="margin-bottom:16px;">
+      <input id="ap-csearch" placeholder="Search by username or email..." oninput="apFilterCustomers()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;width:100%;max-width:320px;outline:none;">
+    </div>
+    <div style="background:#fff;border:1px solid #e8e8e8;overflow-x:auto;" id="ap-ctable"></div>`;
+  apFilterCustomers();
+}
+
+function apFilterCustomers() {
+  const s = (document.getElementById('ap-csearch')?.value || '').toLowerCase();
+  let c = [...apCustomers];
+  if (s) c = c.filter(u => (u.username + u.email).toLowerCase().includes(s));
+  const el = document.getElementById('ap-ctable');
+  if (!c.length) { el.innerHTML = '<div style="padding:30px;text-align:center;color:#888;">No customers found.</div>'; return; }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+    <thead><tr><th style="${apTh()}">#</th><th style="${apTh()}">USERNAME</th><th style="${apTh()}">EMAIL</th><th style="${apTh()}">AGE</th><th style="${apTh()}">GENDER</th><th style="${apTh()}">JOINED</th><th style="${apTh()}">ORDERS</th></tr></thead>
+    <tbody>${c.map((u, i) => {
+    const orders = apOrders.filter(o => o.username === u.username).length;
+    return `<tr style="border-bottom:1px solid #f5f5f5;">
+        <td style="${apTd()};color:#888;">${i + 1}</td>
+        <td style="${apTd()};font-weight:700;">${u.username}</td>
+        <td style="${apTd()};color:#888;font-size:0.75rem;">${u.email}</td>
+        <td style="${apTd()}">${u.age || '—'}</td>
+        <td style="${apTd()}">${u.gender || '—'}</td>
+        <td style="${apTd()};color:#888;font-size:0.7rem;">${u.created_at ? new Date(u.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
+        <td style="${apTd()}"><span style="background:${orders > 0 ? '#e8f4ff' : '#f4f4f4'};color:${orders > 0 ? '#1e90ff' : '#888'};padding:2px 8px;font-size:0.62rem;font-weight:800;">${orders} orders</span></td>
+      </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+function apRenderInventory() {
+  const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+  let totalIn = 0, totalLow = 0, totalOut = 0, totalVal = 0;
+  apProducts.forEach(p => {
+    const ss = p.size_stock || {}; const tot = Object.values(ss).reduce((a, b) => a + b, 0);
+    if (!Object.keys(ss).length || tot === 0) totalOut++; else if (tot <= 5) totalLow++; else totalIn++; totalVal += tot * p.price;
+  });
+  document.getElementById('ap-content').innerHTML = `
+    <div style="font-family:'Anton',sans-serif;font-size:1.8rem;letter-spacing:2px;margin-bottom:4px;">INVENTORY</div>
+    <div style="font-size:0.7rem;color:#888;margin-bottom:20px;">Stock levels per size</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div style="background:#fff;border:1.5px solid #b7e4c7;padding:14px;text-align:center;"><div style="font-family:'Anton',sans-serif;font-size:1.6rem;color:#00c48c;">${totalIn}</div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#00c48c;">IN STOCK</div></div>
+      <div style="background:#fff;border:1.5px solid #f5cba7;padding:14px;text-align:center;"><div style="font-family:'Anton',sans-serif;font-size:1.6rem;color:#ffa502;">${totalLow}</div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#ffa502;">LOW STOCK</div></div>
+      <div style="background:#fff;border:1.5px solid #f5c6c6;padding:14px;text-align:center;"><div style="font-family:'Anton',sans-serif;font-size:1.6rem;color:#ff4757;">${totalOut}</div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#ff4757;">OUT OF STOCK</div></div>
+      <div style="background:#fff;border:1.5px solid #b0c4de;padding:14px;text-align:center;"><div style="font-family:'Anton',sans-serif;font-size:1.1rem;color:#1e90ff;">₱${totalVal.toLocaleString()}</div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#1e90ff;">TOTAL VALUE</div></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <select id="ap-icat" onchange="apInvFilter()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
+        <option value="all">ALL CATEGORIES</option><option value="shirts">SHIRTS</option><option value="pants">PANTS</option><option value="jackets">JACKETS</option>
+      </select>
+      <select id="ap-istat" onchange="apInvFilter()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
+        <option value="all">ALL STATUS</option><option value="in">IN STOCK</option><option value="low">LOW STOCK</option><option value="out">OUT OF STOCK</option>
+      </select>
+    </div>
+    <div style="background:#fff;border:1px solid #e8e8e8;overflow-x:auto;" id="ap-itable"></div>`;
+  apInvFilter();
+}
+
+function apInvFilter() {
+  const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+  const cat = document.getElementById('ap-icat')?.value || 'all';
+  const stat = document.getElementById('ap-istat')?.value || 'all';
+  let p = [...apProducts];
+  if (cat !== 'all') p = p.filter(x => x.category === cat);
+  if (stat === 'out') p = p.filter(x => { const ss = x.size_stock || {}; return !Object.keys(ss).length || Object.values(ss).reduce((a, b) => a + b, 0) === 0; });
+  else if (stat === 'low') p = p.filter(x => { const ss = x.size_stock || {}; const t = Object.values(ss).reduce((a, b) => a + b, 0); return Object.keys(ss).length && t > 0 && t <= 5; });
+  else if (stat === 'in') p = p.filter(x => { const ss = x.size_stock || {}; const t = Object.values(ss).reduce((a, b) => a + b, 0); return Object.keys(ss).length && t > 5; });
+  const el = document.getElementById('ap-itable');
+  if (!p.length) { el.innerHTML = '<div style="padding:30px;text-align:center;color:#888;">No products found.</div>'; return; }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;min-width:600px;">
+    <thead><tr style="background:#0a0a0a;color:#fff;">
+      <th style="padding:10px 14px;text-align:left;font-size:0.6rem;letter-spacing:2px;font-weight:700;">PRODUCT</th>
+      ${SIZES.map(s => `<th style="padding:10px 8px;text-align:center;font-size:0.6rem;letter-spacing:1px;font-weight:700;">${s}</th>`).join('')}
+      <th style="padding:10px 8px;text-align:center;font-size:0.6rem;letter-spacing:1px;font-weight:700;">TOTAL</th>
+      <th style="padding:10px 8px;text-align:center;font-size:0.6rem;letter-spacing:1px;font-weight:700;">STATUS</th>
+      <th style="padding:10px 8px;text-align:center;font-size:0.6rem;letter-spacing:1px;font-weight:700;">VALUE</th>
+    </tr></thead>
+    <tbody>${p.map((x, i) => {
+    const ss = x.size_stock || {}; const tot = Object.values(ss).reduce((a, b) => a + b, 0); const hasSS = Object.keys(ss).length > 0;
+    let badge, bc;
+    if (!hasSS || tot === 0) { badge = 'OUT OF STOCK'; bc = '#ff4757'; } else if (tot <= 5) { badge = 'LOW STOCK'; bc = '#ffa502'; } else { badge = 'IN STOCK'; bc = '#00c48c'; }
+    const sc = s => {
+      if (!hasSS) return `<td style="text-align:center;color:#ccc;padding:10px 8px;">—</td>`; const q = ss[s] != null ? ss[s] : 0;
+      return `<td style="text-align:center;padding:10px 8px;background:${q === 0 ? '#fff0f0' : q <= 2 ? '#fff8e8' : ''};color:${q === 0 ? '#ff4757' : q <= 2 ? '#ffa502' : '#111'};font-weight:700;">${q}</td>`;
+    };
+    return `<tr style="background:${i % 2 ? '#fafafa' : '#fff'};border-bottom:1px solid #f0f0f0;">
+        <td style="${apTd()}"><div style="display:flex;align-items:center;gap:8px;">
+          <img src="${x.image}" style="width:32px;height:38px;object-fit:cover;" onerror="this.style.display='none'">
+          <div><div style="font-weight:700;font-size:0.75rem;">${x.name}</div><div style="color:#888;font-size:0.62rem;">${x.category.toUpperCase()} · ₱${x.price.toLocaleString()}</div></div>
+        </div></td>
+        ${SIZES.map(s => sc(s)).join('')}
+        <td style="text-align:center;padding:10px 8px;font-weight:800;">${hasSS ? tot : '—'}</td>
+        <td style="text-align:center;padding:10px 8px;"><span style="background:${bc}18;color:${bc};font-size:0.58rem;font-weight:800;padding:3px 8px;">${badge}</span></td>
+        <td style="text-align:center;padding:10px 8px;font-weight:700;">₱${hasSS ? (tot * x.price).toLocaleString() : '0'}</td>
+      </tr>`;
+  }).join('')}</tbody></table>`;
+}

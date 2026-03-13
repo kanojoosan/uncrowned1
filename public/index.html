@@ -26,7 +26,8 @@
       </div>
       <div id="user-area" style="display:none;">
         <span id="user-greeting" class="user-greeting"></span>
-        <button class="nav-auth-btn" id="admin-btn" style="display:none;" onclick="openAdminPanel()">ADMIN</button>
+        <a id="admin-btn" style="display:none;" href="?admin=1" target="_blank"><button
+            class="nav-auth-btn">ADMIN</button></a>
         <button class="nav-auth-btn" id="my-orders-btn" style="display:none;" onclick="openMyOrders()">MY
           ORDERS</button>
         <button class="nav-auth-btn" id="my-address-btn" style="display:none;" onclick="openAddressBook()">MY
@@ -1066,6 +1067,54 @@
       <div style="display:flex;gap:10px;margin-top:6px;">
         <button class="submit-btn secondary" style="flex:1;" onclick="closeModal('gcash-reject-modal')">CANCEL</button>
         <button class="submit-btn danger" style="flex:1;" onclick="confirmRejectGCash()">SEND REJECTION</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL PAGE ADMIN PANEL -->
+  <div id="admin-fullpage"
+    style="display:none;position:fixed;inset:0;z-index:99999;background:#f6f6f6;overflow:hidden;">
+    <div style="display:flex;height:100vh;">
+      <!-- Sidebar -->
+      <aside
+        style="width:220px;background:#0a0a0a;color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;">
+        <div style="padding:24px 20px 18px;border-bottom:1px solid #222;">
+          <div style="font-family:'Anton',sans-serif;font-size:1.4rem;letter-spacing:2px;">UNCROWNED.</div>
+          <div style="font-size:0.62rem;letter-spacing:3px;color:#555;margin-top:2px;">ADMIN PANEL</div>
+        </div>
+        <nav style="padding:12px 0;flex:1;">
+          <div style="padding:14px 8px 4px 20px;font-size:0.58rem;letter-spacing:3px;color:#444;">MAIN</div>
+          <div class="ap-nav active" onclick="apTab('dashboard')">📊 <span>Dashboard</span></div>
+          <div style="padding:14px 8px 4px 20px;font-size:0.58rem;letter-spacing:3px;color:#444;">MANAGE</div>
+          <div class="ap-nav" onclick="apTab('orders')">🛒 <span>Orders</span></div>
+          <div class="ap-nav" onclick="apTab('products')">👕 <span>Products</span></div>
+          <div class="ap-nav" onclick="apTab('customers')">👥 <span>Customers</span></div>
+          <div class="ap-nav" onclick="apTab('inventory')">📦 <span>Inventory</span></div>
+        </nav>
+        <div style="padding:14px 20px;border-top:1px solid #222;font-size:0.68rem;color:#444;">
+          <div>Logged in as</div>
+          <div style="color:#fff;font-weight:700;margin-top:2px;" id="ap-admin-name">ADMIN</div>
+          <button onclick="apLogout()"
+            style="width:100%;margin-top:10px;padding:9px;background:#1a1a1a;border:1px solid #333;color:#888;font-size:0.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Inter',sans-serif;">LOG
+            OUT</button>
+        </div>
+      </aside>
+      <!-- Main -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Topbar -->
+        <div
+          style="background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8e8e8;flex-shrink:0;">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:2px;color:#888;" id="ap-topbar-title">DASHBOARD
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="font-size:0.68rem;color:#888;" id="ap-date"></div>
+            <div
+              style="background:#0a0a0a;color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:2px;padding:4px 10px;">
+              ADMIN</div>
+          </div>
+        </div>
+        <!-- Content -->
+        <div style="flex:1;overflow-y:auto;padding:28px;" id="ap-content"></div>
       </div>
     </div>
   </div>

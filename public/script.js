@@ -924,6 +924,11 @@ function login() {
       sessionStorage.setItem('uc_token', data.token);
       currentUser = { username: data.username, role: data.role };
       sessionStorage.setItem('uc_user', JSON.stringify(currentUser));
+      if (data.role === 'admin') {
+        sessionStorage.setItem('uc_admin_token', data.token);
+        window.location.href = 'admin.html';
+        return;
+      }
       updateAuthUI(); closeModal('login-modal');
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
@@ -1150,10 +1155,7 @@ function updateAuthUI() {
   }
 }
 
-function openAdminPanel() {
-  openModal('admin-modal');
-  switchAdminTab('products');
-}
+function openAdminPanel() { window.location.href = 'admin.html'; }
 
 function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach((t, i) => {
@@ -2222,4 +2224,4 @@ function saveAddressBook() {
   saveAddressToStorage({ fname, lname, phone, street, city, province, zip, region });
   showToast('✅ Address saved!');
   openAddressBook();
-}
+} 

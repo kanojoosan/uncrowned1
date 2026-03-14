@@ -379,12 +379,26 @@ function renderProducts(products) {
     return;
   }
   products.forEach(product => {
+    const ss = product.size_stock || {};
+    const hasSizeStock = Object.keys(ss).length > 0;
+    const totalStock = hasSizeStock
+      ? Object.values(ss).reduce((a, b) => a + b, 0)
+      : (product.stock != null ? product.stock : 999);
+    const isFullyOut = totalStock === 0;
+
     const card = document.createElement('div');
     card.className = 'product-card product-card-minimal';
-    card.onclick = () => openProductDetail(product.id);
+    if (isFullyOut) {
+      card.style.opacity = '0.65';
+      card.style.cursor = 'default';
+      card.onclick = () => showToast('Sorry, this item is currently out of stock.');
+    } else {
+      card.onclick = () => openProductDetail(product.id);
+    }
     card.innerHTML = `
-      <div class="image-container">
+      <div class="image-container" style="position:relative;">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
+        ${isFullyOut ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;"><span style="background:#c0392b;color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:2px;padding:6px 14px;">OUT OF STOCK</span></div>` : ''}
         <div class="card-hover-overlay">
           <div class="card-size-chart">
             <div style="color:#fff;font-family:'Anton',sans-serif;font-size:0.75rem;letter-spacing:2px;margin-bottom:6px;text-align:center;">SIZE GUIDE (inches)</div>
@@ -413,7 +427,8 @@ function openProductDetail(id) {
     const surcharge = getSurcharge(s);
     const tag = surcharge > 0 ? `<span class="size-surcharge-detail">+₱${surcharge}</span>` : '';
     const qty = hasSizeStock ? (ss[s] != null ? ss[s] : 0) : null;
-    const isOut = hasSizeStock && qty === 0;
+    const noStockAtAll = !hasSizeStock && (product.stock != null && product.stock <= 0);
+    const isOut = noStockAtAll || (hasSizeStock && qty === 0);
     const isLow = hasSizeStock && qty > 0 && qty <= 2;
     const stockTag = isOut ? `<span style="display:block;font-size:0.55rem;color:#c0392b;font-weight:700;letter-spacing:0.5px;">OUT</span>`
       : isLow ? `<span style="display:block;font-size:0.55rem;color:#e67e22;font-weight:700;letter-spacing:0.5px;">${qty} LEFT</span>` : '';
@@ -811,12 +826,16 @@ function placeOrder(gcashMeta) {
 
 function selectPayMethod(method) {
   selectedPayMethod = method;
-  ['gcash', 'instapay', 'cod'].forEach(m => {
+  ['instapay', 'cod'].forEach(m => {
     const btn = document.getElementById('pm-' + m);
     const pan = document.getElementById('pay-panel-' + m);
     if (btn) btn.classList.toggle('selected', m === method);
     if (pan) pan.classList.toggle('active', m === method);
   });
+  const nextBtn = document.getElementById('checkout-next-btn');
+  if (nextBtn) {
+    nextBtn.textContent = method === 'cod' ? 'REVIEW ORDER →' : 'PROCEED TO PAYMENT →';
+  }
 }
 
 function formatCardNumber(input) {

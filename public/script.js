@@ -2285,8 +2285,14 @@ function apLogout() {
 }
 
 function apTab(name) {
-  document.querySelectorAll('.ap-nav').forEach((n, i) => {
-    n.classList.toggle('active', ['dashboard', 'orders', 'products', 'customers', 'inventory'][i] === name);
+  ['dashboard', 'orders', 'products', 'customers', 'inventory'].forEach(tab => {
+    const el = document.getElementById('apnav-' + tab);
+    if (!el) return;
+    if (tab === name) {
+      el.classList.add('apnav-active');
+    } else {
+      el.classList.remove('apnav-active');
+    }
   });
   const titles = { dashboard: 'DASHBOARD', orders: 'ORDERS', products: 'PRODUCTS', customers: 'CUSTOMERS', inventory: 'INVENTORY' };
   document.getElementById('ap-topbar-title').innerText = titles[name] || name;

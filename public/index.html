@@ -1072,55 +1072,206 @@
   </div>
 
 
-  <div id="admin-fullpage" style="display:none;position:fixed;inset:0;z-index:99999;font-family:'Inter',sans-serif;">
+  <style>
+    #admin-fullpage * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      list-style: none;
+      text-decoration: none;
+    }
 
-    <div id="ap-sidebar"
-      style="position:fixed;top:0;left:0;width:240px;height:100vh;background:#0a0a0a;color:#fff;display:flex;flex-direction:column;z-index:2;">
-      <div style="padding:26px 22px 18px;border-bottom:1px solid #1e1e1e;">
-        <div style="font-family:'Anton',sans-serif;font-size:1.5rem;letter-spacing:2px;color:#fff;">UNCROWNED.</div>
-        <div style="font-size:0.6rem;letter-spacing:3px;color:#444;margin-top:3px;">ADMIN PANEL</div>
+    #ap-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      z-index: 100000;
+      overflow: hidden;
+    }
+
+    #ap-sidebar-logo {
+      padding: 26px 22px 18px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    #ap-sidebar-logo .brand {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: #fff;
+      display: block;
+    }
+
+    #ap-sidebar-logo .sub {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: #3a3a3a;
+      margin-top: 3px;
+      display: block;
+    }
+
+    #ap-sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .apnav-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      padding: 13px 22px !important;
+      cursor: pointer !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      color: #555 !important;
+      border-left: 3px solid transparent !important;
+      text-transform: uppercase !important;
+      background: transparent !important;
+      width: 100% !important;
+    }
+
+    .apnav-item:hover {
+      color: #ccc !important;
+      background: #111 !important;
+    }
+
+    .apnav-item.apnav-active {
+      color: #fff !important;
+      border-left-color: #fff !important;
+      background: #141414 !important;
+    }
+
+    #ap-sidebar-footer {
+      padding: 16px 22px;
+      border-top: 1px solid #1e1e1e;
+    }
+
+    #ap-sidebar-footer .label {
+      font-size: 0.62rem;
+      color: #3a3a3a;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    #ap-sidebar-footer .username {
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    #ap-logout-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid #333;
+      color: #555;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: block;
+    }
+
+    #ap-logout-btn:hover {
+      background: #c0392b;
+      color: #fff;
+      border-color: #c0392b;
+    }
+
+    #ap-main {
+      position: fixed;
+      top: 0;
+      left: 240px;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f5;
+      z-index: 99999;
+    }
+
+    #ap-topbar {
+      background: #fff;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid #ebebeb;
+      flex-shrink: 0;
+    }
+
+    #ap-topbar-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #aaa;
+    }
+
+    #ap-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    #ap-date {
+      font-size: 0.68rem;
+      color: #bbb;
+    }
+
+    #ap-admin-badge {
+      background: #0a0a0a;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 5px 12px;
+    }
+
+    #ap-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+    }
+  </style>
+  <div id="admin-fullpage" style="display:none;position:fixed;inset:0;z-index:99999;">
+    <div id="ap-sidebar">
+      <div id="ap-sidebar-logo">
+        <span class="brand">UNCROWNED.</span>
+        <span class="sub">ADMIN PANEL</span>
       </div>
-      <nav style="flex:1;overflow-y:auto;padding:16px 0;">
-        <div style="padding:12px 22px 5px;font-size:0.58rem;letter-spacing:3px;color:#3a3a3a;font-weight:700;">MAIN
-        </div>
-        <div class="ap-nav active" onclick="apTab('dashboard')"><span style="width:20px;text-align:center;">📊</span>
-          Dashboard</div>
-        <div style="padding:16px 22px 5px;font-size:0.58rem;letter-spacing:3px;color:#3a3a3a;font-weight:700;">MANAGE
-        </div>
-        <div class="ap-nav" onclick="apTab('orders')"><span style="width:20px;text-align:center;">🛒</span> Orders</div>
-        <div class="ap-nav" onclick="apTab('products')"><span style="width:20px;text-align:center;">👕</span> Products
-        </div>
-        <div class="ap-nav" onclick="apTab('customers')"><span style="width:20px;text-align:center;">👥</span> Customers
-        </div>
-        <div class="ap-nav" onclick="apTab('inventory')"><span style="width:20px;text-align:center;">📦</span> Inventory
-        </div>
-      </nav>
-      <div style="padding:16px 22px;border-top:1px solid #1e1e1e;">
-        <div style="font-size:0.62rem;color:#444;margin-bottom:4px;">Logged in as</div>
-        <div style="color:#fff;font-weight:700;font-size:0.85rem;margin-bottom:12px;" id="ap-admin-name">ADMIN</div>
-        <button onclick="apLogout()"
-          style="width:100%;padding:10px;background:transparent;border:1px solid #333;color:#666;font-size:0.68rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s;"
-          onmouseover="this.style.background='#c0392b';this.style.color='#fff';this.style.borderColor='#c0392b';"
-          onmouseout="this.style.background='transparent';this.style.color='#666';this.style.borderColor='#333';">LOG
-          OUT</button>
+      <div id="ap-sidebar-nav">
+        <div id="apnav-dashboard" class="apnav-item apnav-active" onclick="apTab('dashboard')">📊 Dashboard</div>
+        <div id="apnav-orders" class="apnav-item" onclick="apTab('orders')">🛒 Orders</div>
+        <div id="apnav-products" class="apnav-item" onclick="apTab('products')">👕 Products</div>
+        <div id="apnav-customers" class="apnav-item" onclick="apTab('customers')">👥 Customers</div>
+        <div id="apnav-inventory" class="apnav-item" onclick="apTab('inventory')">📦 Inventory</div>
+      </div>
+      <div id="ap-sidebar-footer">
+        <span class="label">Logged in as</span>
+        <span class="username" id="ap-admin-name">ADMIN</span>
+        <button id="ap-logout-btn" onclick="apLogout()">LOG OUT</button>
       </div>
     </div>
-
-    <div style="margin-left:240px;height:100vh;display:flex;flex-direction:column;background:#f5f5f5;">
-
-      <div
-        style="background:#fff;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid #ebebeb;flex-shrink:0;">
-        <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#aaa;" id="ap-topbar-title">DASHBOARD
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="font-size:0.68rem;color:#bbb;" id="ap-date"></div>
-          <div
-            style="background:#0a0a0a;color:#fff;font-size:0.6rem;font-weight:700;letter-spacing:2px;padding:5px 12px;">
-            ADMIN</div>
+    <div id="ap-main">
+      <div id="ap-topbar">
+        <div id="ap-topbar-title">DASHBOARD</div>
+        <div id="ap-topbar-right">
+          <div id="ap-date"></div>
+          <div id="ap-admin-badge">ADMIN</div>
         </div>
       </div>
-
-      <div style="flex:1;overflow-y:auto;padding:28px;" id="ap-content"></div>
+      <div id="ap-content"></div>
     </div>
   </div>
 

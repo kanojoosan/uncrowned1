@@ -607,13 +607,13 @@ function checkout() {
   openCheckout();
 }
 
-let selectedPayMethod = 'gcash';
+let selectedPayMethod = 'instapay';
 let currentStep = 1;
 
 function openCheckout() {
   goToStep(1, true);
-  selectedPayMethod = 'gcash';
-  selectPayMethod('gcash');
+  selectedPayMethod = 'instapay';
+  selectPayMethod('instapay');
   prefillSavedAddress();
   openModal('checkout-modal');
 }
@@ -622,6 +622,9 @@ function goToStep(step, silent) {
   if (!silent && step > currentStep) {
     if (currentStep === 1 && !validateAddress()) return;
     if (currentStep === 2 && !validatePayment()) return;
+  }
+  if (!silent && step < currentStep) {
+    if (!confirm('Are you sure you want to go back? Your progress on this step will be lost.')) return;
   }
   if (step === 3 && !silent) {
     if (selectedPayMethod === 'gcash' || selectedPayMethod === 'instapay') {
@@ -723,10 +726,8 @@ function buildReviewPanel() {
     `<strong>${fname} ${lname}</strong><br>${phone}<br>${street}<br>${city}, ${province} ${zip}<br>${region}`;
 
   let payHTML = '';
-  if (selectedPayMethod === 'gcash') {
-    payHTML = `📱 <strong>GCash</strong><br>09931229769`;
-  } else if (selectedPayMethod === 'instapay') {
-    payHTML = `⚡ <strong>InstaPay</strong><br>Tirso Jr. Gervacio`;
+  if (selectedPayMethod === 'instapay') {
+    payHTML = `⚡ <strong>GCash InstaPay</strong><br>Tirso Jr. Gervacio`;
   } else {
     payHTML = `💵 <strong>Cash on Delivery</strong><br>Pay when your order arrives.`;
   }
@@ -800,6 +801,8 @@ function placeOrder(gcashMeta) {
     updateCartUI();
     updateStepIndicator(4);
     refreshMyOrdersBadges();
+    loadProductsFromAPI();
+    if (typeof apProducts !== 'undefined') apLoadAll();
   }).catch(err => {
     showToast('Order failed. Please try again.');
     console.error(err);
@@ -838,6 +841,16 @@ function openModal(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById('overlay').style.display = 'block';
 }
+function closeCheckout() {
+  const successVisible = document.getElementById('checkout-success')?.classList.contains('active');
+  if (successVisible) {
+    closeModal('checkout-modal');
+    return;
+  }
+  if (!confirm('Are you sure you want to cancel checkout? Your cart items will be kept.')) return;
+  closeModal('checkout-modal');
+}
+
 function closeModal(id) {
   document.getElementById(id).classList.remove('active');
   const anyOpen = document.querySelector('.modal.active');
@@ -1662,14 +1675,13 @@ function saveProduct() {
 }
 
 function getCustomerTab(order) {
-
   if (order.status === 'cancelled') {
     if ((order.payment_method === 'gcash' || order.payment_method === 'instapay') && order.gcash_status === 'rejected') return 'to_pay';
     return null;
   }
   if (order.status === 'pending') {
     if (order.payment_method === 'cod') return 'to_ship';
-    if (order.payment_method === 'gcash' && order.gcash_status === 'confirmed') return 'to_ship';
+    if ((order.payment_method === 'gcash' || order.payment_method === 'instapay') && order.gcash_status === 'confirmed') return 'to_ship';
     return 'to_pay';
   }
   if (order.status === 'out_for_delivery') return 'to_receive';
@@ -1759,7 +1771,7 @@ function renderMyOrders(tab) {
         refunded: '#9b59b6',
       };
       const statusLabels = {
-        pending: order.payment_method === 'cod' ? '📦 Preparing' : (order.payment_method === 'gcash' ? '💙 GCash - Verifying Payment' : '💳 Awaiting Payment'),
+        pending: order.payment_method === 'cod' ? '📦 Preparing' : ((order.payment_method === 'gcash' || order.payment_method === 'instapay') ? '⚡ GCash InstaPay - Verifying Payment' : '💳 Awaiting Payment'),
         out_for_delivery: '🚚 Out for Delivery',
         completed: '✅ Delivered',
         refunded: '💜 Refunded',
@@ -1782,18 +1794,19 @@ function renderMyOrders(tab) {
 
       let actionBtn = '';
       if (tab === 'to_pay') {
-        if (order.payment_method === 'gcash') {
+        const isGCashOrInstapay = order.payment_method === 'gcash' || order.payment_method === 'instapay';
+        if (isGCashOrInstapay) {
           if (order.gcash_status === 'pending_confirmation') {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify payment</span>`;
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin to verify your payment</span>`;
           } else if (order.gcash_status === 'confirmed') {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">💙 GCash Confirmed</span>`;
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#27ae60;background:#f0fff4;border:1px solid #a9dfbf;padding:6px 12px;border-radius:4px;">✅ Payment Confirmed</span>`;
           } else if (order.gcash_status === 'rejected') {
             actionBtn = `<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:#c0392b;background:#fdecea;border:1px solid #f5c6c6;padding:6px 12px;border-radius:4px;display:inline-block;">❌ Payment Rejected</span>${order.gcash_reject_reason ? `<div style="font-size:0.72rem;color:#c0392b;margin-top:4px;">Reason: ${order.gcash_reject_reason}</div>` : ''}<div style="margin-top:8px;"><button class="my-order-action-btn primary" onclick="resubmitGCash('${order.order_num}')">🔄 RESUBMIT PAYMENT</button></div></div>`;
           } else {
-            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;padding:6px 12px;">Pending</span>`;
+            actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:6px 12px;border-radius:4px;">⏳ Waiting for admin approval</span>`;
           }
         } else {
-          actionBtn = `<button class="my-order-action-btn primary" onclick="showToast('Redirecting to payment...')">PAY NOW</button>`;
+          actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;background:#f4f4f4;border:1px solid #e0e0e0;padding:6px 12px;border-radius:4px;">📦 Preparing your order</span>`;
         }
       } else if (tab === 'to_ship') {
         actionBtn = '';
@@ -2381,9 +2394,9 @@ function apBuildCharts() {
   const sc = {}; apOrders.forEach(o => { sc[o.status] = (sc[o.status] || 0) + 1; });
   apMkChart('apc-status', 'doughnut', Object.keys(sc).map(s => s.replace('_', ' ').toUpperCase()), Object.values(sc),
     Object.keys(sc).map(s => ({ pending: '#ffa502', out_for_delivery: '#1e90ff', completed: '#00c48c', cancelled: '#ff4757' }[s] || '#888')));
-  const gcash = apOrders.filter(o => o.payment_method === 'gcash').length;
+  const gcash = apOrders.filter(o => o.payment_method === 'gcash' || o.payment_method === 'instapay').length;
   const cod = apOrders.filter(o => o.payment_method === 'cod').length;
-  apMkChart('apc-payment', 'pie', ['GCash', 'COD'], [gcash, cod], ['#00c48c', '#0a0a0a']);
+  apMkChart('apc-payment', 'pie', ['GCash InstaPay', 'COD'], [gcash, cod], ['#1e90ff', '#0a0a0a']);
   const st = { S: 0, M: 0, L: 0, XL: 0, '2XL': 0 };
   apProducts.forEach(p => { const ss = p.size_stock || {}; Object.entries(ss).forEach(([s, q]) => { if (st[s] != null) st[s] += q; }); });
   apMkChart('apc-stock', 'bar', Object.keys(st), Object.values(st), ['#0a0a0a', '#222', '#444', '#666', '#888']);
@@ -2430,26 +2443,55 @@ function apOrderTable(orders, showActions) {
     </tr></thead>
     <tbody>${orders.map(o => {
     const idx = apOrders.indexOf(o);
-    const isGCash = o.payment_method === 'gcash';
-    const gcashPending = isGCash && o.gcash_status === 'pending_confirmation';
-    const gcashConfirmed = isGCash && o.gcash_status === 'confirmed';
+    const isGCashOrInstapay = o.payment_method === 'gcash' || o.payment_method === 'instapay';
+    const gcashPending = isGCashOrInstapay && o.gcash_status === 'pending_confirmation';
+    const gcashConfirmed = isGCashOrInstapay && o.gcash_status === 'confirmed';
+    const payColor = isGCashOrInstapay ? '#e8f4ff' : '#f4f4f4';
+    const payText = isGCashOrInstapay ? '#1e90ff' : '#888';
+    const payLabel = o.payment_method === 'instapay' ? 'GCASH INSTAPAY' : (o.payment_method || '').toUpperCase();
     let actions = '';
     if (showActions) {
       if (gcashPending) { actions += `<button onclick="apApproveGCash(${idx})" style="${apBtn('#00c48c')}">✓ APPROVE</button><button onclick="apRejectGCash(${idx})" style="${apBtn('#ff4757')}">✗ REJECT</button>`; }
-      if (o.status === 'pending' && (!isGCash || gcashConfirmed)) actions += `<button onclick="apUpdateStatus(${idx},'out_for_delivery')" style="${apBtn('#1e90ff')}">🚚 SHIP</button>`;
+      if (o.status === 'pending' && (!isGCashOrInstapay || gcashConfirmed)) actions += `<button onclick="apUpdateStatus(${idx},'out_for_delivery')" style="${apBtn('#1e90ff')}">🚚 SHIP</button>`;
       if (o.status === 'out_for_delivery') actions += `<button onclick="apUpdateStatus(${idx},'completed')" style="${apBtn('#0a0a0a')}">✅ DONE</button>`;
-      if (o.status !== 'completed' && o.status !== 'cancelled') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
+      if (o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
     }
-    return `<tr style="border-bottom:1px solid #f5f5f5;">
+    const hasProof = isGCashOrInstapay && (o.gcash_ref || o.gcash_proof);
+    const rowId = `aproof-${o.order_num}`;
+    return `<tr style="border-bottom:${hasProof ? 'none' : '1px solid #f5f5f5'};">
         <td style="${apTd()};font-size:0.72rem;font-weight:700;">${o.order_num}</td>
         <td style="${apTd()}">${o.username}</td>
         <td style="${apTd()};font-weight:700;">₱${Number(o.total).toLocaleString()}</td>
-        <td style="${apTd()}"><span style="background:${isGCash ? '#e8faf5' : '#f4f4f4'};color:${isGCash ? '#00c48c' : '#888'};padding:2px 8px;font-size:0.62rem;font-weight:800;">${(o.payment_method || '').toUpperCase()}</span></td>
+        <td style="${apTd()}">
+          <span style="background:${payColor};color:${payText};padding:2px 8px;font-size:0.6rem;font-weight:800;">${payLabel}</span>
+          ${hasProof ? `<button onclick="apToggleProof('${rowId}')" style="display:block;margin-top:4px;background:none;border:none;color:#1e90ff;font-size:0.62rem;cursor:pointer;font-weight:700;padding:0;">📎 VIEW PROOF</button>` : ''}
+        </td>
         <td style="${apTd()}">${apStatusBadge(o)}</td>
         <td style="${apTd()};color:#888;font-size:0.7rem;">${o.created_at ? new Date(o.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
         ${showActions ? `<td style="${apTd()};white-space:nowrap;">${actions || '<span style="color:#ccc;">—</span>'}</td>` : ''}
-      </tr>`;
+      </tr>
+      ${hasProof ? `<tr id="${rowId}" style="display:none;border-bottom:1px solid #f5f5f5;background:#fafcff;">
+        <td colspan="${showActions ? 7 : 6}" style="padding:14px 18px;">
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px;">REFERENCE NUMBER</div>
+              <div style="font-size:1rem;font-weight:800;color:#111;">${o.gcash_ref || '—'}</div>
+            </div>
+            ${o.gcash_proof ? `<div>
+              <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px;">PAYMENT SCREENSHOT</div>
+              <img src="${o.gcash_proof}" onclick="window.open(this.src,'_blank')" style="max-height:200px;max-width:280px;object-fit:contain;border:1px solid #e0e0e0;cursor:zoom-in;border-radius:4px;" title="Click to enlarge">
+            </div>`: '<div style="color:#aaa;font-size:0.75rem;">No screenshot uploaded.</div>'}
+            ${o.gcash_reject_reason ? `<div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#ff4757;margin-bottom:6px;">REJECTION REASON</div><div style="font-size:0.8rem;color:#ff4757;">${o.gcash_reject_reason}</div></div>` : ''}
+          </div>
+        </td>
+      </tr>`: ''}`;
   }).join('')}</tbody></table>`;
+}
+
+function apToggleProof(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
 }
 
 function apRenderOrders() {
@@ -2463,7 +2505,7 @@ function apRenderOrders() {
         <option value="out_for_delivery">OUT FOR DELIVERY</option><option value="completed">COMPLETED</option><option value="cancelled">CANCELLED</option>
       </select>
       <select id="ap-opay" onchange="apFilterOrders()" style="padding:8px 12px;border:1px solid #e8e8e8;font-size:0.78rem;outline:none;">
-        <option value="all">ALL PAYMENTS</option><option value="gcash">GCASH</option><option value="cod">COD</option>
+        <option value="all">ALL PAYMENTS</option><option value="instapay">GCASH INSTAPAY</option><option value="cod">COD</option>
       </select>
     </div>
     <div style="background:#fff;border:1px solid #e8e8e8;overflow-x:auto;" id="ap-otable">${apOrderTable(apOrders, true)}</div>`;
@@ -2651,7 +2693,7 @@ function apFilterCustomers() {
       <th style="${apTh()}">ACTION</th>
     </tr></thead>
     <tbody>${c.map((u, i) => {
-    const userOrders = apOrders.filter(o => o.username === u.username);
+    const userOrders = apOrders.filter(o => (o.username || o.customer) === u.username);
     return `<tr style="border-bottom:1px solid #f0f0f0;">
         <td style="${apTd()};color:#888;">${i + 1}</td>
         <td style="${apTd()};font-weight:700;">${u.username}</td>
@@ -2679,10 +2721,10 @@ function apToggleCustomerOrders(id) {
 }
 
 function apCustomerOrders(username) {
-  const orders = apOrders.filter(o => o.username === username);
+  const orders = apOrders.filter(o => (o.username || o.customer) === username);
   if (!orders.length) return `<div style="padding:16px 24px;color:#888;font-size:0.78rem;">No orders yet.</div>`;
-  const statusColors = { pending: '#ffa502', out_for_delivery: '#1e90ff', completed: '#00c48c', cancelled: '#ff4757', refunded: '#9b59b6' };
-  const statusLabels = { pending: 'Pending', out_for_delivery: 'Out for Delivery', completed: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded' };
+  const statusColors = { pending: '#ffa502', out_for_delivery: '#1e90ff', completed: '#00c48c', cancelled: '#ff4757', refunded: '#9b59b6', return_requested: '#e67e22', returned: '#7f8c8d' };
+  const statusLabels = { pending: 'Pending', out_for_delivery: 'Out for Delivery', completed: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded', return_requested: 'Return Requested', returned: 'Returned' };
   return `<div style="padding:12px 24px;">
     <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:10px;">ORDER HISTORY</div>
     <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
@@ -2699,19 +2741,26 @@ function apCustomerOrders(username) {
     const idx = apOrders.indexOf(o);
     const c = statusColors[o.status] || '#888';
     const items = Array.isArray(o.items) ? o.items : (typeof o.items === 'string' ? JSON.parse(o.items) : []);
-    const canCancel = o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded';
-    const canRefund = (o.status === 'completed' || o.status === 'out_for_delivery') && o.status !== 'refunded';
+    const payLabel = o.payment_method === 'instapay' ? 'GCASH INSTAPAY' : (o.payment_method || '').toUpperCase();
+    const payBg = (o.payment_method === 'gcash' || o.payment_method === 'instapay') ? '#e8f4ff' : '#f4f4f4';
+    const payCol = (o.payment_method === 'gcash' || o.payment_method === 'instapay') ? '#1e90ff' : '#888';
+    const canCancel = !['completed', 'cancelled', 'refunded', 'returned'].includes(o.status);
+    const canRefund = ['completed', 'out_for_delivery'].includes(o.status);
+    const canReturn = o.status === 'completed';
+    const canMarkReturned = o.status === 'return_requested';
     return `<tr style="border-bottom:1px solid #ebebeb;">
           <td style="padding:8px 12px;font-weight:700;font-size:0.72rem;">${o.order_num}</td>
           <td style="padding:8px 12px;color:#888;">${items.length} item(s)</td>
           <td style="padding:8px 12px;font-weight:700;">₱${Number(o.total).toLocaleString()}</td>
-          <td style="padding:8px 12px;"><span style="background:${o.payment_method === 'gcash' ? '#e8faf5' : '#f4f4f4'};color:${o.payment_method === 'gcash' ? '#00c48c' : '#888'};padding:2px 7px;font-size:0.6rem;font-weight:800;">${(o.payment_method || '').toUpperCase()}</span></td>
+          <td style="padding:8px 12px;"><span style="background:${payBg};color:${payCol};padding:2px 7px;font-size:0.6rem;font-weight:800;">${payLabel}</span></td>
           <td style="padding:8px 12px;"><span style="background:${c}18;color:${c};padding:2px 8px;font-size:0.6rem;font-weight:800;">${statusLabels[o.status] || o.status}</span></td>
           <td style="padding:8px 12px;color:#888;font-size:0.7rem;">${o.created_at ? new Date(o.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
-          <td style="padding:8px 12px;white-space:nowrap;">
-            ${canCancel ? `<button onclick="apCancelCustomerOrder(${idx})" style="padding:4px 10px;background:#ff4757;color:#fff;border:none;font-size:0.62rem;font-weight:700;cursor:pointer;margin-right:4px;letter-spacing:1px;">CANCEL</button>` : ''}
-            ${canRefund ? `<button onclick="apRefundCustomerOrder(${idx})" style="padding:4px 10px;background:#9b59b6;color:#fff;border:none;font-size:0.62rem;font-weight:700;cursor:pointer;letter-spacing:1px;">REFUND</button>` : ''}
-            ${!canCancel && !canRefund ? `<span style="color:#ccc;font-size:0.7rem;">—</span>` : ''}
+          <td style="padding:8px 12px;white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;">
+            ${canCancel ? `<button onclick="apCancelCustomerOrder(${idx})" style="padding:4px 9px;background:#ff4757;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">CANCEL</button>` : ''}
+            ${canRefund ? `<button onclick="apRefundCustomerOrder(${idx})" style="padding:4px 9px;background:#9b59b6;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">REFUND</button>` : ''}
+            ${canReturn ? `<button onclick="apReturnCustomerOrder(${idx})" style="padding:4px 9px;background:#e67e22;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">RETURN</button>` : ''}
+            ${canMarkReturned ? `<button onclick="apMarkReturned(${idx})" style="padding:4px 9px;background:#7f8c8d;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">MARK RETURNED</button>` : ''}
+            ${!canCancel && !canRefund && !canReturn && !canMarkReturned ? `<span style="color:#ccc;font-size:0.7rem;">—</span>` : ''}
           </td>
         </tr>`;
   }).join('')}</tbody>
@@ -2721,7 +2770,7 @@ function apCustomerOrders(username) {
 
 async function apCancelCustomerOrder(idx) {
   const o = apOrders[idx]; if (!o) return;
-  if (!confirm(`Cancel order ${o.order_num} for ${o.username}?`)) return;
+  if (!confirm(`Cancel order ${o.order_num} for ${o.username || o.customer}?`)) return;
   await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status: 'cancelled' }) });
   o.status = 'cancelled';
   apRenderCustomers();
@@ -2730,11 +2779,29 @@ async function apCancelCustomerOrder(idx) {
 
 async function apRefundCustomerOrder(idx) {
   const o = apOrders[idx]; if (!o) return;
-  if (!confirm(`Mark order ${o.order_num} as refunded for ${o.username}?\n\nTotal: ₱${Number(o.total).toLocaleString()}\nPayment: ${(o.payment_method || '').toUpperCase()}`)) return;
+  if (!confirm(`Refund order ${o.order_num}?\n\nTotal: ₱${Number(o.total).toLocaleString()}\nPayment: ${o.payment_method === 'instapay' ? 'GCash InstaPay' : (o.payment_method || '').toUpperCase()}`)) return;
   await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status: 'refunded' }) });
   o.status = 'refunded';
   apRenderCustomers();
   showToast('💜 Order ' + o.order_num + ' marked as refunded.');
+}
+
+async function apReturnCustomerOrder(idx) {
+  const o = apOrders[idx]; if (!o) return;
+  if (!confirm(`Mark order ${o.order_num} as Return Requested?\n\nCustomer will be notified to send item back.`)) return;
+  await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status: 'return_requested' }) });
+  o.status = 'return_requested';
+  apRenderCustomers();
+  showToast('🔄 Order ' + o.order_num + ' marked as Return Requested.');
+}
+
+async function apMarkReturned(idx) {
+  const o = apOrders[idx]; if (!o) return;
+  if (!confirm(`Confirm item returned for order ${o.order_num}?`)) return;
+  await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status: 'returned' }) });
+  o.status = 'returned';
+  apRenderCustomers();
+  showToast('📦 Order ' + o.order_num + ' marked as Returned.');
 }
 
 function apRenderInventory() {

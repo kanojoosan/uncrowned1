@@ -384,14 +384,15 @@ function renderProducts(products) {
     const totalStock = hasSizeStock
       ? Object.values(ss).reduce((a, b) => a + b, 0)
       : (product.stock != null ? product.stock : 999);
-    const isFullyOut = totalStock === 0;
+    const isNotSet = !hasSizeStock;
+    const isFullyOut = hasSizeStock && totalStock === 0;
 
     const card = document.createElement('div');
     card.className = 'product-card product-card-minimal';
-    if (isFullyOut) {
+    if (isNotSet || isFullyOut) {
       card.style.opacity = '0.65';
       card.style.cursor = 'default';
-      card.onclick = () => showToast('Sorry, this item is currently out of stock.');
+      card.onclick = () => showToast(isNotSet ? '⚠️ This product is not available yet.' : 'Sorry, this item is currently out of stock.');
     } else {
       card.onclick = () => openProductDetail(product.id);
     }
@@ -399,6 +400,7 @@ function renderProducts(products) {
       <div class="image-container" style="position:relative;">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
         ${isFullyOut ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;"><span style="background:#c0392b;color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:2px;padding:6px 14px;">OUT OF STOCK</span></div>` : ''}
+        ${isNotSet ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;"><span style="background:#888;color:#fff;font-size:0.65rem;font-weight:800;letter-spacing:2px;padding:6px 14px;">NOT AVAILABLE</span></div>` : ''}
         <div class="card-hover-overlay">
           <div class="card-size-chart">
             <div style="color:#fff;font-family:'Anton',sans-serif;font-size:0.75rem;letter-spacing:2px;margin-bottom:6px;text-align:center;">SIZE GUIDE (inches)</div>
@@ -490,6 +492,7 @@ function addToCartFromDetail(id) {
   const size = selectedBtn.dataset.size;
   const ss = product.size_stock || {};
   const hasSizeStock = Object.keys(ss).length > 0;
+  if (!hasSizeStock) return showToast(`❌ ${product.name} is not available for purchase yet.`);
   if (hasSizeStock && (ss[size] == null || ss[size] <= 0)) return showToast(`Sorry, ${size} is out of stock.`);
   if (!hasSizeStock && product.stock != null && product.stock <= 0) return showToast('Sorry, this item is out of stock.');
   const finalPrice = getFinalPrice(product.price, size);
@@ -554,6 +557,7 @@ function addToCart(id) {
   const size = selectedBtn.dataset.size;
   const ss = product.size_stock || {};
   const hasSS = Object.keys(ss).length > 0;
+  if (!hasSS) return showToast(`❌ ${product.name} is not available for purchase yet.`);
   if (hasSS && (ss[size] == null || ss[size] <= 0)) return showToast(`❌ ${product.name} (${size}) is out of stock.`);
   if (!hasSS && product.stock != null && product.stock <= 0) return showToast(`❌ ${product.name} is out of stock.`);
   const currentQtyInCart = cart.filter(i => i.id === id && i.size === size).reduce((s, i) => s + (i.qty || 1), 0);

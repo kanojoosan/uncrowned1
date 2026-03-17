@@ -1675,15 +1675,17 @@ function saveProduct() {
   const priceVal = document.getElementById('new-product-price').value;
 
   const size_stock = {};
+  let anyFilled = false;
   ALL_SIZES.forEach(s => {
     const el = document.getElementById('stock-' + s);
     if (el && el.value.trim() !== '') {
       const qty = parseInt(el.value);
-      if (!isNaN(qty) && qty > 0) size_stock[s] = qty;
+      size_stock[s] = (!isNaN(qty) && qty >= 0) ? qty : 0;
+      anyFilled = true;
     }
   });
-  const sizes = Object.keys(size_stock);
-  const hasSizes = sizes.length > 0;
+  const sizes = Object.keys(size_stock).filter(s => size_stock[s] > 0);
+  const finalSizeStock = anyFilled ? size_stock : {};
 
   if (!image) return showError('add-product-error', 'Please enter an image URL.');
   if (!name) return showError('add-product-error', 'Please enter a product name.');
@@ -1692,12 +1694,12 @@ function saveProduct() {
   document.getElementById('add-product-error').style.display = 'none';
 
   const price = parseInt(priceVal);
-  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
+  const stock = anyFilled ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
   const details = document.getElementById('new-product-details').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('new-product-specs').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
   const method = editingProductId !== null ? 'PUT' : 'POST';
   const url = editingProductId !== null ? '/api/products/' + editingProductId : '/api/products';
-  apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock, details, specs }) })
+  apiFetch(url, { method, body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock: finalSizeStock, details, specs }) })
     .then(data => {
       if (data.error) return showToast('Error: ' + data.error);
       const msg = editingProductId !== null ? '"' + name + '" updated successfully.' : '"' + name + '" added to the store!';
@@ -2779,7 +2781,7 @@ function apOpenProductForm(id = null) {
       <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">IMAGE URL</label>
         <input id="apf-image" value="${p?.image || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;box-sizing:border-box;"></div>
       <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:4px;">STOCK PER SIZE</label>
-        <div style="font-size:0.6rem;color:#aaa;margin-bottom:8px;">Leave blank or 0 = size not available / out of stock</div>
+        <div style="font-size:0.6rem;color:#aaa;margin-bottom:8px;">Enter 0 = Out of Stock · Leave blank = Size not available (NOT SET)</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
           ${SIZES.map(s => `<div style="text-align:center;"><div style="font-size:0.62rem;font-weight:700;margin-bottom:4px;">${s}</div>
             <input id="apf-${s}" type="number" min="0" value="${ss[s] != null ? ss[s] : ''}" placeholder="0" style="width:100%;padding:8px 4px;text-align:center;border:1.5px solid #e8e8e8;font-size:0.82rem;outline:none;box-sizing:border-box;"></div>`).join('')}
@@ -2807,20 +2809,22 @@ async function apSaveProduct() {
   const errEl = document.getElementById('apf-err');
   if (!name || !price || !image) { errEl.style.display = 'block'; errEl.innerText = '⚠ Fill in all required fields.'; return; }
   const size_stock = {};
+  let anyFilled = false;
   SIZES.forEach(s => {
     const el = document.getElementById('apf-' + s);
     if (el && el.value.trim() !== '') {
       const qty = parseInt(el.value);
-      if (!isNaN(qty) && qty > 0) size_stock[s] = qty;
+      size_stock[s] = (!isNaN(qty) && qty >= 0) ? qty : 0;
+      anyFilled = true;
     }
   });
-  const hasSizes = Object.keys(size_stock).length > 0;
-  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : 0;
-  const sizes = Object.keys(size_stock);
+  const stock = anyFilled ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
+  const sizes = Object.keys(size_stock).filter(s => size_stock[s] > 0);
+  const finalSizeStock = anyFilled ? size_stock : {};
   const details = document.getElementById('apf-details').value.split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('apf-specs').value.split('\n').map(s => s.trim()).filter(Boolean);
   const d = await apiFetch(apEditId ? `/api/products/${apEditId}` : '/api/products',
-    { method: apEditId ? 'PUT' : 'POST', body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock, details, specs }) });
+    { method: apEditId ? 'PUT' : 'POST', body: JSON.stringify({ name, category, price, image, sizes, stock, size_stock: finalSizeStock, details, specs }) });
   if (d.error) { errEl.style.display = 'block'; errEl.innerText = '⚠ ' + d.error; return; }
   const fresh = await apiFetch('/api/products');
   if (Array.isArray(fresh)) { apProducts = fresh; allProducts = fresh; }

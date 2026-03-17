@@ -355,15 +355,27 @@ app.post('/api/checkout', requireAuth, async (req, res) => {
     await conn.beginTransaction();
     for (const item of cart) {
       if (!item.id || !item.size) continue;
-      const [rows] = await conn.query('SELECT size_stock, stock FROM products WHERE id=?', [item.id]);
-      if (!rows.length) continue;
+      const [rows] = await conn.query('SELECT size_stock, stock, name FROM products WHERE id=?', [item.id]);
+      if (!rows.length) { await conn.rollback(); conn.release(); return res.status(400).json({ error: `Product not found.` }); }
       let ss = {};
       try { ss = JSON.parse(rows[0].size_stock || '{}'); } catch (_) { }
       const qty = item.qty || 1;
-      if (ss[item.size] != null) {
-        ss[item.size] = Math.max(0, (ss[item.size] || 0) - qty);
+      const hasSS = Object.keys(ss).length > 0;
+      if (hasSS) {
+        const available = ss[item.size] != null ? ss[item.size] : 0;
+        if (available < qty) {
+          await conn.rollback(); conn.release();
+          return res.status(400).json({ error: `Sorry, ${rows[0].name} (${item.size}) only has ${available} left in stock.` });
+        }
+        ss[item.size] = available - qty;
         const newTotal = Object.values(ss).reduce((a, b) => a + b, 0);
         await conn.query('UPDATE products SET size_stock=?, stock=? WHERE id=?', [JSON.stringify(ss), newTotal, item.id]);
+      } else if (rows[0].stock != null) {
+        if (rows[0].stock < qty) {
+          await conn.rollback(); conn.release();
+          return res.status(400).json({ error: `Sorry, ${rows[0].name} is out of stock.` });
+        }
+        await conn.query('UPDATE products SET stock=? WHERE id=?', [rows[0].stock - qty, item.id]);
       }
     }
     const [orderResult] = await conn.query(
@@ -443,4 +455,4 @@ initDB().then(() => {
 }).catch(err => {
   console.error('Database error:', err.message);
   process.exit(1);
-});   
+});

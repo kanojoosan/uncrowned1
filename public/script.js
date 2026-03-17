@@ -552,6 +552,12 @@ function addToCart(id) {
     return;
   }
   const size = selectedBtn.dataset.size;
+  const ss = product.size_stock || {};
+  const hasSS = Object.keys(ss).length > 0;
+  if (hasSS && (ss[size] == null || ss[size] <= 0)) return showToast(`❌ ${product.name} (${size}) is out of stock.`);
+  if (!hasSS && product.stock != null && product.stock <= 0) return showToast(`❌ ${product.name} is out of stock.`);
+  const currentQtyInCart = cart.filter(i => i.id === id && i.size === size).reduce((s, i) => s + (i.qty || 1), 0);
+  if (hasSS && ss[size] != null && currentQtyInCart >= ss[size]) return showToast(`❌ Only ${ss[size]} left in stock for ${product.name} (${size}).`);
   const finalPrice = getFinalPrice(product.price, size);
   const existing = cart.find(i => i.id === id && i.size === size);
   if (existing) { existing.qty = (existing.qty || 1) + 1; }
@@ -799,6 +805,11 @@ function placeOrder(gcashMeta) {
       gcashStatus: gcashMeta ? gcashMeta.gcashStatus : null,
     })
   }).then(data => {
+    if (data && data.error) {
+      showToast('❌ ' + data.error);
+      loadProductsFromAPI();
+      return;
+    }
     const realOrderNum = (data && data.orderNum) ? data.orderNum : orderNum;
     document.getElementById('success-screen-confirmed').style.display = isGCashOrder ? 'none' : 'block';
     document.getElementById('success-screen-gcash').style.display = isGCashOrder ? 'block' : 'none';

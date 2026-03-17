@@ -1671,9 +1671,13 @@ function saveProduct() {
   const size_stock = {};
   ALL_SIZES.forEach(s => {
     const el = document.getElementById('stock-' + s);
-    if (el && el.value !== '') size_stock[s] = parseInt(el.value) || 0;
+    if (el && el.value.trim() !== '') {
+      const qty = parseInt(el.value);
+      if (!isNaN(qty) && qty > 0) size_stock[s] = qty;
+    }
   });
-  const sizes = ALL_SIZES.filter(s => size_stock[s] == null || size_stock[s] > 0);
+  const sizes = Object.keys(size_stock);
+  const hasSizes = sizes.length > 0;
 
   if (!image) return showError('add-product-error', 'Please enter an image URL.');
   if (!name) return showError('add-product-error', 'Please enter a product name.');
@@ -1682,7 +1686,7 @@ function saveProduct() {
   document.getElementById('add-product-error').style.display = 'none';
 
   const price = parseInt(priceVal);
-  const stock = Object.values(size_stock).reduce((a, b) => a + b, 0) || null;
+  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
   const details = document.getElementById('new-product-details').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('new-product-specs').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
   const method = editingProductId !== null ? 'PUT' : 'POST';
@@ -1715,7 +1719,7 @@ function getCustomerTab(order) {
     return 'to_pay';
   }
   if (order.status === 'out_for_delivery') return 'to_receive';
-  if (order.status === 'completed') return order.rated && order.rating ? null : 'to_rate';
+  if (order.status === 'completed' || order.status === 'return_requested' || order.status === 'returned') return order.rated && order.rating ? null : 'to_rate';
   return null;
 }
 
@@ -1839,11 +1843,19 @@ function renderMyOrders(tab) {
           actionBtn = `<span style="font-size:0.75rem;font-weight:700;color:#888;background:#f4f4f4;border:1px solid #e0e0e0;padding:6px 12px;border-radius:4px;">📦 Preparing your order</span>`;
         }
       } else if (tab === 'to_ship') {
-        actionBtn = '';
+        actionBtn = `<button class="my-order-action-btn" onclick="customerCancelOrder('${order.order_num}')" style="background:#fff;color:#c0392b;border:1.5px solid #c0392b;padding:8px 16px;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;border-radius:4px;">✕ CANCEL ORDER</button>`;
       } else if (tab === 'to_receive') {
-        actionBtn = `<button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>`;
+        actionBtn = `<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+        <button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>
+      </div>`;
       } else if (tab === 'to_rate') {
-        actionBtn = `<button class="my-order-action-btn primary" onclick="openRateModal('${order.order_num}')">RATE NOW</button>`;
+        const canReturn = order.status === 'completed' && !order.return_reason;
+        actionBtn = `<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+        <button class="my-order-action-btn primary" onclick="openRateModal('${order.order_num}')">RATE NOW</button>
+        ${canReturn ? `<button class="my-order-action-btn" onclick="customerReturnOrder('${order.order_num}')" style="background:#fff;color:#e67e22;border:1.5px solid #e67e22;padding:6px 14px;font-size:0.72rem;font-weight:700;cursor:pointer;letter-spacing:1px;border-radius:4px;">🔄 REQUEST RETURN</button>` : ''}
+        ${order.return_reason && order.status === 'return_requested' ? `<span style="font-size:0.72rem;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;padding:5px 10px;border-radius:4px;">⏳ Return pending admin approval</span>` : ''}
+        ${order.status === 'returned' ? `<span style="font-size:0.72rem;color:#7f8c8d;background:#f4f4f4;border:1px solid #ddd;padding:5px 10px;border-radius:4px;">✅ Return approved</span>` : ''}
+      </div>`;
       }
 
       const ratedHTML = order.rated
@@ -1879,6 +1891,68 @@ function confirmReceived(orderNum) {
       refreshMyOrdersBadges();
       setTimeout(() => switchMyOrdersTab('to_rate'), 800);
     }).catch(() => showToast('Failed to update order.'));
+}
+
+function customerCancelOrder(orderNum) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:#fff;width:90%;max-width:380px;border-radius:8px;overflow:hidden;">
+      <div style="padding:20px 22px 14px;border-bottom:1px solid #f0f0f0;">
+        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:6px;">CANCEL ORDER</div>
+        <div style="font-size:0.82rem;color:#888;">Are you sure you want to cancel order <strong>#${orderNum}</strong>?</div>
+        <div style="font-size:0.78rem;color:#27ae60;margin-top:6px;">✅ Stock will be automatically restored.</div>
+      </div>
+      <div style="padding:16px 22px;display:flex;gap:10px;justify-content:flex-end;">
+        <button id="cancel-no" style="padding:9px 20px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">KEEP ORDER</button>
+        <button id="cancel-yes" style="padding:9px 20px;background:#c0392b;color:#fff;border:none;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">YES, CANCEL</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cancel-no').onclick = () => overlay.remove();
+  overlay.querySelector('#cancel-yes').onclick = () => {
+    overlay.remove();
+    apiFetch('/api/orders/' + orderNum + '/cancel', { method: 'PUT' })
+      .then(d => {
+        if (d.error) return showToast('❌ ' + d.error);
+        showToast('✅ Order #' + orderNum + ' cancelled. Stock has been restored.');
+        refreshMyOrdersBadges();
+        loadProductsFromAPI();
+        switchMyOrdersTab('to_pay');
+      }).catch(() => showToast('Failed to cancel order.'));
+  };
+}
+
+function customerReturnOrder(orderNum) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:#fff;width:90%;max-width:400px;border-radius:8px;overflow:hidden;">
+      <div style="padding:20px 22px 14px;border-bottom:1px solid #f0f0f0;">
+        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:6px;">REQUEST RETURN</div>
+        <div style="font-size:0.82rem;color:#888;margin-bottom:14px;">Order <strong>#${orderNum}</strong> — Please tell us why you want to return this item.</div>
+        <textarea id="return-reason-input" placeholder="Reason for return (e.g. wrong size, defective item...)" style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:4px;font-size:0.82rem;resize:vertical;min-height:80px;box-sizing:border-box;outline:none;"></textarea>
+        <div style="font-size:0.72rem;color:#e67e22;margin-top:6px;">⚠ Return requests must be approved by admin. Stock will be restored only after approval.</div>
+      </div>
+      <div style="padding:14px 22px;display:flex;gap:10px;justify-content:flex-end;">
+        <button id="return-no" style="padding:9px 20px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">CANCEL</button>
+        <button id="return-yes" style="padding:9px 20px;background:#e67e22;color:#fff;border:none;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">SUBMIT REQUEST</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#return-no').onclick = () => overlay.remove();
+  overlay.querySelector('#return-yes').onclick = () => {
+    const reason = overlay.querySelector('#return-reason-input').value.trim();
+    if (!reason) { showToast('⚠ Please enter a reason for return.'); return; }
+    overlay.remove();
+    apiFetch('/api/orders/' + orderNum + '/return-request', { method: 'PUT', body: JSON.stringify({ reason }) })
+      .then(d => {
+        if (d.error) return showToast('❌ ' + d.error);
+        showToast('📦 Return request submitted. Waiting for admin approval.');
+        refreshMyOrdersBadges();
+        switchMyOrdersTab('to_rate');
+      }).catch(() => showToast('Failed to submit return request.'));
+  };
 }
 
 function openRateModal(orderNum) {
@@ -2460,6 +2534,7 @@ function apStatusBadge(o) {
     else if (o.gcash_status === 'rejected') extra += ' <span style="background:#fff0f0;color:#ff4757;padding:2px 6px;font-size:0.58rem;font-weight:800;">REJECTED</span>';
     else if (o.gcash_status === 'confirmed') extra += ' <span style="background:#e8faf5;color:#00c48c;padding:2px 6px;font-size:0.58rem;font-weight:800;">GCASH OK</span>';
   }
+  if (o.status === 'return_requested') extra += ' <span style="background:#fff8f0;color:#e67e22;padding:2px 6px;font-size:0.58rem;font-weight:800;">RETURN PENDING</span>';
   return `<span style="background:${c}18;color:${c};padding:3px 8px;font-size:0.62rem;font-weight:800;">${labels[o.status] || o.status}</span>${extra}`;
 }
 
@@ -2484,17 +2559,24 @@ function apOrderTable(orders, showActions) {
       if (gcashPending) { actions += `<button onclick="apApproveGCash(${idx})" style="${apBtn('#00c48c')}">✓ APPROVE</button><button onclick="apRejectGCash(${idx})" style="${apBtn('#ff4757')}">✗ REJECT</button>`; }
       if (o.status === 'pending' && (!isGCashOrInstapay || gcashConfirmed)) actions += `<button onclick="apUpdateStatus(${idx},'out_for_delivery')" style="${apBtn('#1e90ff')}">🚚 SHIP</button>`;
       if (o.status === 'out_for_delivery') actions += `<button onclick="apUpdateStatus(${idx},'completed')" style="${apBtn('#0a0a0a')}">✅ DONE</button>`;
-      if (o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
+      if (o.status === 'return_requested') {
+        actions += `<button onclick="apReturnDecision(${idx},'approve')" style="${apBtn('#27ae60')}">✓ ACCEPT RETURN</button>`;
+        actions += `<button onclick="apReturnDecision(${idx},'reject')" style="${apBtn('#c0392b')}">✗ REJECT RETURN</button>`;
+      }
+      if (o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded' && o.status !== 'return_requested' && o.status !== 'returned') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
     }
     const hasProof = isGCashOrInstapay && (o.gcash_ref || o.gcash_proof);
+    const hasReturn = o.status === 'return_requested' || o.status === 'returned';
     const rowId = `aproof-${o.order_num}`;
-    return `<tr style="border-bottom:${hasProof ? 'none' : '1px solid #f5f5f5'};">
+    const returnRowId = `areturn-${o.order_num}`;
+    return `<tr style="border-bottom:${(hasProof || hasReturn) ? 'none' : '1px solid #f5f5f5'};">
         <td style="${apTd()};font-size:0.72rem;font-weight:700;">${o.order_num}</td>
-        <td style="${apTd()}">${o.username}</td>
+        <td style="${apTd()}">${o.username || o.customer}</td>
         <td style="${apTd()};font-weight:700;">₱${Number(o.total).toLocaleString()}</td>
         <td style="${apTd()}">
           <span style="background:${payColor};color:${payText};padding:2px 8px;font-size:0.6rem;font-weight:800;">${payLabel}</span>
           ${hasProof ? `<button onclick="apToggleProof('${rowId}')" style="display:block;margin-top:4px;background:none;border:none;color:#1e90ff;font-size:0.62rem;cursor:pointer;font-weight:700;padding:0;">📎 VIEW PROOF</button>` : ''}
+          ${hasReturn && o.return_reason ? `<button onclick="apToggleProof('${returnRowId}')" style="display:block;margin-top:4px;background:none;border:none;color:#e67e22;font-size:0.62rem;cursor:pointer;font-weight:700;padding:0;">🔄 VIEW RETURN REASON</button>` : ''}
         </td>
         <td style="${apTd()}">${apStatusBadge(o)}</td>
         <td style="${apTd()};color:#888;font-size:0.7rem;">${o.created_at ? new Date(o.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
@@ -2513,6 +2595,12 @@ function apOrderTable(orders, showActions) {
             </div>`: '<div style="color:#aaa;font-size:0.75rem;">No screenshot uploaded.</div>'}
             ${o.gcash_reject_reason ? `<div><div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#ff4757;margin-bottom:6px;">REJECTION REASON</div><div style="font-size:0.8rem;color:#ff4757;">${o.gcash_reject_reason}</div></div>` : ''}
           </div>
+        </td>
+      </tr>`: ''}
+      ${hasReturn && o.return_reason ? `<tr id="${returnRowId}" style="display:none;border-bottom:1px solid #f5f5f5;background:#fff8f0;">
+        <td colspan="${showActions ? 7 : 6}" style="padding:14px 18px;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#e67e22;margin-bottom:6px;">RETURN REASON FROM CUSTOMER</div>
+          <div style="font-size:0.85rem;color:#333;">${o.return_reason}</div>
         </td>
       </tr>`: ''}`;
   }).join('')}</tbody></table>`;
@@ -2569,6 +2657,21 @@ function apRejectGCash(idx) {
   const o = apOrders[idx];
   apiFetch('/api/admin/orders/' + o.order_num + '/gcash', { method: 'PUT', body: JSON.stringify({ gcash_status: 'rejected', gcash_reject_reason: reason }) })
     .then(() => { o.gcash_status = 'rejected'; o.gcash_reject_reason = reason; apRenderOrders(); showToast('❌ GCash rejected.'); });
+}
+
+async function apReturnDecision(idx, decision) {
+  const o = apOrders[idx]; if (!o) return;
+  const label = decision === 'approve' ? 'ACCEPT' : 'REJECT';
+  const msg = decision === 'approve'
+    ? `Accept return for order ${o.order_num}?\n\nThis will restore the stock automatically.`
+    : `Reject return request for order ${o.order_num}?\n\nOrder status will stay as Delivered.`;
+  if (!confirm(msg)) return;
+  const d = await apiFetch('/api/admin/orders/' + o.order_num + '/return-decision', { method: 'PUT', body: JSON.stringify({ decision }) });
+  if (d.error) return showToast('❌ ' + d.error);
+  o.status = decision === 'approve' ? 'returned' : 'completed';
+  apRenderOrders();
+  if (typeof apProducts !== 'undefined') apLoadAll();
+  showToast(decision === 'approve' ? '✅ Return accepted. Stock restored.' : '✗ Return rejected. Order stays Delivered.');
 }
 
 function apRenderProducts() {
@@ -2644,7 +2747,8 @@ function apOpenProductForm(id = null) {
       </div>
       <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:5px;">IMAGE URL</label>
         <input id="apf-image" value="${p?.image || ''}" style="width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;font-size:0.85rem;outline:none;box-sizing:border-box;"></div>
-      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:8px;">STOCK PER SIZE</label>
+      <div><label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:4px;">STOCK PER SIZE</label>
+        <div style="font-size:0.6rem;color:#aaa;margin-bottom:8px;">Leave blank or 0 = size not available / out of stock</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
           ${SIZES.map(s => `<div style="text-align:center;"><div style="font-size:0.62rem;font-weight:700;margin-bottom:4px;">${s}</div>
             <input id="apf-${s}" type="number" min="0" value="${ss[s] != null ? ss[s] : ''}" placeholder="0" style="width:100%;padding:8px 4px;text-align:center;border:1.5px solid #e8e8e8;font-size:0.82rem;outline:none;box-sizing:border-box;"></div>`).join('')}
@@ -2672,9 +2776,16 @@ async function apSaveProduct() {
   const errEl = document.getElementById('apf-err');
   if (!name || !price || !image) { errEl.style.display = 'block'; errEl.innerText = '⚠ Fill in all required fields.'; return; }
   const size_stock = {};
-  SIZES.forEach(s => { const el = document.getElementById('apf-' + s); if (el && el.value !== '') size_stock[s] = parseInt(el.value) || 0; });
-  const stock = Object.values(size_stock).reduce((a, b) => a + b, 0) || null;
-  const sizes = SIZES.filter(s => size_stock[s] == null || size_stock[s] > 0);
+  SIZES.forEach(s => {
+    const el = document.getElementById('apf-' + s);
+    if (el && el.value.trim() !== '') {
+      const qty = parseInt(el.value);
+      if (!isNaN(qty) && qty > 0) size_stock[s] = qty;
+    }
+  });
+  const hasSizes = Object.keys(size_stock).length > 0;
+  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
+  const sizes = Object.keys(size_stock);
   const details = document.getElementById('apf-details').value.split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('apf-specs').value.split('\n').map(s => s.trim()).filter(Boolean);
   const d = await apiFetch(apEditId ? `/api/products/${apEditId}` : '/api/products',

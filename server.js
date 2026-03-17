@@ -104,6 +104,7 @@ async function initDB() {
   try { await db.query('ALTER TABLE users ADD COLUMN birthday DATE'); } catch (_) { }
   try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch (_) { }
   try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
+  try { await db.query('ALTER TABLE orders ADD COLUMN return_reason TEXT'); } catch (_) { }
   const pantsDetails = JSON.stringify(['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase']);
   const pantsSpecs = JSON.stringify(['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']);
   const jacketsDetails = JSON.stringify(['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase']);
@@ -419,6 +420,87 @@ app.post('/api/products/restore-stock', requireAuth, async (req, res) => {
       }
     }
     res.json({ status: 'ok' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/orders/:orderNum/cancel', requireAuth, async (req, res) => {
+  try {
+    const [orders] = await db.query(
+      'SELECT o.*, u.id as uid FROM orders o JOIN users u ON o.user_id=u.id WHERE o.order_num=? AND o.user_id=?',
+      [req.params.orderNum, req.session.userId]
+    );
+    if (!orders.length) return res.status(404).json({ error: 'Order not found.' });
+    const order = orders[0];
+    if (!['pending'].includes(order.status))
+      return res.status(400).json({ error: 'Only pending orders can be cancelled.' });
+    await db.query('UPDATE orders SET status=? WHERE order_num=?', ['cancelled', req.params.orderNum]);
+    const [items] = await db.query('SELECT * FROM order_items WHERE order_id=?', [order.id]);
+    for (const item of items) {
+      if (!item.product_id) continue;
+      const [rows] = await db.query('SELECT size_stock, stock FROM products WHERE id=?', [item.product_id]);
+      if (!rows.length) continue;
+      let ss = {};
+      try { ss = JSON.parse(rows[0].size_stock || '{}'); } catch (_) { }
+      const qty = item.qty || 1;
+      if (ss[item.size] != null) {
+        ss[item.size] = (ss[item.size] || 0) + qty;
+        const newTotal = Object.values(ss).reduce((a, b) => a + b, 0);
+        await db.query('UPDATE products SET size_stock=?, stock=? WHERE id=?', [JSON.stringify(ss), newTotal, item.product_id]);
+      } else if (rows[0].stock != null) {
+        await db.query('UPDATE products SET stock=stock+? WHERE id=?', [qty, item.product_id]);
+      }
+    }
+    res.json({ status: 'success' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/orders/:orderNum/return-request', requireAuth, async (req, res) => {
+  const { reason } = req.body;
+  try {
+    const [orders] = await db.query(
+      'SELECT * FROM orders WHERE order_num=? AND user_id=?',
+      [req.params.orderNum, req.session.userId]
+    );
+    if (!orders.length) return res.status(404).json({ error: 'Order not found.' });
+    if (orders[0].status !== 'completed')
+      return res.status(400).json({ error: 'Only delivered orders can be returned.' });
+    await db.query(
+      'UPDATE orders SET status=?, return_reason=? WHERE order_num=?',
+      ['return_requested', reason || '', req.params.orderNum]
+    );
+    res.json({ status: 'success' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/admin/orders/:orderNum/return-decision', requireAdmin, async (req, res) => {
+  const { decision } = req.body;
+  if (!['approve', 'reject'].includes(decision))
+    return res.status(400).json({ error: 'Invalid decision.' });
+  try {
+    const [orders] = await db.query('SELECT * FROM orders WHERE order_num=?', [req.params.orderNum]);
+    if (!orders.length) return res.status(404).json({ error: 'Order not found.' });
+    if (decision === 'approve') {
+      await db.query('UPDATE orders SET status=? WHERE order_num=?', ['returned', req.params.orderNum]);
+      const [items] = await db.query('SELECT * FROM order_items WHERE order_id=?', [orders[0].id]);
+      for (const item of items) {
+        if (!item.product_id) continue;
+        const [rows] = await db.query('SELECT size_stock, stock FROM products WHERE id=?', [item.product_id]);
+        if (!rows.length) continue;
+        let ss = {};
+        try { ss = JSON.parse(rows[0].size_stock || '{}'); } catch (_) { }
+        const qty = item.qty || 1;
+        if (ss[item.size] != null) {
+          ss[item.size] = (ss[item.size] || 0) + qty;
+          const newTotal = Object.values(ss).reduce((a, b) => a + b, 0);
+          await db.query('UPDATE products SET size_stock=?, stock=? WHERE id=?', [JSON.stringify(ss), newTotal, item.product_id]);
+        } else if (rows[0].stock != null) {
+          await db.query('UPDATE products SET stock=stock+? WHERE id=?', [qty, item.product_id]);
+        }
+      }
+    } else {
+      await db.query('UPDATE orders SET status=? WHERE order_num=?', ['completed', req.params.orderNum]);
+    }
+    res.json({ status: 'success' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

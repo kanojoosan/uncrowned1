@@ -1412,20 +1412,26 @@ function loadProductsFromAPI() {
 }
 
 function seedProductsToDB() {
+  const shirtStock = { S: 1, M: 2, L: 2, XL: 3, '2XL': 3 };
+  const pantsStock = { S: 2, M: 3, L: 1, XL: 6, '2XL': 9 };
+  const jacketStock = { S: 6, M: 7, L: 2, XL: 3, '2XL': 1 };
+  const shirtTotal = Object.values(shirtStock).reduce((a, b) => a + b, 0);
+  const pantsTotal = Object.values(pantsStock).reduce((a, b) => a + b, 0);
+  const jacketTotal = Object.values(jacketStock).reduce((a, b) => a + b, 0);
   const toSeed = [
-    { name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop shoulder cut', 'Boxy oversized fit', 'Front and back logo print', 'Ribbed crew neckline', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Premium Crewneck Shirt", category: "shirts", price: 2800, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed crewneck silhouette', 'Chest pocket detail', 'Washed premium finish', 'Dropped shoulders', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '280 GSM', 'HEAVYWEIGHT JERSEY FABRIC'] },
-    { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Limited edition graphic tee', 'Full front tribute print', 'Oversized boxy fit', 'Reinforced stitching', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC'] },
-    { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Classic crewneck style', 'Minimalist embroidered logo', 'Regular fit construction', 'Soft brushed interior', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FLEECE FABRIC'] },
-    { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Clean all-white colorway', 'Back graphic print', 'Oversized streetwear fit', 'Double-stitched hem', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
-    { name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
-    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Uncrowned Signature Shirt", category: "shirts", price: 1200, image: "https://image2url.com/r2/default/images/1772616627489-ca85cae5-e9e3-4104-9c86-eed7f1c1f95a.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: shirtTotal, size_stock: shirtStock, details: ['Drop shoulder cut', 'Boxy oversized fit', 'Front and back logo print', 'Ribbed crew neckline', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 2800, image: "https://image2url.com/r2/default/images/1772616781321-dc5096d1-b4b1-47e9-9843-07573b357930.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: shirtTotal, size_stock: shirtStock, details: ['Relaxed crewneck silhouette', 'Chest pocket detail', 'Washed premium finish', 'Dropped shoulders', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '280 GSM', 'HEAVYWEIGHT JERSEY FABRIC'] },
+    { name: "U Cant See Me - Cena Tribute", category: "shirts", price: 4500, image: "https://image2url.com/r2/default/images/1772616833059-bcd3948a-7c37-4d31-97c6-3feba9ee504b.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: shirtTotal, size_stock: shirtStock, details: ['Limited edition graphic tee', 'Full front tribute print', 'Oversized boxy fit', 'Reinforced stitching', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '240 GSM', 'COMBED COTTON FABRIC'] },
+    { name: "Premium Crewneck Shirt", category: "shirts", price: 1500, image: "https://image2url.com/r2/default/images/1772616910426-eff84a2f-325c-48fe-b520-2c73db79f33e.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: shirtTotal, size_stock: shirtStock, details: ['Classic crewneck style', 'Minimalist embroidered logo', 'Regular fit construction', 'Soft brushed interior', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '260 GSM', 'FLEECE FABRIC'] },
+    { name: "Crewneck Shirt - White", category: "shirts", price: 3200, image: "https://image2url.com/r2/default/images/1772616926529-99357e25-a78d-4036-9c7d-004abb0914fc.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: shirtTotal, size_stock: shirtStock, details: ['Clean all-white colorway', 'Back graphic print', 'Oversized streetwear fit', 'Double-stitched hem', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '270 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Signature Denim Pants", category: "pants", price: 1500, image: "https://image2url.com/r2/default/images/1772687296130-88262a7a-5fe6-4152-9207-8d2db21469f5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: pantsTotal, size_stock: pantsStock, details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Baggy Jeans Pants", category: "pants", price: 2500, image: "https://image2url.com/r2/default/images/1772687493366-18a16328-2aca-4f31-b434-68009c34dbda.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: pantsTotal, size_stock: pantsStock, details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Gothic Retro Spider - Baggy Jeans", category: "pants", price: 2100, image: "https://image2url.com/r2/default/images/1772687632857-3958a437-db9d-4a98-8346-7c572adc2de5.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: pantsTotal, size_stock: pantsStock, details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "2125 - Divine Sweats", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687674047-b56301ed-dbde-4bf3-acfc-2bc698bdfd56.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: pantsTotal, size_stock: pantsStock, details: ['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC'] },
+    { name: "Aonga Y2k Sweatpants", category: "pants", price: 1300, image: "https://image2url.com/r2/default/images/1772687697510-5beab4ad-3b58-4355-a2b3-26b2d3d3d383.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: pantsTotal, size_stock: pantsStock, details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Vielseitige Herbst-Windbreaker Jacket", category: "jackets", price: 1500, image: "https://image2url.com/r2/default/images/1772687951776-b553f020-c392-44ed-bea1-944d2892746c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: jacketTotal, size_stock: jacketStock, details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "POOPMOOM Y2k Jacket", category: "jackets", price: 1000, image: "https://image2url.com/r2/default/images/1772688023426-eb7e157e-eb84-4d55-8935-37d0190a9b7c.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: jacketTotal, size_stock: jacketStock, details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
+    { name: "Japanese Zip Up Hoodie Patagonia", category: "jackets", price: 1600, image: "https://image2url.com/r2/default/images/1772688071488-95b3b0fa-ccb6-4313-a409-bff8d0d85ea1.png", sizes: ['S', 'M', 'L', 'XL', '2XL'], stock: jacketTotal, size_stock: jacketStock, details: ['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FREE Stickers in every purchase'], specs: ['100% COTTON / COTTON BLEND', '380-420 GSM', 'FRENCH TERRY / FLEECE FABRIC'] },
   ];
 
   const originalToken = sessionStorage.getItem('uc_token');
@@ -2397,8 +2403,33 @@ async function apLoadAll() {
     apOrders = Array.isArray(orders) ? orders : [];
     apProducts = Array.isArray(products) ? products : [];
     apCustomers = Array.isArray(users) ? users.filter(u => u.role !== 'admin') : [];
+    apApplyDefaultStocks();
     apTab('dashboard');
   } catch (e) { showToast('Failed to load admin data.'); }
+}
+
+async function apApplyDefaultStocks() {
+  const shirtStock = { S: 1, M: 2, L: 2, XL: 3, '2XL': 3 };
+  const pantsStock = { S: 2, M: 3, L: 1, XL: 6, '2XL': 9 };
+  const jacketStock = { S: 6, M: 7, L: 2, XL: 3, '2XL': 1 };
+  const needsUpdate = apProducts.filter(p => {
+    const ss = p.size_stock || {};
+    const total = Object.values(ss).reduce((a, b) => a + b, 0);
+    return Object.keys(ss).length === 0 || total === 0;
+  });
+  if (!needsUpdate.length) return;
+  const updates = needsUpdate.map(p => {
+    const ss = p.category === 'shirts' ? { ...shirtStock }
+      : p.category === 'pants' ? { ...pantsStock }
+        : { ...jacketStock };
+    return { id: p.id, size_stock: ss };
+  });
+  const d = await apiFetch('/api/admin/bulk-stock', { method: 'POST', body: JSON.stringify({ updates }) });
+  if (d.status === 'success') {
+    const fresh = await apiFetch('/api/products');
+    if (Array.isArray(fresh)) { apProducts = fresh; allProducts = fresh; }
+    showToast(`✅ Applied default stock to ${d.updated} product(s).`);
+  }
 }
 
 function apLogout() {
@@ -2784,7 +2815,7 @@ async function apSaveProduct() {
     }
   });
   const hasSizes = Object.keys(size_stock).length > 0;
-  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : null;
+  const stock = hasSizes ? Object.values(size_stock).reduce((a, b) => a + b, 0) : 0;
   const sizes = Object.keys(size_stock);
   const details = document.getElementById('apf-details').value.split('\n').map(s => s.trim()).filter(Boolean);
   const specs = document.getElementById('apf-specs').value.split('\n').map(s => s.trim()).filter(Boolean);

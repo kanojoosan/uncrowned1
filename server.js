@@ -273,6 +273,22 @@ app.get('/api/admin/orders', requireAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+app.post('/api/admin/bulk-stock', requireAdmin, async (req, res) => {
+  const { updates } = req.body;
+  if (!Array.isArray(updates)) return res.status(400).json({ error: 'Invalid data.' });
+  try {
+    for (const u of updates) {
+      const ss = u.size_stock || {};
+      const total = Object.values(ss).reduce((a, b) => a + b, 0);
+      await db.query(
+        'UPDATE products SET size_stock=?, stock=?, sizes=? WHERE id=?',
+        [JSON.stringify(ss), total, JSON.stringify(Object.keys(ss)), u.id]
+      );
+    }
+    res.json({ status: 'success', updated: updates.length });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.put('/api/admin/orders/:orderNum/status', requireAdmin, async (req, res) => {
   const { status } = req.body;
   if (!['pending', 'out_for_delivery', 'completed', 'cancelled', 'refunded', 'return_requested', 'returned'].includes(status))

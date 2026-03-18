@@ -2714,8 +2714,7 @@ function apOrderTable(orders, showActions) {
         actions += `<button onclick="apOpenTracking(${idx})" style="${apBtn('#1e90ff')}">📍 TRACKING</button>`;
       }
       if (o.status === 'return_requested') {
-        actions += `<button onclick="apReturnDecision(${idx},'approve')" style="${apBtn('#27ae60')}">✓ ACCEPT RETURN</button>`;
-        actions += `<button onclick="apReturnDecision(${idx},'reject')" style="${apBtn('#c0392b')}">✗ REJECT RETURN</button>`;
+        actions += `<button onclick="apReturnDecision(${idx})" style="${apBtn('#e67e22')}">🔄 REVIEW RETURN</button>`;
       }
       if (o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded' && o.status !== 'return_requested' && o.status !== 'returned') actions += `<button onclick="apUpdateStatus(${idx},'cancelled')" style="${apBtn('#ff4757')}">CANCEL</button>`;
     }
@@ -2879,19 +2878,75 @@ function apRejectGCash(idx) {
     .then(() => { o.gcash_status = 'rejected'; o.gcash_reject_reason = reason; apRenderOrders(); showToast('❌ GCash rejected.'); });
 }
 
-async function apReturnDecision(idx, decision) {
+function apReturnDecision(idx) {
   const o = apOrders[idx]; if (!o) return;
-  const label = decision === 'approve' ? 'ACCEPT' : 'REJECT';
-  const msg = decision === 'approve'
-    ? `Accept return for order ${o.order_num}?\n\nThis will restore the stock automatically.`
-    : `Reject return request for order ${o.order_num}?\n\nOrder status will stay as Delivered.`;
-  if (!confirm(msg)) return;
-  const d = await apiFetch('/api/admin/orders/' + o.order_num + '/return-decision', { method: 'PUT', body: JSON.stringify({ decision }) });
-  if (d.error) return showToast('❌ ' + d.error);
-  o.status = decision === 'approve' ? 'returned' : 'completed';
-  apRenderOrders();
-  if (typeof apProducts !== 'undefined') apLoadAll();
-  showToast(decision === 'approve' ? '✅ Return accepted. Stock restored.' : '✗ Return rejected. Order stays Delivered.');
+  const isVideo = o.return_proof && o.return_proof.startsWith('data:video');
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  ov.innerHTML = `
+    <div style="background:#fff;width:100%;max-width:500px;border-radius:10px;overflow:hidden;max-height:92vh;overflow-y:auto;">
+      <div style="padding:16px 20px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:5;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:2px;">RETURN REQUEST</div>
+          <div style="font-size:0.72rem;color:#888;margin-top:2px;">Order <strong>#${o.order_num}</strong> · ${o.username || o.customer}</div>
+        </div>
+        <span style="background:#fff8f0;color:#e67e22;font-size:0.6rem;font-weight:800;letter-spacing:1px;padding:4px 10px;border-radius:4px;">RETURN PENDING</span>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:#f8f8f8;border-radius:8px;padding:14px;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px;">REASON FROM CUSTOMER</div>
+          <div style="font-size:0.85rem;color:#222;line-height:1.5;">${o.return_reason || '<em style="color:#aaa;">No reason provided.</em>'}</div>
+        </div>
+        <div>
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:8px;">PROOF SUBMITTED</div>
+          ${o.return_proof
+      ? (isVideo
+        ? `<video src="${o.return_proof}" controls style="width:100%;max-height:280px;border-radius:8px;border:1px solid #e0e0e0;background:#000;" playsinline></video>`
+        : `<img src="${o.return_proof}" onclick="window.open(this.src,'_blank')" style="width:100%;max-height:280px;object-fit:contain;border-radius:8px;border:1px solid #e0e0e0;cursor:zoom-in;background:#f5f5f5;" title="Click to view full size">
+                   <div style="font-size:0.65rem;color:#aaa;margin-top:4px;text-align:center;">Click image to view full size</div>`)
+      : `<div style="background:#f5f5f5;border:1.5px dashed #ddd;border-radius:8px;padding:24px;text-align:center;color:#bbb;font-size:0.78rem;">No photo or video uploaded</div>`
+    }
+        </div>
+        <div style="background:#fff8f0;border:1px solid #f5cba7;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:0.68rem;font-weight:700;color:#e67e22;margin-bottom:4px;">⚠ DECIDE CAREFULLY</div>
+          <div style="font-size:0.72rem;color:#888;line-height:1.5;">
+            <strong>Accept</strong> — Order marked as Returned. Stock restored automatically.<br>
+            <strong>Reject</strong> — Request denied. Order stays as Delivered.
+          </div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;">
+        <button id="ret-cancel" style="padding:10px 18px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:6px;">CLOSE</button>
+        <button id="ret-reject" style="padding:10px 18px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:6px;letter-spacing:0.5px;">✗ REJECT RETURN</button>
+        <button id="ret-approve" style="padding:10px 18px;background:#27ae60;color:#fff;border:none;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:6px;letter-spacing:0.5px;">✓ ACCEPT RETURN</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+
+  ov.querySelector('#ret-cancel').addEventListener('click', () => ov.remove());
+
+  const decide = async (decision) => {
+    const approveBtn = ov.querySelector('#ret-approve');
+    const rejectBtn = ov.querySelector('#ret-reject');
+    approveBtn.disabled = rejectBtn.disabled = true;
+    approveBtn.textContent = decision === 'approve' ? 'Processing...' : '✓ ACCEPT RETURN';
+    rejectBtn.textContent = decision === 'reject' ? 'Processing...' : '✗ REJECT RETURN';
+    const d = await apiFetch('/api/admin/orders/' + o.order_num + '/return-decision', { method: 'PUT', body: JSON.stringify({ decision }) });
+    if (d.error) {
+      approveBtn.disabled = rejectBtn.disabled = false;
+      approveBtn.textContent = '✓ ACCEPT RETURN';
+      rejectBtn.textContent = '✗ REJECT RETURN';
+      return showToast('❌ ' + d.error);
+    }
+    o.status = decision === 'approve' ? 'returned' : 'completed';
+    ov.remove();
+    apRenderOrders();
+    if (typeof apProducts !== 'undefined') apLoadAll();
+    showToast(decision === 'approve' ? '✅ Return accepted. Stock restored.' : '✗ Return rejected. Order stays Delivered.');
+  };
+
+  ov.querySelector('#ret-approve').addEventListener('click', () => decide('approve'));
+  ov.querySelector('#ret-reject').addEventListener('click', () => decide('reject'));
 }
 
 function apRenderProducts() {
@@ -3122,7 +3177,7 @@ function apCustomerOrders(username) {
             ${canCancel ? `<button onclick="apCancelCustomerOrder(${idx})" style="padding:4px 9px;background:#ff4757;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">CANCEL</button>` : ''}
             ${canRefund ? `<button onclick="apRefundCustomerOrder(${idx})" style="padding:4px 9px;background:#9b59b6;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">REFUND</button>` : ''}
             ${canReturn ? `<button onclick="apReturnCustomerOrder(${idx})" style="padding:4px 9px;background:#e67e22;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">RETURN</button>` : ''}
-            ${canMarkReturned ? `<button onclick="apMarkReturned(${idx})" style="padding:4px 9px;background:#7f8c8d;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">MARK RETURNED</button>` : ''}
+            ${canMarkReturned ? `<button onclick="apReturnDecision(${idx})" style="padding:4px 9px;background:#e67e22;color:#fff;border:none;font-size:0.6rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">🔄 REVIEW RETURN</button>` : ''}
             ${!canCancel && !canRefund && !canReturn && !canMarkReturned ? `<span style="color:#ccc;font-size:0.7rem;">—</span>` : ''}
           </td>
         </tr>`;

@@ -1857,8 +1857,43 @@ function renderMyOrders(tab) {
       } else if (tab === 'to_ship') {
         actionBtn = `<button class="my-order-action-btn" onclick="customerCancelOrder('${order.order_num}')" style="background:#fff;color:#c0392b;border:1.5px solid #c0392b;padding:8px 16px;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;border-radius:4px;">✕ CANCEL ORDER</button>`;
       } else if (tab === 'to_receive') {
-        actionBtn = `<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-        <button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">ORDER RECEIVED</button>
+        const TRACKING_STEPS = [
+          { key: 'order_prepared', icon: '📦', label: 'Order Prepared', desc: 'Your order has been packed and is ready for pickup.' },
+          { key: 'picked_up', icon: '🏍️', label: 'Picked Up by Rider', desc: 'The rider has collected your order from the seller.' },
+          { key: 'in_transit', icon: '🛣️', label: 'In Transit', desc: 'Your order is on its way to your area.' },
+          { key: 'nearby', icon: '📍', label: 'Almost There!', desc: 'Your order is nearby. Please be ready to receive it.' },
+          { key: 'out_for_delivery', icon: '🚚', label: 'Out for Delivery', desc: 'The rider is heading to your address now.' },
+        ];
+        const currentStep = order.tracking_status || '';
+        const currentIdx = TRACKING_STEPS.findIndex(s => s.key === currentStep);
+        const timelineHTML = `
+        <div style="background:#fff;border:1.5px solid #e0ecff;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+          <div style="font-size:0.62rem;font-weight:800;letter-spacing:2px;color:#1e90ff;margin-bottom:12px;">🚚 DELIVERY TRACKING</div>
+          ${TRACKING_STEPS.map((step, i) => {
+          const isDone = currentIdx >= 0 && i <= currentIdx;
+          const isCurrent = i === currentIdx;
+          const dotColor = isDone ? '#1e90ff' : '#e0e0e0';
+          const lineColor = i < currentIdx ? '#1e90ff' : '#e0e0e0';
+          return `<div style="display:flex;gap:12px;align-items:flex-start;${i < TRACKING_STEPS.length - 1 ? 'margin-bottom:0;' : ''}">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:28px;height:28px;border-radius:50%;background:${dotColor};display:flex;align-items:center;justify-content:center;font-size:0.85rem;${isCurrent ? 'box-shadow:0 0 0 3px #bae0f7;' : ''}transition:all 0.3s;">
+                  ${isDone ? (isCurrent ? step.icon : '✓') : '<span style="color:#ccc;font-size:0.65rem;">○</span>'}
+                </div>
+                ${i < TRACKING_STEPS.length - 1 ? `<div style="width:2px;height:24px;background:${lineColor};margin:2px 0;transition:background 0.3s;"></div>` : ''}
+              </div>
+              <div style="padding-top:4px;padding-bottom:${i < TRACKING_STEPS.length - 1 ? '0' : '0'};">
+                <div style="font-size:0.78rem;font-weight:${isCurrent ? '800' : '600'};color:${isDone ? '#111' : '#bbb'};">${step.label}</div>
+                ${isCurrent ? `<div style="font-size:0.7rem;color:#1e90ff;margin-top:1px;">${step.desc}</div>` : ''}
+                ${isCurrent && order.tracking_note ? `<div style="font-size:0.7rem;color:#555;margin-top:2px;font-style:italic;">"${order.tracking_note}"</div>` : ''}
+                ${isCurrent && order.tracking_updated ? `<div style="font-size:0.62rem;color:#aaa;margin-top:2px;">${new Date(order.tracking_updated).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>` : ''}
+              </div>
+            </div>`;
+        }).join('')}
+          ${!currentStep ? `<div style="font-size:0.72rem;color:#aaa;text-align:center;margin-top:6px;">⏳ Waiting for tracking update from seller...</div>` : ''}
+        </div>`;
+        actionBtn = `<div style="display:flex;flex-direction:column;gap:6px;width:100%;">
+        ${timelineHTML}
+        <button class="my-order-action-btn primary" onclick="confirmReceived('${order.order_num}')">✅ ORDER RECEIVED</button>
       </div>`;
       } else if (tab === 'to_rate') {
         const canReturn = order.status === 'completed' && !order.return_reason;
@@ -1874,6 +1909,17 @@ function renderMyOrders(tab) {
         ? `<div class="rated-stars">${'★'.repeat(order.rating)}${'☆'.repeat(5 - order.rating)}</div>${order.rating_comment ? `<div class="rated-comment">"${order.rating_comment}"</div>` : ''}`
         : '';
 
+      const addr = order.address ? (typeof order.address === 'string' ? JSON.parse(order.address) : order.address) : null;
+      const deliveryHTML = (tab === 'to_receive' && addr) ? `
+      <div style="margin:10px 0;padding:12px 14px;background:#f0f7ff;border:1px solid #bbd6f5;border-radius:6px;">
+        <div style="font-size:0.62rem;font-weight:800;letter-spacing:2px;color:#1e90ff;margin-bottom:8px;">📍 DELIVERY DESTINATION</div>
+        <div style="font-size:0.82rem;font-weight:700;color:#111;margin-bottom:2px;">${addr.name || ''}</div>
+        <div style="font-size:0.78rem;color:#555;">📞 ${addr.phone || ''}</div>
+        <div style="font-size:0.78rem;color:#555;margin-top:4px;">${addr.street || ''}${addr.street2 ? ' — ' + addr.street2 : ''}</div>
+        <div style="font-size:0.78rem;color:#555;">${addr.barangay ? addr.barangay + ', ' : ''}${addr.city || ''}, ${addr.province || ''} ${addr.zip || ''}</div>
+        <div style="font-size:0.72rem;color:#888;margin-top:2px;">${addr.region || ''}</div>
+      </div>` : '';
+
       const card = document.createElement('div');
       card.className = 'my-order-card';
       card.innerHTML = `
@@ -1885,6 +1931,7 @@ function renderMyOrders(tab) {
         <span class="my-order-status" style="background:${color};color:#fff;">${label}</span>
       </div>
       <div class="my-order-items-list">${itemsHTML}</div>
+      ${deliveryHTML}
       ${ratedHTML}
       <div class="my-order-footer">
         <div class="my-order-total">Total: <strong>₱${order.total.toLocaleString()}</strong></div>
@@ -2595,7 +2642,10 @@ function apOrderTable(orders, showActions) {
     if (showActions) {
       if (gcashPending) { actions += `<button onclick="apApproveGCash(${idx})" style="${apBtn('#00c48c')}">✓ APPROVE</button><button onclick="apRejectGCash(${idx})" style="${apBtn('#ff4757')}">✗ REJECT</button>`; }
       if (o.status === 'pending' && (!isGCashOrInstapay || gcashConfirmed)) actions += `<button onclick="apUpdateStatus(${idx},'out_for_delivery')" style="${apBtn('#1e90ff')}">🚚 SHIP</button>`;
-      if (o.status === 'out_for_delivery') actions += `<button onclick="apUpdateStatus(${idx},'completed')" style="${apBtn('#0a0a0a')}">✅ DONE</button>`;
+      if (o.status === 'out_for_delivery') {
+        actions += `<button onclick="apUpdateStatus(${idx},'completed')" style="${apBtn('#0a0a0a')}">✅ DONE</button>`;
+        actions += `<button onclick="apOpenTracking(${idx})" style="${apBtn('#1e90ff')}">📍 TRACKING</button>`;
+      }
       if (o.status === 'return_requested') {
         actions += `<button onclick="apReturnDecision(${idx},'approve')" style="${apBtn('#27ae60')}">✓ ACCEPT RETURN</button>`;
         actions += `<button onclick="apReturnDecision(${idx},'reject')" style="${apBtn('#c0392b')}">✗ REJECT RETURN</button>`;
@@ -2681,6 +2731,57 @@ async function apUpdateStatus(idx, status) {
   const o = apOrders[idx]; if (!o) return;
   await apiFetch('/api/admin/orders/' + o.order_num + '/status', { method: 'PUT', body: JSON.stringify({ status }) });
   o.status = status; apRenderOrders(); showToast('✅ Order updated.');
+}
+
+function apOpenTracking(idx) {
+  const o = apOrders[idx]; if (!o) return;
+  const STEPS = [
+    { key: 'order_prepared', label: '📦 Order Prepared' },
+    { key: 'picked_up', label: '🏍️ Picked Up by Rider' },
+    { key: 'in_transit', label: '🛣️ In Transit' },
+    { key: 'nearby', label: '📍 Almost There!' },
+    { key: 'out_for_delivery', label: '🚚 Out for Delivery' },
+  ];
+  const ov = document.createElement('div');
+  ov.id = 'ap-tracking-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML = `<div style="background:#fff;width:90%;max-width:420px;border-radius:8px;overflow:hidden;">
+    <div style="padding:16px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:2px;">UPDATE TRACKING</span>
+      <span style="font-size:0.75rem;color:#888;">#${o.order_num}</span>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:6px;">DELIVERY STAGE</label>
+        <select id="ap-track-status" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;font-size:0.85rem;outline:none;border-radius:4px;">
+          ${STEPS.map(s => `<option value="${s.key}" ${o.tracking_status === s.key ? 'selected' : ''}>${s.label}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:6px;">NOTE (optional)</label>
+        <input id="ap-track-note" type="text" value="${o.tracking_note || ''}" placeholder="e.g. Package is at the barangay hall" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;font-size:0.82rem;outline:none;border-radius:4px;box-sizing:border-box;">
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('ap-tracking-overlay').remove()" style="padding:9px 18px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;">CANCEL</button>
+      <button onclick="apSaveTracking(${idx})" style="padding:9px 18px;background:#1e90ff;color:#fff;border:none;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;letter-spacing:1px;">UPDATE TRACKING</button>
+    </div>
+  </div>`;
+  document.getElementById('admin-fullpage')?.appendChild(ov) || document.body.appendChild(ov);
+}
+
+async function apSaveTracking(idx) {
+  const o = apOrders[idx]; if (!o) return;
+  const status = document.getElementById('ap-track-status')?.value;
+  const note = document.getElementById('ap-track-note')?.value || '';
+  const d = await apiFetch('/api/admin/orders/' + o.order_num + '/tracking', { method: 'PUT', body: JSON.stringify({ tracking_status: status, tracking_note: note }) });
+  if (d.error) return showToast('❌ ' + d.error);
+  o.tracking_status = status;
+  o.tracking_note = note;
+  o.tracking_updated = new Date().toISOString();
+  document.getElementById('ap-tracking-overlay')?.remove();
+  apRenderOrders();
+  showToast('📍 Tracking updated!');
 }
 
 async function apApproveGCash(idx) {

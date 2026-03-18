@@ -1983,35 +1983,102 @@ function customerCancelOrder(orderNum) {
 }
 
 function customerReturnOrder(orderNum) {
+  let proofDataUrl = null;
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
   overlay.innerHTML = `
-    <div style="background:#fff;width:90%;max-width:400px;border-radius:8px;overflow:hidden;">
-      <div style="padding:20px 22px 14px;border-bottom:1px solid #f0f0f0;">
-        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:6px;">REQUEST RETURN</div>
-        <div style="font-size:0.82rem;color:#888;margin-bottom:14px;">Order <strong>#${orderNum}</strong> — Please tell us why you want to return this item.</div>
-        <textarea id="return-reason-input" placeholder="Reason for return (e.g. wrong size, defective item...)" style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:4px;font-size:0.82rem;resize:vertical;min-height:80px;box-sizing:border-box;outline:none;"></textarea>
-        <div style="font-size:0.72rem;color:#e67e22;margin-top:6px;">⚠ Return requests must be approved by admin. Stock will be restored only after approval.</div>
+    <div style="background:#fff;width:100%;max-width:440px;border-radius:10px;overflow:hidden;max-height:90vh;overflow-y:auto;">
+      <div style="padding:18px 20px 14px;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff;z-index:5;">
+        <div style="font-family:'Anton',sans-serif;font-size:1.1rem;letter-spacing:1px;margin-bottom:4px;">🔄 REQUEST RETURN</div>
+        <div style="font-size:0.78rem;color:#888;">Order <strong>#${orderNum}</strong></div>
       </div>
-      <div style="padding:14px 22px;display:flex;gap:10px;justify-content:flex-end;">
-        <button id="return-no" style="padding:9px 20px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">CANCEL</button>
-        <button id="return-yes" style="padding:9px 20px;background:#e67e22;color:#fff;border:none;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:4px;">SUBMIT REQUEST</button>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:6px;">REASON FOR RETURN <span style="color:#ff4757;">*</span></label>
+          <textarea id="return-reason-input" placeholder="e.g. Item is defective, wrong size, item looks different from photo..." style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:6px;font-size:0.82rem;resize:vertical;min-height:80px;box-sizing:border-box;outline:none;font-family:inherit;"></textarea>
+        </div>
+        <div>
+          <label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:6px;">PROOF — PHOTO OR VIDEO <span style="color:#ff4757;">*</span></label>
+          <div style="font-size:0.7rem;color:#aaa;margin-bottom:8px;">Upload a clear photo or short video showing the defect or issue.</div>
+          <label id="return-proof-label" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:2px dashed #e0e0e0;border-radius:8px;padding:20px;cursor:pointer;background:#fafafa;">
+            <span style="font-size:2rem;">📎</span>
+            <span id="return-proof-text" style="font-size:0.78rem;font-weight:700;color:#888;">TAP TO UPLOAD PHOTO / VIDEO</span>
+            <span style="font-size:0.65rem;color:#bbb;">JPG, PNG, MP4, MOV — max 10MB</span>
+            <input type="file" id="return-proof-input" accept="image/*,video/*" style="display:none;">
+          </label>
+          <div id="return-proof-preview" style="display:none;margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;">
+            <img id="return-proof-img" src="" style="width:100%;max-height:180px;object-fit:cover;display:none;">
+            <video id="return-proof-video" src="" style="width:100%;max-height:180px;display:none;" controls muted playsinline></video>
+            <div style="padding:8px 10px;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;">
+              <span id="return-proof-fname" style="font-size:0.7rem;color:#555;"></span>
+              <button id="return-proof-remove" style="background:none;border:none;color:#ff4757;font-size:0.72rem;font-weight:700;cursor:pointer;">✕ REMOVE</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:0.7rem;color:#e67e22;background:#fff8f0;border:1px solid #f5cba7;border-radius:6px;padding:10px 12px;">
+          ⚠ Return requests must be <strong>approved by admin</strong>. Stock will only be restored after approval.
+        </div>
+        <div id="return-err" style="color:#ff4757;font-size:0.75rem;display:none;"></div>
+      </div>
+      <div style="padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;">
+        <button id="return-no" style="padding:10px 20px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:6px;">CANCEL</button>
+        <button id="return-yes" style="padding:10px 20px;background:#e67e22;color:#fff;border:none;font-size:0.75rem;font-weight:700;cursor:pointer;border-radius:6px;letter-spacing:1px;">SUBMIT REQUEST</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
-  overlay.querySelector('#return-no').onclick = () => overlay.remove();
-  overlay.querySelector('#return-yes').onclick = () => {
+
+  const fileInput = overlay.querySelector('#return-proof-input');
+  const labelEl = overlay.querySelector('#return-proof-label');
+  const labelText = overlay.querySelector('#return-proof-text');
+  const preview = overlay.querySelector('#return-proof-preview');
+  const imgEl = overlay.querySelector('#return-proof-img');
+  const videoEl = overlay.querySelector('#return-proof-video');
+  const fnameEl = overlay.querySelector('#return-proof-fname');
+  const removeBtn = overlay.querySelector('#return-proof-remove');
+  const errEl = overlay.querySelector('#return-err');
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { showToast('⚠ File too large. Max 10MB.'); fileInput.value = ''; return; }
+    const isVideo = file.type.startsWith('video');
+    const reader = new FileReader();
+    reader.onload = e => {
+      proofDataUrl = e.target.result;
+      labelEl.style.display = 'none';
+      preview.style.display = 'block';
+      fnameEl.textContent = file.name;
+      if (isVideo) { videoEl.style.display = 'block'; imgEl.style.display = 'none'; videoEl.src = proofDataUrl; }
+      else { imgEl.style.display = 'block'; videoEl.style.display = 'none'; imgEl.src = proofDataUrl; }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  removeBtn.addEventListener('click', () => {
+    proofDataUrl = null; fileInput.value = '';
+    preview.style.display = 'none'; labelEl.style.display = 'flex';
+    imgEl.src = ''; videoEl.src = '';
+  });
+
+  overlay.querySelector('#return-no').addEventListener('click', () => overlay.remove());
+
+  overlay.querySelector('#return-yes').addEventListener('click', () => {
     const reason = overlay.querySelector('#return-reason-input').value.trim();
-    if (!reason) { showToast('⚠ Please enter a reason for return.'); return; }
-    overlay.remove();
-    apiFetch('/api/orders/' + orderNum + '/return-request', { method: 'PUT', body: JSON.stringify({ reason }) })
-      .then(d => {
-        if (d.error) return showToast('❌ ' + d.error);
-        showToast('📦 Return request submitted. Waiting for admin approval.');
-        refreshMyOrdersBadges();
-        switchMyOrdersTab('to_rate');
-      }).catch(() => showToast('Failed to submit return request.'));
-  };
+    errEl.style.display = 'none';
+    if (!reason) { errEl.style.display = 'block'; errEl.textContent = '⚠ Please enter a reason for return.'; return; }
+    if (!proofDataUrl) { errEl.style.display = 'block'; errEl.textContent = '⚠ Please upload a photo or video as proof.'; return; }
+    const btn = overlay.querySelector('#return-yes');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    apiFetch('/api/orders/' + orderNum + '/return-request', {
+      method: 'PUT', body: JSON.stringify({ reason, proof: proofDataUrl })
+    }).then(d => {
+      if (d.error) { btn.disabled = false; btn.textContent = 'SUBMIT REQUEST'; errEl.style.display = 'block'; errEl.textContent = '❌ ' + d.error; return; }
+      overlay.remove();
+      showToast('📦 Return request submitted. Waiting for admin approval.');
+      refreshMyOrdersBadges();
+      switchMyOrdersTab('to_rate');
+    }).catch(() => { btn.disabled = false; btn.textContent = 'SUBMIT REQUEST'; showToast('Failed to submit.'); });
+  });
 }
 
 function openRateModal(orderNum) {
@@ -2686,8 +2753,14 @@ function apOrderTable(orders, showActions) {
       </tr>`: ''}
       ${hasReturn && o.return_reason ? `<tr id="${returnRowId}" style="display:none;border-bottom:1px solid #f5f5f5;background:#fff8f0;">
         <td colspan="${showActions ? 7 : 6}" style="padding:14px 18px;">
-          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#e67e22;margin-bottom:6px;">RETURN REASON FROM CUSTOMER</div>
-          <div style="font-size:0.85rem;color:#333;">${o.return_reason}</div>
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#e67e22;margin-bottom:6px;">RETURN REASON</div>
+          <div style="font-size:0.85rem;color:#333;margin-bottom:10px;">${o.return_reason}</div>
+          ${o.return_proof ? (o.return_proof.startsWith('data:video') ?
+          `<div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#e67e22;margin-bottom:6px;">PROOF VIDEO</div>
+             <video src="${o.return_proof}" controls style="max-width:300px;max-height:200px;border-radius:6px;border:1px solid #f5cba7;" muted playsinline></video>` :
+          `<div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#e67e22;margin-bottom:6px;">PROOF PHOTO</div>
+             <img src="${o.return_proof}" onclick="window.open(this.src,\'_blank\')" style="max-width:280px;max-height:200px;object-fit:contain;border-radius:6px;border:1px solid #f5cba7;cursor:zoom-in;" title="Click to enlarge">`)
+          : '<div style="font-size:0.75rem;color:#aaa;">No proof uploaded.</div>'}
         </td>
       </tr>`: ''}`;
   }).join('')}</tbody></table>`;

@@ -105,6 +105,9 @@ async function initDB() {
   try { await db.query('ALTER TABLE products ADD COLUMN size_stock TEXT'); } catch (_) { }
   try { await db.query('ALTER TABLE users ADD COLUMN gender VARCHAR(20)'); } catch (_) { }
   try { await db.query('ALTER TABLE orders ADD COLUMN return_reason TEXT'); } catch (_) { }
+  try { await db.query('ALTER TABLE orders ADD COLUMN tracking_status VARCHAR(100)'); } catch (_) { }
+  try { await db.query('ALTER TABLE orders ADD COLUMN tracking_note TEXT'); } catch (_) { }
+  try { await db.query('ALTER TABLE orders ADD COLUMN tracking_updated TIMESTAMP'); } catch (_) { }
   const pantsDetails = JSON.stringify(['Relaxed Tapered Fit', 'Elastic Waistband with Adjustable Drawstring', 'Side Pockets and Back Pocket', 'Minimal Front Logo Print', 'Ribbed / Adjustable Ankle Cuffs', 'Custom Tailored Fit', 'FREE Stickers in every purchase']);
   const pantsSpecs = JSON.stringify(['100% COTTON', '320 GSM', 'FRENCH TERRY FABRIC']);
   const jacketsDetails = JSON.stringify(['Drop Shoulder Fit', 'Relaxed / Boxy Silhouette', 'Full Front Zipper Closure', 'Front and Back Logo Print', 'Side Pockets', 'Ribbed Cuffs and Hem', 'Custom Fit', 'FRENCH TERRY / FLEECE FABRIC', 'FREE Stickers in every purchase']);
@@ -270,6 +273,18 @@ app.get('/api/admin/orders', requireAdmin, async (req, res) => {
       o.address = typeof o.address === 'string' ? JSON.parse(o.address) : o.address;
     }
     res.json(orders);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/admin/orders/:orderNum/tracking', requireAdmin, async (req, res) => {
+  const { tracking_status, tracking_note } = req.body;
+  if (!tracking_status) return res.status(400).json({ error: 'tracking_status required.' });
+  try {
+    await db.query(
+      'UPDATE orders SET tracking_status=?, tracking_note=?, tracking_updated=NOW() WHERE order_num=?',
+      [tracking_status, tracking_note || '', req.params.orderNum]
+    );
+    res.json({ status: 'success' });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

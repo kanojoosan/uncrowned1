@@ -2761,27 +2761,36 @@ function apOpenTracking(idx) {
         <label style="font-size:0.62rem;font-weight:700;letter-spacing:2px;color:#888;display:block;margin-bottom:6px;">NOTE (optional)</label>
         <input id="ap-track-note" type="text" value="${o.tracking_note || ''}" placeholder="e.g. Package is at the barangay hall" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;font-size:0.82rem;outline:none;border-radius:4px;box-sizing:border-box;">
       </div>
+      <div id="ap-track-err" style="color:#ff4757;font-size:0.75rem;display:none;"></div>
     </div>
     <div style="padding:14px 20px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end;">
-      <button onclick="document.getElementById('ap-tracking-overlay').remove()" style="padding:9px 18px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;">CANCEL</button>
-      <button onclick="apSaveTracking(${idx})" style="padding:9px 18px;background:#1e90ff;color:#fff;border:none;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;letter-spacing:1px;">UPDATE TRACKING</button>
+      <button id="ap-track-cancel" style="padding:9px 18px;background:#fff;border:1.5px solid #e0e0e0;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;">CANCEL</button>
+      <button id="ap-track-save" style="padding:9px 18px;background:#1e90ff;color:#fff;border:none;font-size:0.72rem;font-weight:700;cursor:pointer;border-radius:4px;letter-spacing:1px;">UPDATE TRACKING</button>
     </div>
   </div>`;
-  document.getElementById('admin-fullpage')?.appendChild(ov) || document.body.appendChild(ov);
-}
-
-async function apSaveTracking(idx) {
-  const o = apOrders[idx]; if (!o) return;
-  const status = document.getElementById('ap-track-status')?.value;
-  const note = document.getElementById('ap-track-note')?.value || '';
-  const d = await apiFetch('/api/admin/orders/' + o.order_num + '/tracking', { method: 'PUT', body: JSON.stringify({ tracking_status: status, tracking_note: note }) });
-  if (d.error) return showToast('❌ ' + d.error);
-  o.tracking_status = status;
-  o.tracking_note = note;
-  o.tracking_updated = new Date().toISOString();
-  document.getElementById('ap-tracking-overlay')?.remove();
-  apRenderOrders();
-  showToast('📍 Tracking updated!');
+  document.body.appendChild(ov);
+  ov.querySelector('#ap-track-cancel').addEventListener('click', () => ov.remove());
+  ov.querySelector('#ap-track-save').addEventListener('click', async () => {
+    const status = ov.querySelector('#ap-track-status').value;
+    const note = ov.querySelector('#ap-track-note').value || '';
+    const btn = ov.querySelector('#ap-track-save');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    const d = await apiFetch('/api/admin/orders/' + o.order_num + '/tracking', { method: 'PUT', body: JSON.stringify({ tracking_status: status, tracking_note: note }) });
+    if (d.error) {
+      btn.disabled = false;
+      btn.textContent = 'UPDATE TRACKING';
+      ov.querySelector('#ap-track-err').style.display = 'block';
+      ov.querySelector('#ap-track-err').textContent = '❌ ' + d.error;
+      return;
+    }
+    o.tracking_status = status;
+    o.tracking_note = note;
+    o.tracking_updated = new Date().toISOString();
+    ov.remove();
+    apRenderOrders();
+    showToast('📍 Tracking updated!');
+  });
 }
 
 async function apApproveGCash(idx) {
